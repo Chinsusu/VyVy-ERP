@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Package, Users, Warehouse, ArrowRight } from 'lucide-react';
 
 export default function DashboardPage() {
     const navigate = useNavigate();
@@ -40,34 +40,57 @@ export default function DashboardPage() {
             </nav>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="card">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to VyVy ERP!</h2>
-                    <p className="text-gray-600 mb-6">
-                        You are now logged in as <span className="font-semibold">{user?.full_name}</span> ({user?.email}).
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to VyVy ERP!</h2>
+                    <p className="text-gray-600">
+                        You are logged in as <span className="font-semibold">{user?.full_name}</span> ({user?.email}).
                     </p>
+                </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="card bg-primary-50 border border-primary-200">
-                            <h3 className="font-semibold text-primary-900 mb-2">Materials</h3>
-                            <p className="text-sm text-primary-700">Manage raw materials and inventory</p>
+                {/* Module Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Materials Module */}
+                    <Link
+                        to="/materials"
+                        className="card card-hover p-6 group"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                                <Package className="w-6 h-6 text-primary" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
                         </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Materials</h3>
+                        <p className="text-gray-600 text-sm">Manage raw materials and ingredients</p>
+                    </Link>
 
-                        <div className="card bg-success-50 border border-success-200">
-                            <h3 className="font-semibold text-success-900 mb-2">Purchase Orders</h3>
-                            <p className="text-sm text-success-700">Create and track purchase orders</p>
+                    {/* Suppliers Module - Coming Soon */}
+                    <div className="card p-6 opacity-60">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-gray-100 rounded-lg">
+                                <Users className="w-6 h-6 text-gray-500" />
+                            </div>
                         </div>
-
-                        <div className="card bg-info-50 border border-info-200">
-                            <h3 className="font-semibold text-info-900 mb-2">Stock Management</h3>
-                            <p className="text-sm text-info-700">Track stock levels and movements</p>
-                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Suppliers</h3>
+                        <p className="text-gray-600 text-sm">Coming soon...</p>
                     </div>
 
-                    <div className="mt-6 p-4 bg-warning-50 border border-warning-200 rounded-md">
-                        <p className="text-sm text-warning-800">
-                            <strong>Note:</strong> This is Phase 1 of the ERP system. More features will be added in upcoming phases.
-                        </p>
+                    {/* Warehouses Module - Coming Soon */}
+                    <div className="card p-6 opacity-60">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-gray-100 rounded-lg">
+                                <Warehouse className="w-6 h-6 text-gray-500" />
+                            </div>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Warehouses</h3>
+                        <p className="text-gray-600 text-sm">Coming soon...</p>
                     </div>
+                </div>
+
+                <div className="mt-8 p-4 bg-warning-50 border border-warning-200 rounded-md">
+                    <p className="text-sm text-warning-800">
+                        <strong>Note:</strong> This is Phase 2 of the ERP system. More features will be added in upcoming phases.
+                    </p>
                 </div>
             </main>
         </div>
