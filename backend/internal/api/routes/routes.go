@@ -14,37 +14,41 @@ import (
 func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
+	materialRepo := repository.NewMaterialRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
+	materialService := service.NewMaterialService(materialRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
+	materialHandler := handlers.NewMaterialHandler(materialService)
+
+	// Initialize auth middleware
+	authMiddleware := middleware.NewAuthMiddleware(authService)
 
 	// API v1 group
-	api := router.Group("/api/v1")
+	v1 := router.Group("/api/v1")
 
-	// Public routes (no auth required)
-	auth := api.Group("/auth")
+	// Auth routes
+	authGroup := v1.Group("/auth")
 	{
-		auth.POST("/login", authHandler.Login)
-		auth.POST("/refresh", authHandler.RefreshToken)
-		auth.POST("/logout", authHandler.Logout)
+		authGroup.POST("/login", authHandler.Login)
+		authGroup.POST("/logout", authMiddleware.RequireAuth(), authHandler.Logout)
+		authGroup.POST("/refresh", authHandler.RefreshToken)
+		authGroup.GET("/me", authMiddleware.RequireAuth(), authHandler.Me)
 	}
 
-	// Protected routes (auth required)
-	protected := api.Group("")
-	protected.Use(middleware.AuthMiddleware(authService))
+	// Material routes
+	materialGroup := v1.Group("/materials")
 	{
-		// User profile
-		protected.GET("/auth/me", authHandler.Me)
+		// Public endpoints
+		materialGroup.GET("", materialHandler.List)
+		materialGroup.GET("/:id", materialHandler.GetByID)
 
-		// Future protected routes will go here:
-		// - Materials
-		// - Suppliers
-		// - Warehouses
-		// - Purchase Orders
-		// - etc.
+		// Protected endpoints (require authentication)
+		materialGroup.POST("", authMiddleware.RequireAuth(), materialHandler.Create)
+		materialGroup.PUT("/:id", authMiddleware.RequireAuth(), materialHandler.Update)
+		materialGroup.DELETE("/:id", authMiddleware.RequireAuth(), materialHandler.Delete)
 	}
 }
-

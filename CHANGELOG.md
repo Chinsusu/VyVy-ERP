@@ -7,6 +7,35 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [0.3.0] - 2026-02-09
+
+### Added - Phase 2: Materials CRUD Module
+
+#### Backend - Materials API
+- **Material Model** (`internal/models/material.go`) — GORM model with 24 fields matching database schema, SafeMaterial DTO
+- **Material DTOs** (`internal/dto/material_dto.go`) — CreateMaterialRequest, UpdateMaterialRequest, MaterialFilterRequest with validation tags
+- **Material Repository** (`internal/repository/material_repo.go`) — CRUD operations: Create, GetByID, GetByCode, List with filters, Update, Delete (soft), Restore, HardDelete
+- **Material Service** (`internal/service/material_service.go`) — Business logic: code uniqueness validation, CRUD operations with user tracking
+- **Material Handlers** (`internal/api/handlers/material.go`) — HTTP endpoints: List (GET /materials), GetByID (GET /materials/:id), Create (POST), Update (PUT), Delete (DELETE)
+- **Routes Integration** (`internal/api/routes/routes.go`) — Material routes under `/api/v1/materials` with auth middleware for protected endpoints
+
+**API Endpoints:**
+- `GET /api/v1/materials` — List materials with filters (search, type, category, supplier, QC, hazardous, active) and pagination
+- `GET /api/v1/materials/:id` — Get single material
+- `POST /api/v1/materials` — Create material (auth required)
+- `PUT /api/v1/materials/:id` — Update material (auth required)
+- `DELETE /api/v1/materials/:id` — Soft delete material (auth required)
+
+#### Frontend - Materials UI (Started)
+- **Material Types** (`src/types/material.ts`) — TypeScript interfaces: Material, CreateMaterialInput, UpdateMaterialInput, MaterialFilters, MaterialListResponse
+- **Materials API Client** (`src/api/materials.ts`) — Axios methods: getMaterials, getMaterialById, createMaterial, updateMaterial, deleteMaterial
+
+### Infrastructure
+- Backend compiles successfully with Materials module
+- All Material endpoints ready for testing
+
+---
+
 ## [0.2.0] - 2026-02-09
 
 ### Added - Backend Foundation (Phase 1)
