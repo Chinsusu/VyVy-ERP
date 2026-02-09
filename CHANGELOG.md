@@ -11,6 +11,32 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added - Backend Foundation (Phase 1)
 
+#### Frontend Setup (React + Vite + TypeScript)
+- **Project Initialization** — Vite 7.3.1 with React 19 + TypeScript template
+- **Tailwind CSS** — Configured with Vuexy theme colors (primary, secondary, success, danger, warning, info), custom shadows, Inter font
+- **Global Styles** (`src/index.css`) — Reusable component classes: card, btn, input, label, badge variants
+- **API Client** (`src/lib/axios.ts`) — Axios with auth interceptors, automatic token refresh on 401
+- **TypeScript Types** (`src/types/auth.ts`) — User, LoginRequest, LoginResponse, APIResponse interfaces
+- **Zustand Store** (`src/stores/authStore.ts`) — Auth state management with localStorage persistence
+- **Auth API** (`src/api/auth.ts`) — Login, logout, getCurrentUser, refreshToken methods
+- **Login Page** (`src/pages/auth/LoginPage.tsx`) — Form with validation, error handling, loading states, Lucide icons
+- **Dashboard Page** (`src/pages/dashboard/DashboardPage.tsx`) — User info display, logout, placeholder module cards
+- **Protected Route** (`src/components/auth/ProtectedRoute.tsx`) — Authentication guard component
+- **React Router** — BrowserRouter with protected routes setup
+- **React Query** — QueryClient configuration with custom defaults
+- **Environment Config** — `.env` and `.env.example` with API base URL
+- **Docker** — Frontend service enabled in `docker-compose.yml` (port 3000)
+
+#### Dependencies (Frontend)
+- `react` v19.0.0 + `react-dom` v19.0.0
+- `react-router-dom` v7.6.2 — Routing
+- `axios` v1.9.1 — HTTP client
+- `zustand` v5.0.3 — State management
+- `@tanstack/react-query` v6.2.1 — Data fetching
+- `lucide-react` v0.515.0 — Icons
+- `tailwindcss` v4.1.0 — Styling
+- `typescript` v5.7.3
+
 #### Authentication Module
 - **User Model** (`internal/models/user.go`) — User entity with bcrypt password hashing, SafeUser DTO for API responses
 - **JWT Utilities** (`internal/utils/jwt.go`) — Token generation/validation with custom claims (user_id, username, email, role)
