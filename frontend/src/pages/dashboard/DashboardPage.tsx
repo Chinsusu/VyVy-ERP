@@ -64,16 +64,20 @@ export default function DashboardPage() {
                         <p className="text-gray-600 text-sm">Manage raw materials and ingredients</p>
                     </Link>
 
-                    {/* Suppliers Module - Coming Soon */}
-                    <div className="card p-6 opacity-60">
+                    {/* Suppliers Module */}
+                    <Link
+                        to="/suppliers"
+                        className="card card-hover p-6 group"
+                    >
                         <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-gray-100 rounded-lg">
-                                <Users className="w-6 h-6 text-gray-500" />
+                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                                <Users className="w-6 h-6 text-primary" />
                             </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Suppliers</h3>
-                        <p className="text-gray-600 text-sm">Coming soon...</p>
-                    </div>
+                        <p className="text-gray-600 text-sm">Manage suppliers and vendors</p>
+                    </Link>
 
                     {/* Warehouses Module - Coming Soon */}
                     <div className="card p-6 opacity-60">

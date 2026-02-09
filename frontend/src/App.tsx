@@ -6,6 +6,10 @@ import MaterialListPage from './pages/materials/MaterialListPage';
 import MaterialCreatePage from './pages/materials/MaterialCreatePage';
 import MaterialEditPage from './pages/materials/MaterialEditPage';
 import MaterialDetailPage from './pages/materials/MaterialDetailPage';
+import SupplierListPage from './pages/suppliers/SupplierListPage';
+import SupplierCreatePage from './pages/suppliers/SupplierCreatePage';
+import SupplierEditPage from './pages/suppliers/SupplierEditPage';
+import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -33,6 +37,12 @@ function App() {
             <Route path="/materials/new" element={<MaterialCreatePage />} />
             <Route path="/materials/:id" element={<MaterialDetailPage />} />
             <Route path="/materials/:id/edit" element={<MaterialEditPage />} />
+
+            {/* Suppliers Routes */}
+            <Route path="/suppliers" element={<SupplierListPage />} />
+            <Route path="/suppliers/new" element={<SupplierCreatePage />} />
+            <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
+            <Route path="/suppliers/:id/edit" element={<SupplierEditPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
