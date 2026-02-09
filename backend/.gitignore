@@ -1,0 +1,6 @@
+# Backend .gitignore
+.env
+*.log
+tmp/
+dist/
+coverage/
