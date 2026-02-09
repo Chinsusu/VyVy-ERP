@@ -7,6 +7,37 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [0.4.0] - 2026-02-09
+
+### Added - Phase 2: Suppliers Module (In Progress)
+
+#### Backend - Suppliers API (Complete ✅)
+- **Supplier Model** (`internal/models/supplier.go`) — GORM model with 17 fields: code, name, name_en, tax_code, contact_person, phone, email, address, city, country, payment_terms, credit_limit, is_active, notes + audit fields
+- **Supplier DTOs** (`internal/dto/supplier_dto.go`) — CreateSupplierRequest, UpdateSupplierRequest, SupplierFilterRequest with validation tags
+- **Supplier Repository** (`internal/repository/supplier_repo.go`) — CRUD operations: Create, GetByID, GetByCode, List with filters (search, country, city, is_active), Update, Delete (soft)
+- **Supplier Service** (`internal/service/supplier_service.go`) — Business logic: code uniqueness validation, CRUD operations with user tracking (created_by, updated_by)
+- **Supplier Handlers** (`internal/api/handlers/supplier.go`) — HTTP endpoints: List, GetByID, Create, Update, Delete
+- **Routes Integration** (`internal/api/routes/routes.go`) — Supplier routes under `/api/v1/suppliers` with auth middleware for protected endpoints
+
+**API Endpoints:**
+- `GET /api/v1/suppliers` — List suppliers with filters (search, country, city, is_active) and pagination
+- `GET /api/v1/suppliers/:id` — Get single supplier
+- `POST /api/v1/suppliers` — Create supplier (auth required)
+- `PUT /api/v1/suppliers/:id` — Update supplier (auth required)
+- `DELETE /api/v1/suppliers/:id` — Soft delete supplier (auth required)
+
+#### Frontend - Suppliers UI (In Progress 🔄)
+- **Supplier Types** (`src/types/supplier.ts`) — TypeScript interfaces: Supplier, CreateSupplierInput, UpdateSupplierInput, SupplierFilters, SupplierListResponse
+- **Suppliers API Client** (`src/api/suppliers.ts`) — Axios methods: getSuppliers, getSupplierById, createSupplier, updateSupplier, deleteSupplier
+- **React Query Hooks** (`src/hooks/useSuppliers.ts`) — useSuppliers, useSupplier, useCreateSupplier, useUpdateSupplier, useDeleteSupplier with automatic cache invalidation
+
+**Next Steps:**
+- Complete frontend UI components (SupplierForm, SupplierList, SupplierCreate, SupplierEdit, SupplierDetail)
+- Add routes and navigation
+- Update Dashboard
+
+---
+
 ## [0.3.0] - 2026-02-09
 
 ### Added - Phase 2: Materials CRUD Module

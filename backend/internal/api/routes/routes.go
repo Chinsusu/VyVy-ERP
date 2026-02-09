@@ -15,14 +15,17 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
 	materialRepo := repository.NewMaterialRepository(db)
+	supplierRepo := repository.NewSupplierRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
 	materialService := service.NewMaterialService(materialRepo)
+	supplierService := service.NewSupplierService(supplierRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	materialHandler := handlers.NewMaterialHandler(materialService)
+	supplierHandler := handlers.NewSupplierHandler(supplierService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -47,5 +50,18 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		materialGroup.POST("", middleware.AuthMiddleware(authService), materialHandler.Create)
 		materialGroup.PUT("/:id", middleware.AuthMiddleware(authService), materialHandler.Update)
 		materialGroup.DELETE("/:id", middleware.AuthMiddleware(authService), materialHandler.Delete)
+	}
+
+	// Supplier routes
+	supplierGroup := v1.Group("/suppliers")
+	{
+		// Public endpoints
+		supplierGroup.GET("", supplierHandler.List)
+		supplierGroup.GET("/:id", supplierHandler.GetByID)
+
+		// Protected endpoints (require authentication)
+		supplierGroup.POST("", middleware.AuthMiddleware(authService), supplierHandler.Create)
+		supplierGroup.PUT("/:id", middleware.AuthMiddleware(authService), supplierHandler.Update)
+		supplierGroup.DELETE("/:id", middleware.AuthMiddleware(authService), supplierHandler.Delete)
 	}
 }
