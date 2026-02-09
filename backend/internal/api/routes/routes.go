@@ -24,9 +24,6 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	authHandler := handlers.NewAuthHandler(authService)
 	materialHandler := handlers.NewMaterialHandler(materialService)
 
-	// Initialize auth middleware
-	authMiddleware := middleware.NewAuthMiddleware(authService)
-
 	// API v1 group
 	v1 := router.Group("/api/v1")
 
@@ -34,9 +31,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	authGroup := v1.Group("/auth")
 	{
 		authGroup.POST("/login", authHandler.Login)
-		authGroup.POST("/logout", authMiddleware.RequireAuth(), authHandler.Logout)
+		authGroup.POST("/logout", middleware.AuthMiddleware(authService), authHandler.Logout)
 		authGroup.POST("/refresh", authHandler.RefreshToken)
-		authGroup.GET("/me", authMiddleware.RequireAuth(), authHandler.Me)
+		authGroup.GET("/me", middleware.AuthMiddleware(authService), authHandler.Me)
 	}
 
 	// Material routes
@@ -47,8 +44,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		materialGroup.GET("/:id", materialHandler.GetByID)
 
 		// Protected endpoints (require authentication)
-		materialGroup.POST("", authMiddleware.RequireAuth(), materialHandler.Create)
-		materialGroup.PUT("/:id", authMiddleware.RequireAuth(), materialHandler.Update)
-		materialGroup.DELETE("/:id", authMiddleware.RequireAuth(), materialHandler.Delete)
+		materialGroup.POST("", middleware.AuthMiddleware(authService), materialHandler.Create)
+		materialGroup.PUT("/:id", middleware.AuthMiddleware(authService), materialHandler.Update)
+		materialGroup.DELETE("/:id", middleware.AuthMiddleware(authService), materialHandler.Delete)
 	}
 }
