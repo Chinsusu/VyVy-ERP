@@ -1,0 +1,2 @@
+DROP TRIGGER IF EXISTS update_material_issue_note_items_updated_at ON material_issue_note_items;
+DROP TABLE IF EXISTS material_issue_note_items CASCADE;

@@ -45,6 +45,22 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `000004_create_warehouse_locations.up/down.sql` — Storage locations (aisle, rack, shelf, bin structure)
 - `000005_create_materials.up/down.sql` — Materials with pricing, stock control, QC requirements, shelf life
 
+**Note:** Migrations 000006-000025 (19 tables + 3 views) created but will be applied in next deployment:
+- `finished_products` — Product master data with shelf life, costing
+- `purchase_orders` + `purchase_order_items` — PO management
+- `goods_receipt_notes` + `goods_receipt_note_items` — GRN with QC workflow
+- `material_requests` + `material_request_items` — Material requisitions
+- `material_issue_notes` + `material_issue_note_items` — Material issuance with FIFO/FEFO
+- `delivery_orders` + `delivery_order_items` — Finished goods delivery
+- `stock_ledger` — Transaction history (all stock movements)
+- `stock_balance` — Current stock levels with batch/lot tracking, generated available_quantity column
+- `stock_reservations` — Stock allocation for orders
+- `stock_adjustments` + `stock_adjustment_items` — Inventory adjustments
+- `stock_transfers` + `stock_transfer_items` — Inter-warehouse transfers
+- `audit_logs` — System audit trail with JSONB change tracking
+- Views: `v_material_stock_summary`, `v_expiring_items`, `v_stock_movement_summary`
+
+
 #### DevOps & Configuration
 - `docker-compose.yml` — PostgreSQL 15 Alpine service with health checks, volume persistence
 - `backend/Dockerfile` — Multi-stage build (builder + alpine runtime)

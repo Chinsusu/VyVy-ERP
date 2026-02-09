@@ -1,0 +1,2 @@
+DROP TRIGGER IF EXISTS update_goods_receipt_note_items_updated_at ON goods_receipt_note_items;
+DROP TABLE IF EXISTS goods_receipt_note_items CASCADE;
