@@ -26,6 +26,11 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **React Query** — QueryClient configuration with custom defaults
 - **Environment Config** — `.env` and `.env.example` with API base URL
 - **Docker** — Frontend service enabled in `docker-compose.yml` (port 3000)
+- **Build Test** — `npm run build` ✅ Success
+
+> [!NOTE]
+> Frontend dev server has Tailwind v4 `@apply` directive runtime issues. Build completes successfully but dev server CSS compilation needs debugging. Backend API fully functional.
+
 
 #### Dependencies (Frontend)
 - `react` v19.0.0 + `react-dom` v19.0.0
