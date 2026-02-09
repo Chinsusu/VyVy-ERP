@@ -42,13 +42,13 @@ func NewMaterialHandler(service service.MaterialService) *MaterialHandler {
 func (h *MaterialHandler) List(c *gin.Context) {
 	var filter dto.MaterialFilterRequest
 	if err := c.ShouldBindQuery(&filter); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid query parameters", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_QUERY", err.Error()))
 		return
 	}
 
 	materials, total, err := h.service.ListMaterials(filter)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve materials", err.Error())
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("FETCH_ERROR", err.Error()))
 		return
 	}
 
@@ -61,14 +61,18 @@ func (h *MaterialHandler) List(c *gin.Context) {
 		pageSize = 20
 	}
 
-	pagination := utils.PaginationMeta{
-		Total:       total,
-		Page:        page,
-		PageSize:    pageSize,
-		TotalPages:  int((total + int64(pageSize) - 1) / int64(pageSize)),
+	pagination := utils.Pagination{
+		Page:       page,
+		Limit:      pageSize,
+		TotalItems: total,
+		TotalPages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 	}
 
-	utils.SuccessResponseWithPagination(c, materials, pagination)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    materials,
+		"pagination": pagination,
+	})
 }
 
 // GetByID godoc
@@ -85,17 +89,17 @@ func (h *MaterialHandler) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid material ID", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid material ID"))
 		return
 	}
 
 	material, err := h.service.GetMaterialByID(id)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusNotFound, "Material not found", err.Error())
+		c.JSON(http.StatusNotFound, utils.ErrorResponse("NOT_FOUND", err.Error()))
 		return
 	}
 
-	utils.SuccessResponse(c, material)
+	c.JSON(http.StatusOK, utils.SuccessResponse(material))
 }
 
 // Create godoc
@@ -113,27 +117,24 @@ func (h *MaterialHandler) GetByID(c *gin.Context) {
 func (h *MaterialHandler) Create(c *gin.Context) {
 	var req dto.CreateMaterialRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid request body", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
 		return
 	}
 
 	// Get user ID from context (set by auth middleware)
 	userID, exists := c.Get("user_id")
 	if !exists {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "Unauthorized", "User ID not found")
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
 		return
 	}
 
 	material, err := h.service.CreateMaterial(req, userID.(int64))
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Failed to create material", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusCreated, utils.APIResponse{
-		Success: true,
-		Data:    material,
-	})
+	c.JSON(http.StatusCreated, utils.SuccessResponse(material))
 }
 
 // Update godoc
@@ -154,30 +155,30 @@ func (h *MaterialHandler) Update(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid material ID", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid material ID"))
 		return
 	}
 
 	var req dto.UpdateMaterialRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid request body", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
 		return
 	}
 
 	// Get user ID from context (set by auth middleware)
 	userID, exists := c.Get("user_id")
 	if !exists {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "Unauthorized", "User ID not found")
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
 		return
 	}
 
 	material, err := h.service.UpdateMaterial(id, req, userID.(int64))
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Failed to update material", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return
 	}
 
-	utils.SuccessResponse(c, material)
+	c.JSON(http.StatusOK, utils.SuccessResponse(material))
 }
 
 // Delete godoc
@@ -197,14 +198,14 @@ func (h *MaterialHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid material ID", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid material ID"))
 		return
 	}
 
 	if err := h.service.DeleteMaterial(id); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Failed to delete material", err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("DELETE_ERROR", err.Error()))
 		return
 	}
 
-	utils.SuccessResponse(c, gin.H{"message": "Material deleted successfully"})
+	c.JSON(http.StatusOK, utils.SuccessMessageResponse("Material deleted successfully", nil))
 }
