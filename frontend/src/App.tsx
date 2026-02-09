@@ -10,6 +10,10 @@ import SupplierListPage from './pages/suppliers/SupplierListPage';
 import SupplierCreatePage from './pages/suppliers/SupplierCreatePage';
 import SupplierEditPage from './pages/suppliers/SupplierEditPage';
 import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
+import WarehouseListPage from './pages/warehouses/WarehouseListPage';
+import WarehouseCreatePage from './pages/warehouses/WarehouseCreatePage';
+import WarehouseEditPage from './pages/warehouses/WarehouseEditPage';
+import WarehouseDetailPage from './pages/warehouses/WarehouseDetailPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -43,6 +47,12 @@ function App() {
             <Route path="/suppliers/new" element={<SupplierCreatePage />} />
             <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
             <Route path="/suppliers/:id/edit" element={<SupplierEditPage />} />
+
+            {/* Warehouses Routes */}
+            <Route path="/warehouses" element={<WarehouseListPage />} />
+            <Route path="/warehouses/new" element={<WarehouseCreatePage />} />
+            <Route path="/warehouses/:id" element={<WarehouseDetailPage />} />
+            <Route path="/warehouses/:id/edit" element={<WarehouseEditPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
