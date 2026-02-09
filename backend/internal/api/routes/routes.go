@@ -16,16 +16,22 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	userRepo := repository.NewUserRepository(db)
 	materialRepo := repository.NewMaterialRepository(db)
 	supplierRepo := repository.NewSupplierRepository(db)
+	warehouseRepo := repository.NewWarehouseRepository(db)
+	warehouseLocationRepo := repository.NewWarehouseLocationRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
 	materialService := service.NewMaterialService(materialRepo)
 	supplierService := service.NewSupplierService(supplierRepo)
+	warehouseService := service.NewWarehouseService(warehouseRepo, warehouseLocationRepo)
+	warehouseLocationService := service.NewWarehouseLocationService(warehouseLocationRepo, warehouseRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	materialHandler := handlers.NewMaterialHandler(materialService)
 	supplierHandler := handlers.NewSupplierHandler(supplierService)
+	warehouseHandler := handlers.NewWarehouseHandler(warehouseService)
+	warehouseLocationHandler := handlers.NewWarehouseLocationHandler(warehouseLocationService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -63,5 +69,32 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		supplierGroup.POST("", middleware.AuthMiddleware(authService), supplierHandler.Create)
 		supplierGroup.PUT("/:id", middleware.AuthMiddleware(authService), supplierHandler.Update)
 		supplierGroup.DELETE("/:id", middleware.AuthMiddleware(authService), supplierHandler.Delete)
+	}
+
+	// Warehouse routes
+	warehouseGroup := v1.Group("/warehouses")
+	{
+		// Public endpoints
+		warehouseGroup.GET("", warehouseHandler.List)
+		warehouseGroup.GET("/:id", warehouseHandler.GetByID)
+		warehouseGroup.GET("/:id/locations", warehouseHandler.GetLocations)
+
+		// Protected endpoints (require authentication)
+		warehouseGroup.POST("", middleware.AuthMiddleware(authService), warehouseHandler.Create)
+		warehouseGroup.PUT("/:id", middleware.AuthMiddleware(authService), warehouseHandler.Update)
+		warehouseGroup.DELETE("/:id", middleware.AuthMiddleware(authService), warehouseHandler.Delete)
+	}
+
+	// Warehouse Location routes
+	locationGroup := v1.Group("/warehouse-locations")
+	{
+		// Public endpoints
+		locationGroup.GET("", warehouseLocationHandler.List)
+		locationGroup.GET("/:id", warehouseLocationHandler.GetByID)
+
+		// Protected endpoints (require authentication)
+		locationGroup.POST("", middleware.AuthMiddleware(authService), warehouseLocationHandler.Create)
+		locationGroup.PUT("/:id", middleware.AuthMiddleware(authService), warehouseLocationHandler.Update)
+		locationGroup.DELETE("/:id", middleware.AuthMiddleware(authService), warehouseLocationHandler.Delete)
 	}
 }

@@ -7,6 +7,57 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [0.5.0] - 2026-02-09
+
+### Added - Warehouses & Locations Module (Backend Complete ✅)
+
+#### Backend - Warehouses (Complete ✅)
+- **Warehouse Model** (`internal/models/warehouse.go`) — 11 fields with FK to users (manager_id), relationships to locations and manager
+- **Warehouse DTOs** (`internal/dto/warehouse_dto.go`) — CreateWarehouseRequest, UpdateWarehouseRequest, WarehouseFilterRequest with validation
+- **Warehouse Repository** (`internal/repository/warehouse_repo.go`) — CRUD operations + GetLocationsCount method
+- **Warehouse Service** (`internal/service/warehouse_service.go`) — Code uniqueness validation, cascade delete protection (prevents delete if warehouse has locations)
+- **Warehouse Handlers** (`internal/api/handlers/warehouse.go`) — 6 endpoints:
+  - `GET /api/v1/warehouses` — List warehouses (public)
+  - `GET /api/v1/warehouses/:id` — Get warehouse by ID (public)
+  - `GET /api/v1/warehouses/:id/locations` — Get warehouse locations (public)
+  - `POST /api/v1/warehouses` — Create warehouse (auth required)
+  - `PUT /api/v1/warehouses/:id` — Update warehouse (auth required)
+  - `DELETE /api/v1/warehouses/:id` — Delete warehouse (auth required, fails if has locations)
+
+#### Backend - Warehouse Locations (Complete ✅)
+- **WarehouseLocation Model** (`internal/models/warehouse_location.go`) — 13 fields with FK to warehouses (warehouse_id NOT NULL), location hierarchy helper (GetFullLocation method for Aisle-Rack-Shelf-Bin format)
+- **Location DTOs** (`internal/dto/warehouse_location_dto.go`) — CreateWarehouseLocationRequest (warehouse_id required), UpdateWarehouseLocationRequest, WarehouseLocationFilterRequest
+- **Location Repository** (`internal/repository/warehouse_location_repo.go`) — CRUD operations + ListByWarehouseID method + Warehouse preloading
+- **Location Service** (`internal/service/warehouse_location_service.go`) — Warehouse existence validation, code uniqueness validation, user tracking
+- **Location Handlers** (`internal/api/handlers/warehouse_location.go`) — 5 endpoints:
+  - `GET /api/v1/warehouse-locations` — List locations (public)
+  - `GET /api/v1/warehouse-locations/:id` — Get location by ID (public)
+  - `POST /api/v1/warehouse-locations` — Create location (auth required)
+  - `PUT /api/v1/warehouse-locations/:id` — Update location (auth required)
+  - `DELETE /api/v1/warehouse-locations/:id` — Delete location (auth required)
+
+#### Routes Integration
+- **Routes** (`internal/api/routes/routes.go`) — Integrated warehouse and location repositories, services, handlers, and routes under `/api/v1/warehouses` and `/api/v1/warehouse-locations`
+
+**Backend Features:**
+- ✅ Parent-child relationship (Warehouse ← Locations via warehouse_id FK)
+- ✅ Manager assignment (FK to users table via manager_id)
+- ✅ Cascade delete protection (cannot delete warehouse with existing locations)
+- ✅ Code uniqueness validation (both entities)
+- ✅ Location hierarchy (aisle, rack, shelf, bin) with formatted display
+- ✅ Warehouse types (main, satellite, etc.)
+- ✅ Location types (storage, picking, receiving, staging)
+- ✅ Locations count in warehouse responses
+- ✅ Search & filters for both entities
+- ✅ Pagination & sorting
+- ✅ User tracking (created_by, updated_by)
+
+**Next Steps:**
+- Frontend implementation (types, API clients, hooks, UI pages)
+- Nested location management in Warehouse Detail page
+
+---
+
 ## [0.4.0] - 2026-02-09
 
 ### Added - Phase 2: Suppliers Module (In Progress)
