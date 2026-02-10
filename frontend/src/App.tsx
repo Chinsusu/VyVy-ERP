@@ -14,6 +14,10 @@ import WarehouseListPage from './pages/warehouses/WarehouseListPage';
 import WarehouseCreatePage from './pages/warehouses/WarehouseCreatePage';
 import WarehouseEditPage from './pages/warehouses/WarehouseEditPage';
 import WarehouseDetailPage from './pages/warehouses/WarehouseDetailPage';
+import FinishedProductListPage from './pages/finished-products/FinishedProductListPage';
+import FinishedProductCreatePage from './pages/finished-products/FinishedProductCreatePage';
+import FinishedProductEditPage from './pages/finished-products/FinishedProductEditPage';
+import FinishedProductDetailPage from './pages/finished-products/FinishedProductDetailPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -53,6 +57,12 @@ function App() {
             <Route path="/warehouses/new" element={<WarehouseCreatePage />} />
             <Route path="/warehouses/:id" element={<WarehouseDetailPage />} />
             <Route path="/warehouses/:id/edit" element={<WarehouseEditPage />} />
+
+            {/* Finished Products Routes */}
+            <Route path="/finished-products" element={<FinishedProductListPage />} />
+            <Route path="/finished-products/new" element={<FinishedProductCreatePage />} />
+            <Route path="/finished-products/:id" element={<FinishedProductDetailPage />} />
+            <Route path="/finished-products/:id/edit" element={<FinishedProductEditPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

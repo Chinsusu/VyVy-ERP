@@ -93,6 +93,21 @@ export default function DashboardPage() {
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Warehouses</h3>
                         <p className="text-gray-600 text-sm">Manage warehouse facilities and locations</p>
                     </Link>
+
+                    {/* Finished Products Module */}
+                    <Link
+                        to="/finished-products"
+                        className="card card-hover p-6 group"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                                <Package className="w-6 h-6 text-primary" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Finished Products</h3>
+                        <p className="text-gray-600 text-sm">Manage finished products and inventory</p>
+                    </Link>
                 </div>
 
                 <div className="mt-8 p-4 bg-warning-50 border border-warning-200 rounded-md">
