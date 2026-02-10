@@ -82,7 +82,7 @@ Bạn có **10 files tài liệu** đầy đủ:
    - Performance optimization
    - Deployment checklist
 
-### 8. **08_ARCHITECTURE_DESIGN.md** ⭐ NEW
+### 8. **08_ARCHITECTURE_DESIGN.md**
    - Clean Architecture (Hexagonal Architecture)
    - Layered Architecture chi tiết (Presentation, Application, Domain, Infrastructure)
    - Design Patterns (Repository, Service, Factory, Strategy, Unit of Work, Observer)
@@ -94,7 +94,7 @@ Bạn có **10 files tài liệu** đầy đủ:
    - Scalability Considerations
    - Testing Strategy
 
-### 9. **09_CODING_STANDARDS.md** ⭐ NEW
+### 9. **09_CODING_STANDARDS.md**
    - Go Coding Standards (Naming, Code Organization, Error Handling, Testing)
    - React/TypeScript Standards (Component Structure, Hooks, Type Definitions)
    - React Patterns (Context, Memoization, Performance)
@@ -103,7 +103,7 @@ Bạn có **10 files tài liệu** đầy đủ:
    - Code Review Checklist
    - Linting & Formatting (ESLint, Prettier, golangci-lint)
 
-### 10. **10_TECH_STACK_DECISIONS.md** ⭐ NEW
+### 10. **10_TECH_STACK_DECISIONS.md**
    - Backend Stack: Go + Gin + PostgreSQL + GORM/sqlc + JWT + Zap
    - Frontend Stack: React 18 + Vite + TypeScript + Tailwind + Zustand + React Query
    - Lý do chọn từng tech (Pros/Cons)
@@ -168,33 +168,33 @@ npm install
 npm run dev
 
 # Docker
-docker-compose up -d
+# docker-compose up -d
 ```
 
 ---
 
-## 🎯 Roadmap Triển Khai
+## 🎯 Roadmap Triển Khai (Thực Tế)
 
-### Phase 1-2: Foundation & Master Data (4-6 tuần)
-- ✅ Database setup
-- ✅ Authentication
-- ✅ Materials, Suppliers, Warehouses CRUD
+### Phase 1-2: Foundation & Master Data (Sơ đồ cơ bản)
+- [x] Database setup
+- [x] Authentication
+- [x] Materials, Suppliers, Warehouses CRUD
+- [x] Finished Products CRUD
 
-### Phase 3-4: Purchase & Production Flow (4-6 tuần)
-- ✅ Purchase Order workflow
-- ✅ GRN + QC workflow
-- ✅ Material Request + Issue workflow
+### Phase 3-4: Purchase & Production Flow
+- [x] Purchase Order workflow
+- [x] GRN + QC workflow
+- [x] Material Request workflow
+- [ ] Material Issue Note (MIN) workflow (Next)
 
-### Phase 5-6: Sales & Inventory (4-6 tuần)
-- ✅ Delivery Order workflow
-- ✅ Stock management (Balance, Ledger, Adjustment, Transfer)
+### Phase 5-6: Sales & Inventory (Tiếp theo)
+- [ ] Delivery Order workflow
+- [ ] Stock management (Balance, Ledger, Adjustment, Transfer)
 
-### Phase 7-9: Reports, Testing & Go-live (3-4 tuần)
-- ✅ Dashboard & Reports
-- ✅ UAT & Testing
-- ✅ Deployment
-
-**Total: ~16 tuần (4 tháng)**
+### Phase 7-9: Reports, Testing & Go-live
+- [ ] Dashboard & Reports
+- [ ] UAT & Testing
+- [ ] Deployment
 
 ---
 
@@ -204,51 +204,20 @@ docker-compose up -d
 - **Language:** Go 1.21+
 - **Framework:** Gin
 - **Database:** PostgreSQL 15+
-- **ORM:** GORM hoặc sqlc
+- **ORM:** GORM
 - **Auth:** JWT
 - **Migration:** golang-migrate
 
 ### Frontend
-- **Framework:** React 18 + TypeScript
+- **Framework:** React 19 + TypeScript
 - **Build Tool:** Vite
-- **Styling:** Tailwind CSS (Vuexy palette)
+- **Styling:** Tailwind CSS (Standard CSS Transcription for v4 compatibility)
 - **State:** Zustand + React Query
 - **Forms:** React Hook Form + Zod
-- **Tables:** TanStack Table
-- **Charts:** Recharts
-
-### DevOps
-- Docker + Docker Compose
-- GitHub Actions (CI/CD)
-- PostgreSQL container
 
 ---
 
-## 📊 Database Overview
-
-**24 Tables:**
-- **Master Data:** materials, finished_products, warehouses, warehouse_locations, suppliers
-- **Purchase:** purchase_orders, purchase_order_items, goods_receipt_notes, grn_items
-- **Production:** material_requests, mr_items, material_issue_notes, min_items
-- **Sales:** delivery_orders, do_items
-- **Inventory:** stock_ledger, stock_balance, stock_reservations
-- **Adjustments:** stock_adjustments, stock_adjustment_items, stock_transfers, stock_transfer_items
-- **System:** users, audit_logs
-
----
-
-## 🎨 UI/UX Highlights
-
-- **Color Scheme:** Vuexy template (Purple #7367F0 primary)
-- **Layout:** Sidebar + Header + Content
-- **Components:** Custom components với Tailwind
-- **Responsive:** Mobile, Tablet, Desktop
-- **Accessibility:** WCAG 2.1 Level AA
-- **Charts:** Dashboard với Recharts
-
----
-
-## ✅ Features Checklist
+## ✅ Features Checklist (Thực Tế)
 
 ### Master Data
 - [x] Materials CRUD
@@ -257,75 +226,50 @@ docker-compose up -d
 - [x] Warehouses + Locations CRUD
 
 ### Purchase Flow
-- [x] Create PO → Approve → Send
+- [x] Create PO → Approve
 - [x] Receive goods (GRN)
 - [x] QC Approve/Reject
 - [x] Post GRN → Update stock
 
 ### Production Flow
 - [x] Material Request → Approve
-- [x] Picking list (FIFO/FEFO)
-- [x] Issue materials (MIN)
-- [x] Post MIN → Decrease stock
+- [ ] Picking list (FIFO/FEFO)
+- [ ] Issue materials (MIN)
+- [ ] Post MIN → Decrease stock
 
 ### Sales Flow
-- [x] Delivery Order → Pick → Pack → Ship
-- [x] Post DO → Decrease stock
+- [ ] Delivery Order → Pick → Pack → Ship
+- [ ] Post DO → Decrease stock
 
 ### Inventory
-- [x] Stock Balance view (by warehouse, batch)
-- [x] Stock Ledger (transaction history)
-- [x] Stock Adjustment (kiểm kê)
-- [x] Stock Transfer (chuyển kho)
-- [x] Batch Tracking & Traceability
+- [ ] Stock Balance view (by warehouse, batch)
+- [ ] Stock Ledger (transaction history)
+- [ ] Stock Adjustment (kiểm kê)
+- [ ] Stock Transfer (chuyển kho)
+- [x] Batch Tracking & Traceability (Schema Ready)
 
 ### Alerts
-- [x] Low Stock Alert
-- [x] Expiring Items Alert (30/60/90 days)
-- [x] QC Pending Alert
+- [ ] Low Stock Alert
+- [ ] Expiring Items Alert (30/60/90 days)
+- [ ] QC Pending Alert
 
 ### Reports
-- [x] Stock Movement Report (XNT)
-- [x] Inventory Value Report
-- [x] Low Stock Report
-- [x] Dashboard Stats
+- [ ] Stock Movement Report (XNT)
+- [ ] Inventory Value Report
+- [ ] Low Stock Report
+- [ ] Dashboard Stats
 
 ---
 
 ## 🔐 Security
-
-- JWT authentication
-- Role-based access control (RBAC)
-- Input validation (backend + frontend)
-- SQL injection prevention (parameterized queries)
-- XSS prevention
-- CORS configuration
-- Rate limiting
-- Audit logging
+- [x] JWT authentication
+- [x] Role-based access control (RBAC)
+- [x] Input validation (backend + frontend)
+- [x] SQL injection prevention
+- [x] CORS configuration
 
 ---
 
-## 📞 Support
-
-Nếu cần hỗ trợ khi implement:
-1. Đọc kỹ tài liệu reference (files 01-05)
-2. Kiểm tra prompts trong file 06
-3. Tham khảo folder structure trong file 07
-
----
-
-## 📝 Notes
-
-- Tất cả workflows đã được design chi tiết
-- Database schema optimized với indexes
-- API documentation đầy đủ request/response
-- UI design theo chuẩn Vuexy (professional)
-- Prompts được viết rõ ràng cho AI coding assistant
-
-**Good luck với implementation! 🚀**
-
----
-
-**Version:** 1.0  
-**Last Updated:** 2025-02-09  
-**Author:** DenDa Team
+**Version:** 0.8.0
+**Last Updated:** 2026-02-10
+**Author:** VyVy ERP Team (Merged with AI Assistant)
