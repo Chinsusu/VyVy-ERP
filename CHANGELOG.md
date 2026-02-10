@@ -7,6 +7,58 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [0.6.0] - 2026-02-10
+
+### Added - Finished Products Module (Complete ✅)
+
+#### Backend - Finished Products (Complete ✅)
+- **Finished Product Model** (`internal/models/finished_product.go`) — 22 comprehensive fields:
+  - Basic: code, name, name_en, category, sub_category, unit, barcode
+  - Specifications: net_weight, gross_weight, volume
+  - Stock Management: min_stock_level, max_stock_level, reorder_point, shelf_life_days, storage_conditions
+  - Pricing: standard_cost, selling_price
+  - Status: is_active, notes
+  - Audit: created_at, updated_at, created_by, updated_by
+- **Finished Product DTOs** (`internal/dto/finished_product_dto.go`) — CreateFinishedProductRequest, UpdateFinishedProductRequest, FinishedProductFilterRequest with comprehensive validation
+- **Finished Product Repository** (`internal/repository/finished_product_repo.go`) — CRUD operations + search (code, name, barcode) + filters (category, sub_category, is_active)
+- **Finished Product Service** (`internal/service/finished_product_service.go`) — Code uniqueness validation, default values, user tracking
+- **Finished Product Handlers** (`internal/api/handlers/finished_product.go`) — 5 endpoints:
+  - `GET /api/v1/finished-products` — List products with filters (public)
+  - `GET /api/v1/finished-products/:id` — Get product by ID (public)
+  - `POST /api/v1/finished-products` — Create product (auth required)
+  - `PUT /api/v1/finished-products/:id` — Update product (auth required)
+  - `DELETE /api/v1/finished-products/:id` — Delete product (auth required)
+- **Routes Integration** (`internal/api/routes/routes.go`) — Added finished products routes under `/api/v1/finished-products`
+
+#### Frontend - Finished Products (Complete ✅)
+- **Types** (`src/types/finishedProduct.ts`) — FinishedProduct, CreateFinishedProductInput, UpdateFinishedProductInput, FinishedProductFilters interfaces
+- **API Client** (`src/api/finishedProducts.ts`) — 5 methods (getFinishedProducts, getFinishedProductById, createFinishedProduct, updateFinishedProduct, deleteFinishedProduct)
+- **React Query Hooks** (`src/hooks/useFinishedProducts.ts`) — useFinishedProducts, useFinishedProduct, useCreateFinishedProduct, useUpdateFinishedProduct, useDeleteFinishedProduct with cache invalidation
+- **FinishedProductListPage** (`src/pages/finished-products/FinishedProductListPage.tsx`) — Table with search by code/name/barcode, pagination
+- **FinishedProductForm** (`src/components/finished-products/FinishedProductForm.tsx`) — Comprehensive 22-field form organized in 5 sections:
+  1. Basic Information (code*, name*, name_en, category, sub_category, unit*, barcode)
+  2. Specifications (net_weight, gross_weight, volume)
+  3. Stock Management (min/max stock levels, reorder point, shelf life, storage conditions)
+  4. Pricing (standard cost, selling price)
+  5. Additional Information (notes, active status)
+- **FinishedProductCreatePage** (`src/pages/finished-products/FinishedProductCreatePage.tsx`) — Wrapper for form creation
+- **FinishedProductEditPage** (`src/pages/finished-products/FinishedProductEditPage.tsx`) — Loads and edits existing product
+- **FinishedProductDetailPage** (`src/pages/finished-products/FinishedProductDetailPage.tsx`) — Display product with 5 information sections + delete confirmation
+- **Routes Integration** (`src/App.tsx`) — 4 routes: /finished-products, /finished-products/new, /finished-products/:id, /finished-products/:id/edit
+- **Dashboard Update** (`src/pages/dashboard/DashboardPage.tsx`) — Added active Finished Products card
+
+**Features:**
+- 22 comprehensive product fields covering specifications, pricing, and stock management
+- Code uniqueness validation
+- Search by code, name, or barcode
+- Filter by category, sub-category, and status
+- Pagination and sorting
+- User audit tracking
+- Form validation (code, name, unit required)
+- Responsive design with Tailwind CSS
+
+---
+
 ## [0.5.0] - 2026-02-09
 
 ### Added - Warehouses & Locations Module (Backend Complete ✅)
