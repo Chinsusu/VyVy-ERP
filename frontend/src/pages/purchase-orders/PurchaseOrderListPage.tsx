@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search } from 'lucide-react';
 import { usePurchaseOrders } from '../../hooks/usePurchaseOrders';
-import type { PurchaseOrderFilters } from '../../types/purchaseOrder';
+import type { PurchaseOrder, PurchaseOrderFilters } from '../../types/purchaseOrder';
 
 export default function PurchaseOrderListPage() {
     const [filters, setFilters] = useState<PurchaseOrderFilters>({
@@ -139,7 +139,7 @@ export default function PurchaseOrderListPage() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {purchaseOrders.map((po) => (
+                                        {purchaseOrders.map((po: PurchaseOrder) => (
                                             <tr key={po.id}>
                                                 <td className="font-medium">{po.po_number}</td>
                                                 <td>{po.supplier?.name || '-'}</td>

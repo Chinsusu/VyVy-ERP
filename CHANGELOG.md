@@ -7,6 +7,19 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [0.9.0] - 2026-02-10
+
+### Added
+- **Material Issue Notes (MIN) Module (Phase 4)**:
+    - Backend: `MaterialIssueNote` and `MaterialIssueNoteItem` models.
+    - Backend: `MaterialIssueNoteService` with stock reduction and MR synchronization logic.
+    - Backend: `StockService` with `/inventory/balance` endpoint for intelligent picking.
+    - Backend: REST endpoints for MIN lifecycle (Draft, Post, Cancel).
+    - Frontend: TypeScript types and API client for MIN.
+    - Frontend: `MINListPage`, `MINDetailPage`, and `MINCreatePage`.
+    - Frontend: `MINForm` with automated stock picking logic from specific batches/locations.
+    - Frontend: Comprehensive validation and workflow integration.
+
 ## [0.8.0] - 2026-02-10
 
 ### Added

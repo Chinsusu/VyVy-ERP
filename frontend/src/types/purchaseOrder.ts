@@ -1,6 +1,6 @@
-import { Supplier } from './supplier';
-import { Warehouse } from './warehouse';
-import { Material } from './material';
+import type { Supplier } from './supplier';
+import type { Warehouse } from './warehouse';
+import type { Material } from './material';
 
 export interface PurchaseOrder {
     id: number;

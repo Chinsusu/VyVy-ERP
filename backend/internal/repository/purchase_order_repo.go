@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"VyVy-ERP/internal/dto"
-	"VyVy-ERP/internal/models"
+	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
+	"github.com/VyVy-ERP/warehouse-backend/internal/models"
 	"time"
 
 	"gorm.io/gorm"

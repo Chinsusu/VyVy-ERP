@@ -13,7 +13,7 @@ import (
 type MaterialService interface {
 	CreateMaterial(req dto.CreateMaterialRequest, userID int64) (*models.SafeMaterial, error)
 	GetMaterialByID(id int64) (*models.SafeMaterial, error)
-	ListMaterials(filter dto.MaterialFilterRequest) ([]models.SafeMaterial, int64, error)
+	ListMaterials(filter dto.MaterialFilterRequest) ([]*models.SafeMaterial, int64, error)
 	UpdateMaterial(id int64, req dto.UpdateMaterialRequest, userID int64) (*models.SafeMaterial, error)
 	DeleteMaterial(id int64) error
 }
@@ -69,8 +69,7 @@ func (s *materialService) CreateMaterial(req dto.CreateMaterialRequest, userID i
 		return nil, err
 	}
 
-	safe := material.ToSafe()
-	return &safe, nil
+	return material.ToSafe(), nil
 }
 
 // GetMaterialByID retrieves a material by ID
@@ -83,18 +82,16 @@ func (s *materialService) GetMaterialByID(id int64) (*models.SafeMaterial, error
 		return nil, err
 	}
 
-	safe := material.ToSafe()
-	return &safe, nil
+	return material.ToSafe(), nil
 }
 
-// ListMaterials retrieves materials with filters
-func (s *materialService) ListMaterials(filter dto.MaterialFilterRequest) ([]models.SafeMaterial, int64, error) {
+func (s *materialService) ListMaterials(filter dto.MaterialFilterRequest) ([]*models.SafeMaterial, int64, error) {
 	materials, total, err := s.repo.List(filter)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	safeMaterials := make([]models.SafeMaterial, len(materials))
+	safeMaterials := make([]*models.SafeMaterial, len(materials))
 	for i, material := range materials {
 		safeMaterials[i] = material.ToSafe()
 	}
@@ -177,8 +174,7 @@ func (s *materialService) UpdateMaterial(id int64, req dto.UpdateMaterialRequest
 		return nil, err
 	}
 
-	safe := material.ToSafe()
-	return &safe, nil
+	return material.ToSafe(), nil
 }
 
 // DeleteMaterial soft deletes a material

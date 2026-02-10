@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"VyVy-ERP/internal/models"
+	"github.com/VyVy-ERP/warehouse-backend/internal/models"
 
 	"gorm.io/gorm"
 )

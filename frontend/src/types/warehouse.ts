@@ -16,6 +16,7 @@ export interface Warehouse {
         full_name: string;
         email: string;
     };
+    locations?: import('./warehouseLocation').WarehouseLocation[];
 }
 
 export interface CreateWarehouseInput {

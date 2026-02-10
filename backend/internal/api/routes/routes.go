@@ -21,6 +21,13 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	finishedProductRepo := repository.NewFinishedProductRepository(db)
 	purchaseOrderRepo := repository.NewPurchaseOrderRepository(db)
 	purchaseOrderItemRepo := repository.NewPurchaseOrderItemRepository(db)
+	grnRepo := repository.NewGoodsReceiptNoteRepository(db)
+	grnItemRepo := repository.NewGoodsReceiptNoteItemRepository(db)
+	mrRepo := repository.NewMaterialRequestRepository(db)
+	mrItemRepo := repository.NewMaterialRequestItemRepository(db)
+	stockLedgerRepo := repository.NewStockLedgerRepository(db)
+	stockBalanceRepo := repository.NewStockBalanceRepository(db)
+	minRepo := repository.NewMaterialIssueNoteRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -30,6 +37,10 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseLocationService := service.NewWarehouseLocationService(warehouseLocationRepo, warehouseRepo)
 	finishedProductService := service.NewFinishedProductService(finishedProductRepo)
 	purchaseOrderService := service.NewPurchaseOrderService(purchaseOrderRepo, purchaseOrderItemRepo, supplierRepo, warehouseRepo)
+	grnService := service.NewGRNService(db, grnRepo, grnItemRepo, purchaseOrderRepo, purchaseOrderItemRepo, warehouseRepo, stockLedgerRepo, stockBalanceRepo)
+	mrService := service.NewMaterialRequestService(mrRepo, mrItemRepo, warehouseRepo, materialRepo)
+	minService := service.NewMaterialIssueNoteService(minRepo, mrRepo, materialRepo, db)
+	stockService := service.NewStockService(stockBalanceRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -39,6 +50,10 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseLocationHandler := handlers.NewWarehouseLocationHandler(warehouseLocationService)
 	finishedProductHandler := handlers.NewFinishedProductHandler(finishedProductService)
 	purchaseOrderHandler := handlers.NewPurchaseOrderHandler(purchaseOrderService)
+	grnHandler := handlers.NewGRNHandler(grnService)
+	mrHandler := handlers.NewMaterialRequestHandler(mrService)
+	minHandler := handlers.NewMaterialIssueNoteHandler(minService)
+	stockHandler := handlers.NewStockHandler(stockService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -135,5 +150,52 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		poGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), purchaseOrderHandler.Cancel)
 	}
 
-	return router
+	// Stock / Inventory routes
+	inventoryGroup := v1.Group("/inventory")
+	{
+		inventoryGroup.GET("/balance", stockHandler.GetBalance)
+	}
+
+	// Goods Receipt Note (GRN) routes
+	grnGroup := v1.Group("/grns")
+	{
+		// Public endpoints
+		grnGroup.GET("", grnHandler.List)
+		grnGroup.GET("/:id", grnHandler.GetByID)
+
+		// Protected endpoints (require authentication)
+		grnGroup.POST("", middleware.AuthMiddleware(authService), grnHandler.Create)
+		grnGroup.POST("/:id/qc", middleware.AuthMiddleware(authService), grnHandler.UpdateQC)
+		grnGroup.POST("/:id/post", middleware.AuthMiddleware(authService), grnHandler.Post)
+	}
+
+	// Material Request (MR) routes
+	mrGroup := v1.Group("/material-requests")
+	{
+		// Public endpoints
+		mrGroup.GET("", mrHandler.List)
+		mrGroup.GET("/:id", mrHandler.GetByID)
+
+		// Protected endpoints (require authentication)
+		mrGroup.POST("", middleware.AuthMiddleware(authService), mrHandler.Create)
+		mrGroup.PUT("/:id", middleware.AuthMiddleware(authService), mrHandler.Update)
+		mrGroup.DELETE("/:id", middleware.AuthMiddleware(authService), mrHandler.Delete)
+
+		// Workflow endpoints
+		mrGroup.POST("/:id/approve", middleware.AuthMiddleware(authService), mrHandler.Approve)
+		mrGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), mrHandler.Cancel)
+	}
+
+	// Material Issue Note (MIN) routes
+	minGroup := v1.Group("/material-issue-notes")
+	{
+		// Public endpoints
+		minGroup.GET("", minHandler.List)
+		minGroup.GET("/:id", minHandler.GetByID)
+
+		// Protected endpoints (require authentication)
+		minGroup.POST("", middleware.AuthMiddleware(authService), minHandler.Create)
+		minGroup.POST("/:id/post", middleware.AuthMiddleware(authService), minHandler.Post)
+		minGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), minHandler.Cancel)
+	}
 }

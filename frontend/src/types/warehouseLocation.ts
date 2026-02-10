@@ -12,6 +12,7 @@ export interface WarehouseLocation {
     notes?: string;
     created_at: string;
     updated_at: string;
+    full_path?: string; // Virtual property from backend or helper
     warehouse?: {
         id: number;
         code: string;

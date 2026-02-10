@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"VyVy-ERP/internal/dto"
-	"VyVy-ERP/internal/service"
-	"VyVy-ERP/pkg/utils"
+	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
+	"github.com/VyVy-ERP/warehouse-backend/internal/service"
+	"github.com/VyVy-ERP/warehouse-backend/internal/utils"
 	"net/http"
 	"strconv"
 
@@ -24,35 +24,23 @@ func NewPurchaseOrderHandler(service service.PurchaseOrderService) *PurchaseOrde
 func (h *PurchaseOrderHandler) List(c *gin.Context) {
 	var filter dto.PurchaseOrderFilterRequest
 	if err := c.ShouldBindQuery(&filter); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid filter parameters")
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_QUERY", err.Error()))
 		return
 	}
 
 	pos, total, err := h.service.ListPurchaseOrders(&filter)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("FETCH_ERROR", err.Error()))
 		return
 	}
 
-	// Calculate pagination
-	page := 1
-	if filter.Page > 0 {
-		page = filter.Page
-	}
-	pageSize := 10
-	if filter.PageSize > 0 {
-		pageSize = filter.PageSize
-	}
-	totalPages := int((total + int64(pageSize) - 1) / int64(pageSize))
+	pagination := utils.CalculatePagination(filter.Page, filter.PageSize, total)
 
-	pagination := utils.Pagination{
-		Page:       page,
-		PageSize:   pageSize,
-		Total:      int(total),
-		TotalPages: totalPages,
-	}
-
-	utils.SuccessResponseWithPagination(c, pos, pagination)
+	c.JSON(http.StatusOK, gin.H{
+		"success":    true,
+		"data":       pos,
+		"pagination": pagination,
+	})
 }
 
 // GetByID retrieves a purchase order by ID
@@ -60,54 +48,42 @@ func (h *PurchaseOrderHandler) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid purchase order ID")
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
 		return
 	}
 
 	po, err := h.service.GetPurchaseOrderByID(uint(id))
 	if err != nil {
-		if err.Error() == "purchase order not found" {
-			utils.ErrorResponse(c, http.StatusNotFound, err.Error())
-			return
-		}
-		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusNotFound, utils.ErrorResponse("NOT_FOUND", err.Error()))
 		return
 	}
 
-	utils.SuccessResponse(c, po)
+	c.JSON(http.StatusOK, utils.SuccessResponse(po))
 }
 
 // Create creates a new purchase order with items
 func (h *PurchaseOrderHandler) Create(c *gin.Context) {
 	var req dto.CreatePurchaseOrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
 		return
 	}
 
 	// Get user ID from context
-	userID, exists := c.Get("userID")
+	val, exists := c.Get("user_id")
 	if !exists {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated")
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
 		return
 	}
+	userID := val.(int64)
 
-	po, err := h.service.CreatePurchaseOrder(&req, userID.(uint))
+	po, err := h.service.CreatePurchaseOrder(&req, uint(userID))
 	if err != nil {
-		if err.Error() == "purchase order number already exists" ||
-			err.Error() == "supplier not found" ||
-			err.Error() == "warehouse not found" {
-			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"success": true,
-		"data":    po,
-	})
+	c.JSON(http.StatusCreated, utils.SuccessResponse(po))
 }
 
 // Update updates a purchase order (only if status is draft)
@@ -115,41 +91,31 @@ func (h *PurchaseOrderHandler) Update(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid purchase order ID")
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
 		return
 	}
 
 	var req dto.UpdatePurchaseOrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
 		return
 	}
 
 	// Get user ID from context
-	userID, exists := c.Get("userID")
+	val, exists := c.Get("user_id")
 	if !exists {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated")
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
 		return
 	}
+	userID := val.(int64)
 
-	po, err := h.service.UpdatePurchaseOrder(uint(id), &req, userID.(uint))
+	po, err := h.service.UpdatePurchaseOrder(uint(id), &req, uint(userID))
 	if err != nil {
-		if err.Error() == "purchase order not found" {
-			utils.ErrorResponse(c, http.StatusNotFound, err.Error())
-			return
-		}
-		if err.Error() == "can only update purchase orders in draft status" ||
-			err.Error() == "purchase order number already exists" ||
-			err.Error() == "supplier not found" ||
-			err.Error() == "warehouse not found" {
-			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return
 	}
 
-	utils.SuccessResponse(c, po)
+	c.JSON(http.StatusOK, utils.SuccessResponse(po))
 }
 
 // Delete deletes a purchase order (only if status is draft)
@@ -157,28 +123,17 @@ func (h *PurchaseOrderHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid purchase order ID")
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
 		return
 	}
 
 	err = h.service.DeletePurchaseOrder(uint(id))
 	if err != nil {
-		if err.Error() == "purchase order not found" {
-			utils.ErrorResponse(c, http.StatusNotFound, err.Error())
-			return
-		}
-		if err.Error() == "can only delete purchase orders in draft status" {
-			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("DELETE_ERROR", err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "Purchase order deleted successfully",
-	})
+	c.JSON(http.StatusOK, utils.SuccessMessageResponse("Purchase order deleted successfully", nil))
 }
 
 // Approve approves a purchase order (draft → approved)
@@ -186,32 +141,25 @@ func (h *PurchaseOrderHandler) Approve(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid purchase order ID")
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
 		return
 	}
 
 	// Get user ID from context
-	userID, exists := c.Get("userID")
+	val, exists := c.Get("user_id")
 	if !exists {
-		utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated")
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
 		return
 	}
+	userID := val.(int64)
 
-	po, err := h.service.ApprovePurchaseOrder(uint(id), userID.(uint))
+	po, err := h.service.ApprovePurchaseOrder(uint(id), uint(userID))
 	if err != nil {
-		if err.Error() == "purchase order not found" {
-			utils.ErrorResponse(c, http.StatusNotFound, err.Error())
-			return
-		}
-		if err.Error() == "can only approve purchase orders in draft status" {
-			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("APPROVE_ERROR", err.Error()))
 		return
 	}
 
-	utils.SuccessResponse(c, po)
+	c.JSON(http.StatusOK, utils.SuccessResponse(po))
 }
 
 // Cancel cancels a purchase order
@@ -219,23 +167,15 @@ func (h *PurchaseOrderHandler) Cancel(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid purchase order ID")
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
 		return
 	}
 
 	po, err := h.service.CancelPurchaseOrder(uint(id))
 	if err != nil {
-		if err.Error() == "purchase order not found" {
-			utils.ErrorResponse(c, http.StatusNotFound, err.Error())
-			return
-		}
-		if err.Error() == "purchase order is already cancelled" {
-			utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CANCEL_ERROR", err.Error()))
 		return
 	}
 
-	utils.SuccessResponse(c, po)
+	c.JSON(http.StatusOK, utils.SuccessResponse(po))
 }

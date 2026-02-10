@@ -3,9 +3,9 @@ package service
 import (
 	"errors"
 
-	"erp-warehouse/internal/dto"
-	"erp-warehouse/internal/models"
-	"erp-warehouse/internal/repository"
+	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
+	"github.com/VyVy-ERP/warehouse-backend/internal/models"
+	"github.com/VyVy-ERP/warehouse-backend/internal/repository"
 
 	"gorm.io/gorm"
 )

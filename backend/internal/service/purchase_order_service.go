@@ -1,9 +1,9 @@
 package service
 
 import (
-	"VyVy-ERP/internal/dto"
-	"VyVy-ERP/internal/models"
-	"VyVy-ERP/internal/repository"
+	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
+	"github.com/VyVy-ERP/warehouse-backend/internal/models"
+	"github.com/VyVy-ERP/warehouse-backend/internal/repository"
 	"errors"
 	"time"
 

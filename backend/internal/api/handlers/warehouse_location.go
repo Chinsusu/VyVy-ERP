@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"erp-warehouse/internal/dto"
-	"erp-warehouse/internal/service"
-	"erp-warehouse/internal/utils"
+	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
+	"github.com/VyVy-ERP/warehouse-backend/internal/service"
+	"github.com/VyVy-ERP/warehouse-backend/internal/utils"
 	"net/http"
 	"strconv"
 
@@ -35,22 +35,7 @@ func (h *WarehouseLocationHandler) List(c *gin.Context) {
 		return
 	}
 
-	// Build pagination
-	page := 1
-	if filter.Page > 0 {
-		page = filter.Page
-	}
-	pageSize := 20
-	if filter.PageSize > 0 {
-		pageSize = filter.PageSize
-	}
-
-	pagination := utils.Pagination{
-		Page:       page,
-		PageSize:   pageSize,
-		Total:      total,
-		TotalPages: (int(total) + pageSize - 1) / pageSize,
-	}
+	pagination := utils.CalculatePagination(filter.Page, filter.PageSize, total)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success":    true,
@@ -87,13 +72,14 @@ func (h *WarehouseLocationHandler) Create(c *gin.Context) {
 	}
 
 	// Get user ID from context (set by auth middleware)
-	userID, exists := c.Get("user_id")
+	val, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
 		return
 	}
+	userID := val.(int64)
 
-	location, err := h.service.CreateLocation(&req, userID.(uint))
+	location, err := h.service.CreateLocation(&req, uint(userID))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
@@ -118,13 +104,14 @@ func (h *WarehouseLocationHandler) Update(c *gin.Context) {
 	}
 
 	// Get user ID from context
-	userID, exists := c.Get("user_id")
+	val, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
 		return
 	}
+	userID := val.(int64)
 
-	location, err := h.service.UpdateLocation(uint(id), &req, userID.(uint))
+	location, err := h.service.UpdateLocation(uint(id), &req, uint(userID))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return

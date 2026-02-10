@@ -153,6 +153,21 @@ export default function DashboardPage() {
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Material Requests</h3>
                         <p className="text-gray-600 text-sm">Request materials for production</p>
                     </Link>
+
+                    {/* Material Issue Notes Module */}
+                    <Link
+                        to="/material-issue-notes"
+                        className="card card-hover p-6 group"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <ClipboardCheck className="w-6 h-6 text-primary-600" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Material Issues</h3>
+                        <p className="text-gray-600 text-sm">Issue materials to production</p>
+                    </Link>
                 </div>
 
                 <div className="mt-8 p-4 bg-primary-50 border border-primary-200 rounded-md">

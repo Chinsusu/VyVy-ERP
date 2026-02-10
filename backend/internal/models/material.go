@@ -96,8 +96,8 @@ type SafeMaterial struct {
 }
 
 // ToSafe converts Material to SafeMaterial
-func (m *Material) ToSafe() SafeMaterial {
-	return SafeMaterial{
+func (m *Material) ToSafe() *SafeMaterial {
+	return &SafeMaterial{
 		ID:                m.ID,
 		Code:              m.Code,
 		TradingName:       m.TradingName,

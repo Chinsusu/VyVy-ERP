@@ -29,6 +29,9 @@ import MRListPage from './pages/material-requests/MRListPage';
 import MRCreatePage from './pages/material-requests/MRCreatePage';
 import MREditPage from './pages/material-requests/MREditPage';
 import MRDetailPage from './pages/material-requests/MRDetailPage';
+import MINListPage from './pages/material-issue-notes/MINListPage';
+import MINCreatePage from './pages/material-issue-notes/MINCreatePage';
+import MINDetailPage from './pages/material-issue-notes/MINDetailPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -91,6 +94,11 @@ function App() {
             <Route path="/material-requests/new" element={<MRCreatePage />} />
             <Route path="/material-requests/:id" element={<MRDetailPage />} />
             <Route path="/material-requests/:id/edit" element={<MREditPage />} />
+
+            {/* Material Issue Notes (MIN) Routes */}
+            <Route path="/material-issue-notes" element={<MINListPage />} />
+            <Route path="/material-issue-notes/new" element={<MINCreatePage />} />
+            <Route path="/material-issue-notes/:id" element={<MINDetailPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
