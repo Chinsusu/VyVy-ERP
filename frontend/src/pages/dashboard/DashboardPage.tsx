@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import { LogOut, User, Package, Users, Warehouse, ArrowRight, ShoppingCart } from 'lucide-react';
+import { LogOut, User, Package, Users, Warehouse, ArrowRight, ShoppingCart, ClipboardCheck, FileText } from 'lucide-react';
 
 export default function DashboardPage() {
     const navigate = useNavigate();
@@ -55,10 +55,10 @@ export default function DashboardPage() {
                         className="card card-hover p-6 group"
                     >
                         <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                                <Package className="w-6 h-6 text-primary" />
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <Package className="w-6 h-6 text-primary-600" />
                             </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Materials</h3>
                         <p className="text-gray-600 text-sm">Manage raw materials and ingredients</p>
@@ -70,10 +70,10 @@ export default function DashboardPage() {
                         className="card card-hover p-6 group"
                     >
                         <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                                <Users className="w-6 h-6 text-primary" />
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <Users className="w-6 h-6 text-primary-600" />
                             </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Suppliers</h3>
                         <p className="text-gray-600 text-sm">Manage suppliers and vendors</p>
@@ -85,10 +85,10 @@ export default function DashboardPage() {
                         className="card card-hover p-6 group"
                     >
                         <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                                <Warehouse className="w-6 h-6 text-primary" />
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <Warehouse className="w-6 h-6 text-primary-600" />
                             </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Warehouses</h3>
                         <p className="text-gray-600 text-sm">Manage warehouse facilities and locations</p>
@@ -100,10 +100,10 @@ export default function DashboardPage() {
                         className="card card-hover p-6 group"
                     >
                         <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                                <Package className="w-6 h-6 text-primary" />
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <Package className="w-6 h-6 text-primary-600" />
                             </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Finished Products</h3>
                         <p className="text-gray-600 text-sm">Manage finished products and inventory</p>
@@ -115,19 +115,49 @@ export default function DashboardPage() {
                         className="card card-hover p-6 group"
                     >
                         <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                                <ShoppingCart className="w-6 h-6 text-primary" />
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <ShoppingCart className="w-6 h-6 text-primary-600" />
                             </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Purchase Orders</h3>
                         <p className="text-gray-600 text-sm">Manage procurement and supplier orders</p>
                     </Link>
+
+                    {/* Goods Receipt Module */}
+                    <Link
+                        to="/grns"
+                        className="card card-hover p-6 group"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <ClipboardCheck className="w-6 h-6 text-primary-600" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Goods Receipt</h3>
+                        <p className="text-gray-600 text-sm">Receive goods and manage quality control</p>
+                    </Link>
+
+                    {/* Material Requests Module */}
+                    <Link
+                        to="/material-requests"
+                        className="card card-hover p-6 group"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <FileText className="w-6 h-6 text-primary-600" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Material Requests</h3>
+                        <p className="text-gray-600 text-sm">Request materials for production</p>
+                    </Link>
                 </div>
 
-                <div className="mt-8 p-4 bg-warning-50 border border-warning-200 rounded-md">
-                    <p className="text-sm text-warning-800">
-                        <strong>Note:</strong> This is Phase 3 of the ERP system. We are now implementing the Purchase Flow.
+                <div className="mt-8 p-4 bg-primary-50 border border-primary-200 rounded-md">
+                    <p className="text-sm text-primary-800">
+                        <strong>Note:</strong> We have entered Phase 4 (Production Flow). Material Requests are now available.
                     </p>
                 </div>
             </main>

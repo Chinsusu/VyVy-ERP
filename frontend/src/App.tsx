@@ -22,6 +22,13 @@ import PurchaseOrderListPage from './pages/purchase-orders/PurchaseOrderListPage
 import PurchaseOrderCreatePage from './pages/purchase-orders/PurchaseOrderCreatePage';
 import PurchaseOrderEditPage from './pages/purchase-orders/PurchaseOrderEditPage';
 import PurchaseOrderDetailPage from './pages/purchase-orders/PurchaseOrderDetailPage';
+import GrnListPage from './pages/grns/GrnListPage';
+import GrnCreatePage from './pages/grns/GrnCreatePage';
+import GrnDetailPage from './pages/grns/GrnDetailPage';
+import MRListPage from './pages/material-requests/MRListPage';
+import MRCreatePage from './pages/material-requests/MRCreatePage';
+import MREditPage from './pages/material-requests/MREditPage';
+import MRDetailPage from './pages/material-requests/MRDetailPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -73,6 +80,17 @@ function App() {
             <Route path="/purchase-orders/new" element={<PurchaseOrderCreatePage />} />
             <Route path="/purchase-orders/:id" element={<PurchaseOrderDetailPage />} />
             <Route path="/purchase-orders/:id/edit" element={<PurchaseOrderEditPage />} />
+
+            {/* Goods Receipt Notes (GRN) Routes */}
+            <Route path="/grns" element={<GrnListPage />} />
+            <Route path="/grns/new" element={<GrnCreatePage />} />
+            <Route path="/grns/:id" element={<GrnDetailPage />} />
+
+            {/* Material Requests (MR) Routes */}
+            <Route path="/material-requests" element={<MRListPage />} />
+            <Route path="/material-requests/new" element={<MRCreatePage />} />
+            <Route path="/material-requests/:id" element={<MRDetailPage />} />
+            <Route path="/material-requests/:id/edit" element={<MREditPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

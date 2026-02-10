@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { suppliersAPI } from '../api/suppliers';
 import type {
-    Supplier,
     CreateSupplierInput,
     UpdateSupplierInput,
     SupplierFilters,
@@ -61,7 +60,7 @@ export function useUpdateSupplier() {
     return useMutation({
         mutationFn: ({ id, input }: { id: number; input: UpdateSupplierInput }) =>
             suppliersAPI.updateSupplier(id, input),
-        onSuccess: (_, variables) => {
+        onSuccess: (_: any, variables: { id: number; input: UpdateSupplierInput }) => {
             // Invalidate all supplier lists and the specific detail
             queryClient.invalidateQueries({ queryKey: supplierKeys.lists() });
             queryClient.invalidateQueries({ queryKey: supplierKeys.detail(variables.id) });

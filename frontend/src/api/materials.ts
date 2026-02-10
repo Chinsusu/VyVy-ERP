@@ -24,7 +24,7 @@ export const materialsAPI = {
      */
     getMaterialById: async (id: number): Promise<Material> => {
         const { data } = await api.get<APIResponse<Material>>(`/materials/${id}`);
-        return data.data;
+        return data.data!;
     },
 
     /**
@@ -32,7 +32,7 @@ export const materialsAPI = {
      */
     createMaterial: async (input: CreateMaterialInput): Promise<Material> => {
         const { data } = await api.post<APIResponse<Material>>('/materials', input);
-        return data.data;
+        return data.data!;
     },
 
     /**
@@ -40,7 +40,7 @@ export const materialsAPI = {
      */
     updateMaterial: async (id: number, input: UpdateMaterialInput): Promise<Material> => {
         const { data } = await api.put<APIResponse<Material>>(`/materials/${id}`, input);
-        return data.data;
+        return data.data!;
     },
 
     /**

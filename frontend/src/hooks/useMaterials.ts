@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { materialsAPI } from '../api/materials';
 import type {
-    Material,
     CreateMaterialInput,
     UpdateMaterialInput,
     MaterialFilters,
@@ -61,7 +60,7 @@ export function useUpdateMaterial() {
     return useMutation({
         mutationFn: ({ id, input }: { id: number; input: UpdateMaterialInput }) =>
             materialsAPI.updateMaterial(id, input),
-        onSuccess: (_, variables) => {
+        onSuccess: (_: any, variables: { id: number; input: UpdateMaterialInput }) => {
             // Invalidate all material lists and the specific detail
             queryClient.invalidateQueries({ queryKey: materialKeys.lists() });
             queryClient.invalidateQueries({ queryKey: materialKeys.detail(variables.id) });

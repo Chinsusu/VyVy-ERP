@@ -1,12 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { warehousesAPI } from '../api/warehouses';
 import type {
-    Warehouse,
     CreateWarehouseInput,
     UpdateWarehouseInput,
     WarehouseFilters,
 } from '../types/warehouse';
-import type { WarehouseLocation } from '../types/warehouseLocation';
 
 // Query keys factory
 export const warehouseKeys = {
@@ -64,7 +62,7 @@ export function useUpdateWarehouse() {
     return useMutation({
         mutationFn: ({ id, input }: { id: number; input: UpdateWarehouseInput }) =>
             warehousesAPI.updateWarehouse(id, input),
-        onSuccess: (_, variables) => {
+        onSuccess: (_: any, variables: { id: number; input: UpdateWarehouseInput }) => {
             // Invalidate lists and the specific warehouse detail
             queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
             queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(variables.id) });

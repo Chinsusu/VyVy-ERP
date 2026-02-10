@@ -7,8 +7,8 @@ export default {
     theme: {
         extend: {
             colors: {
-                // Vuexy theme colors
                 primary: {
+                    DEFAULT: '#6d28d9',
                     50: '#f0f4ff',
                     100: '#e0e7ff',
                     200: '#c7d2fe',

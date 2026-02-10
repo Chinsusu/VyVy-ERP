@@ -7,6 +7,29 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [0.8.0] - 2026-02-10
+
+### Added
+- **Material Requests Module (Phase 4)**:
+    - Frontend: TypeScript types for `MaterialRequest` and `MaterialRequestItem`.
+    - Frontend: API client with full CRUD and workflow (Approve/Cancel) support.
+    - Frontend: React Query hooks for state management and cache coordination.
+    - Frontend: `MRListPage` with search, status filtering, and pagination.
+    - Frontend: `MRDetailPage` with workflow actions (Approve/Cancel) and item breakdown.
+    - Frontend: `MRForm` component with validation and dynamic item management.
+    - Frontend: Route registration and Dashboard integration.
+
+### Fixed
+- **TypeScript Build Errors**:
+    - Fixed widespread implicit `any` errors in React Query hooks and components.
+    - Corrected `@tanstack/react-query` import typo.
+    - Optimized imports using `import type` for type-only files.
+- **Tailwind CSS Build Fix**:
+    - Resolved critical `undefined:NaN` scanner error in Tailwind 4 by transcribing `index.css` to standard CSS for core components.
+    - Standardized primary color usage across the frontend to specific color levels.
+
+---
+
 ## [0.6.0] - 2026-02-10
 
 ### Added - Finished Products Module (Complete ✅)

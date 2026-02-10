@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { warehouseLocationsAPI } from '../api/warehouseLocations';
 import { warehouseKeys } from './useWarehouses';
 import type {
-    WarehouseLocation,
     CreateWarehouseLocationInput,
     UpdateWarehouseLocationInput,
     WarehouseLocationFilters,
@@ -41,7 +40,7 @@ export function useCreateLocation() {
     return useMutation({
         mutationFn: (input: CreateWarehouseLocationInput) =>
             warehouseLocationsAPI.createLocation(input),
-        onSuccess: (_, variables) => {
+        onSuccess: (_: any, variables: CreateWarehouseLocationInput) => {
             // Invalidate location lists
             queryClient.invalidateQueries({ queryKey: locationKeys.lists() });
             // Invalidate the specific warehouse's locations cache
@@ -61,7 +60,7 @@ export function useUpdateLocation() {
     return useMutation({
         mutationFn: ({ id, input }: { id: number; input: UpdateWarehouseLocationInput }) =>
             warehouseLocationsAPI.updateLocation(id, input),
-        onSuccess: (data, variables) => {
+        onSuccess: (data: any, variables: { id: number; input: UpdateWarehouseLocationInput }) => {
             // Invalidate location lists and the specific location detail
             queryClient.invalidateQueries({ queryKey: locationKeys.lists() });
             queryClient.invalidateQueries({ queryKey: locationKeys.detail(variables.id) });

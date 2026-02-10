@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tantml/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { purchaseOrdersAPI } from '../api/purchaseOrders';
 import type {
     CreatePurchaseOrderInput,
@@ -50,7 +50,7 @@ export const useUpdatePurchaseOrder = () => {
     return useMutation({
         mutationFn: ({ id, input }: { id: number; input: UpdatePurchaseOrderInput }) =>
             purchaseOrdersAPI.updatePurchaseOrder(id, input),
-        onSuccess: (_, variables) => {
+        onSuccess: (_: any, variables: { id: number; input: UpdatePurchaseOrderInput }) => {
             // Invalidate specific detail and all lists
             queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(variables.id) });
             queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.lists() });
@@ -75,7 +75,7 @@ export const useApprovePurchaseOrder = () => {
 
     return useMutation({
         mutationFn: (id: number) => purchaseOrdersAPI.approvePurchaseOrder(id),
-        onSuccess: (_, id) => {
+        onSuccess: (_: any, id: number) => {
             // Invalidate specific detail and all lists
             queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(id) });
             queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.lists() });
@@ -88,7 +88,7 @@ export const useCancelPurchaseOrder = () => {
 
     return useMutation({
         mutationFn: (id: number) => purchaseOrdersAPI.cancelPurchaseOrder(id),
-        onSuccess: (_, id) => {
+        onSuccess: (_: any, id: number) => {
             // Invalidate specific detail and all lists
             queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(id) });
             queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.lists() });
