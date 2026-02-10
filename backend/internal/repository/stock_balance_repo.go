@@ -77,6 +77,6 @@ func (r *stockBalanceRepository) List(itemType string, itemID uint, warehouseID 
 		query = query.Where("warehouse_id = ?", warehouseID)
 	}
 
-	err := query.Find(&balances).Error
+	err := query.Order("expiry_date ASC NULLS LAST, created_at ASC").Find(&balances).Error
 	return balances, err
 }

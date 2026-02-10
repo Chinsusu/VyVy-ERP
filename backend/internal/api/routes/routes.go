@@ -28,6 +28,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	stockLedgerRepo := repository.NewStockLedgerRepository(db)
 	stockBalanceRepo := repository.NewStockBalanceRepository(db)
 	minRepo := repository.NewMaterialIssueNoteRepository(db)
+	stockReservationRepo := repository.NewStockReservationRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -38,8 +39,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	finishedProductService := service.NewFinishedProductService(finishedProductRepo)
 	purchaseOrderService := service.NewPurchaseOrderService(purchaseOrderRepo, purchaseOrderItemRepo, supplierRepo, warehouseRepo)
 	grnService := service.NewGRNService(db, grnRepo, grnItemRepo, purchaseOrderRepo, purchaseOrderItemRepo, warehouseRepo, stockLedgerRepo, stockBalanceRepo)
-	mrService := service.NewMaterialRequestService(mrRepo, mrItemRepo, warehouseRepo, materialRepo)
-	minService := service.NewMaterialIssueNoteService(minRepo, mrRepo, materialRepo, db)
+	mrService := service.NewMaterialRequestService(db, mrRepo, mrItemRepo, warehouseRepo, materialRepo, stockBalanceRepo, stockReservationRepo)
+	minService := service.NewMaterialIssueNoteService(minRepo, mrRepo, materialRepo, stockBalanceRepo, stockReservationRepo, db)
 	stockService := service.NewStockService(stockBalanceRepo)
 
 	// Initialize handlers

@@ -7,6 +7,16 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [0.9.1] - 2026-02-10
+
+### Added
+- **Production Flow Refinements (Phase 4)**:
+    - Backend: New `StockReservation` system to prevent over-allocation of materials.
+    - Backend: Automatic stock holding logic during Material Request approval.
+    - Backend: Advanced picking suggestions based on FEFO (Expiry) and FIFO (Age) logic.
+    - Backend: Transactional integrity for reservation fulfillment during issuance.
+    - Backend: Unit tests for core issuance and reservation logic.
+
 ## [0.9.0] - 2026-02-10
 
 ### Added

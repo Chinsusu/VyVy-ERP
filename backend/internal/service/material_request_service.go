@@ -22,24 +22,33 @@ type MaterialRequestService interface {
 }
 
 type materialRequestService struct {
+	db             *gorm.DB
 	mrRepo         repository.MaterialRequestRepository
 	mrItemRepo     repository.MaterialRequestItemRepository
 	warehouseRepo  repository.WarehouseRepository
 	materialRepo   repository.MaterialRepository
+	stockRepo      repository.StockBalanceRepository
+	reservationRepo repository.StockReservationRepository
 }
 
 // NewMaterialRequestService creates a new MaterialRequestService
 func NewMaterialRequestService(
+	db *gorm.DB,
 	mrRepo repository.MaterialRequestRepository,
 	mrItemRepo repository.MaterialRequestItemRepository,
 	warehouseRepo repository.WarehouseRepository,
 	materialRepo repository.MaterialRepository,
+	stockRepo repository.StockBalanceRepository,
+	reservationRepo repository.StockReservationRepository,
 ) MaterialRequestService {
 	return &materialRequestService{
-		mrRepo:        mrRepo,
-		mrItemRepo:    mrItemRepo,
-		warehouseRepo: warehouseRepo,
-		materialRepo:  materialRepo,
+		db:             db,
+		mrRepo:         mrRepo,
+		mrItemRepo:     mrItemRepo,
+		warehouseRepo:  warehouseRepo,
+		materialRepo:   materialRepo,
+		stockRepo:      stockRepo,
+		reservationRepo: reservationRepo,
 	}
 }
 
@@ -263,8 +272,78 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint) (*
 		return nil, errors.New("can only approve material requests in draft status")
 	}
 
-	now := time.Now()
-	if err := s.mrRepo.UpdateStatus(id, "approved", &userID, &now); err != nil {
+	// Start transaction for reservation logic
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		now := time.Now()
+
+		// 1. Update MR status
+		if err := s.mrRepo.UpdateStatus(id, "approved", &userID, &now); err != nil {
+			return err
+		}
+
+		// 2. Reserve stock for each item
+		for _, item := range mr.Items {
+			// Get all available stock for this material in this warehouse
+			balances, err := s.stockRepo.List("material", item.MaterialID, mr.WarehouseID)
+			if err != nil {
+				return err
+			}
+
+			remainingToReserve := item.RequestedQuantity
+			
+			// Simple FIFO-ish reservation across batches/locations
+			for _, balance := range balances {
+				if remainingToReserve <= 0 {
+					break
+				}
+
+				if balance.AvailableQuantity <= 0 {
+					continue
+				}
+
+				reserveQty := balance.AvailableQuantity
+				if reserveQty > remainingToReserve {
+					reserveQty = remainingToReserve
+				}
+
+				// Create reservation record
+				reservation := &models.StockReservation{
+					ItemType:           "material",
+					ItemID:             item.MaterialID,
+					WarehouseID:        mr.WarehouseID,
+					WarehouseLocationID: balance.WarehouseLocationID,
+					BatchNumber:        balance.BatchNumber,
+					LotNumber:          balance.LotNumber,
+					ReservedQuantity:   reserveQty,
+					ReferenceType:      "material_request",
+					ReferenceID:        mr.ID,
+					Status:             "active",
+					CreatedBy:          &userID,
+				}
+
+				if err := tx.Create(reservation).Error; err != nil {
+					return err
+				}
+
+				// Update stock balance reserved quantity
+				balance.ReservedQuantity += reserveQty
+				// We need a TX-aware repo or use tx directly
+				if err := tx.Save(balance).Error; err != nil {
+					return err
+				}
+
+				remainingToReserve -= reserveQty
+			}
+
+			if remainingToReserve > 0 {
+				return errors.New("insufficient stock to fulfill request for material: " + item.Material.TradingName)
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 

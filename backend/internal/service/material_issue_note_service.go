@@ -22,6 +22,8 @@ type materialIssueNoteService struct {
 	minRepo    repository.MaterialIssueNoteRepository
 	mrRepo     repository.MaterialRequestRepository
 	materialRepo repository.MaterialRepository
+	stockRepo  repository.StockBalanceRepository
+	reservationRepo repository.StockReservationRepository
 	db         *gorm.DB
 }
 
@@ -29,12 +31,16 @@ func NewMaterialIssueNoteService(
 	minRepo repository.MaterialIssueNoteRepository,
 	mrRepo repository.MaterialRequestRepository,
 	materialRepo repository.MaterialRepository,
+	stockRepo repository.StockBalanceRepository,
+	reservationRepo repository.StockReservationRepository,
 	db *gorm.DB,
 ) MaterialIssueNoteService {
 	return &materialIssueNoteService{
 		minRepo:      minRepo,
 		mrRepo:       mrRepo,
 		materialRepo: materialRepo,
+		stockRepo:    stockRepo,
+		reservationRepo: reservationRepo,
 		db:           db,
 	}
 }
@@ -101,14 +107,22 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 				First(&balance).Error
 
 			if err != nil {
-				return fmt.Errorf("insufficient stock for material %d in specified batch/location", item.MaterialID)
+				return fmt.Errorf("stock balance not found for material %d in specified batch/location", item.MaterialID)
 			}
 
-			if balance.AvailableQuantity < item.Quantity {
-				return fmt.Errorf("insufficient stock for material %d (available: %f, required: %f)", item.MaterialID, balance.AvailableQuantity, item.Quantity)
+			if balance.Quantity < item.Quantity {
+				return fmt.Errorf("insufficient physical stock for material %d (quantity: %f, required: %f)", item.MaterialID, balance.Quantity, item.Quantity)
 			}
 
-			// b. Calculate new balance for ledger entry
+			// b. Find matching reservation for this MR
+			var reservation models.StockReservation
+			err = tx.Where("reference_type = ? AND reference_id = ? AND item_id = ? AND item_type = ?", "material_request", min.MaterialRequestID, item.MaterialID, "material").
+				Where("batch_number = ? AND warehouse_location_id = ? AND status = 'active'", item.BatchNumber, item.WarehouseLocationID).
+				First(&reservation).Error
+
+			hasReservation := err == nil
+			
+			// c. Calculate new balance for ledger entry
 			var prevBalance float64
 			row := tx.Table("stock_ledger").
 				Select("balance_quantity").
@@ -119,7 +133,7 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 			row.Scan(&prevBalance)
 			newBalance := prevBalance - item.Quantity
 
-			// c. Create stock ledger entry
+			// d. Create stock ledger entry
 			ledger := models.StockLedger{
 				TransactionType:   "MIN",
 				TransactionNumber: min.MINNumber,
@@ -130,7 +144,7 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 				WarehouseLocationID: item.WarehouseLocationID,
 				BatchNumber:       item.BatchNumber,
 				LotNumber:         item.LotNumber,
-				Quantity:          -item.Quantity, // Outward movement is negative
+				Quantity:          -item.Quantity,
 				UnitCost:          balance.UnitCost,
 				TotalCost:         -item.Quantity * balance.UnitCost,
 				BalanceQuantity:   newBalance,
@@ -142,15 +156,34 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 				return err
 			}
 
-			// d. Update stock balance
+			// e. Update stock balance and reservation
 			balance.Quantity -= item.Quantity
-			balance.TotalCost -= item.Quantity * balance.UnitCost
+			if hasReservation {
+				// Fulfill reservation
+				fulfilledQty := item.Quantity
+				if fulfilledQty > (reservation.ReservedQuantity - reservation.FulfilledQuantity) {
+					fulfilledQty = reservation.ReservedQuantity - reservation.FulfilledQuantity
+				}
+				
+				reservation.FulfilledQuantity += fulfilledQty
+				if reservation.FulfilledQuantity >= reservation.ReservedQuantity {
+					reservation.Status = "fulfilled"
+				}
+				if err := tx.Save(&reservation).Error; err != nil {
+					return err
+				}
+				
+				// Reduce reserved quantity in balance
+				balance.ReservedQuantity -= fulfilledQty
+			}
+			
+			balance.TotalCost = balance.Quantity * balance.UnitCost
 			balance.LastTransactionDate = &now
 			if err := tx.Save(&balance).Error; err != nil {
 				return err
 			}
 
-			// e. Update MR item issued quantity
+			// f. Update MR item issued quantity
 			for _, mrItem := range min.MaterialRequest.Items {
 				if mrItem.ID == item.MRItemID {
 					mrItem.IssuedQuantity += item.Quantity
