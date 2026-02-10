@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import { LogOut, User, Package, Users, Warehouse, ArrowRight } from 'lucide-react';
+import { LogOut, User, Package, Users, Warehouse, ArrowRight, ShoppingCart } from 'lucide-react';
 
 export default function DashboardPage() {
     const navigate = useNavigate();
@@ -108,11 +108,26 @@ export default function DashboardPage() {
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Finished Products</h3>
                         <p className="text-gray-600 text-sm">Manage finished products and inventory</p>
                     </Link>
+
+                    {/* Purchase Orders Module */}
+                    <Link
+                        to="/purchase-orders"
+                        className="card card-hover p-6 group"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                                <ShoppingCart className="w-6 h-6 text-primary" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Purchase Orders</h3>
+                        <p className="text-gray-600 text-sm">Manage procurement and supplier orders</p>
+                    </Link>
                 </div>
 
                 <div className="mt-8 p-4 bg-warning-50 border border-warning-200 rounded-md">
                     <p className="text-sm text-warning-800">
-                        <strong>Note:</strong> This is Phase 2 of the ERP system. More features will be added in upcoming phases.
+                        <strong>Note:</strong> This is Phase 3 of the ERP system. We are now implementing the Purchase Flow.
                     </p>
                 </div>
             </main>

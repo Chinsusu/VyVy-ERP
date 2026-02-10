@@ -19,6 +19,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseRepo := repository.NewWarehouseRepository(db)
 	warehouseLocationRepo := repository.NewWarehouseLocationRepository(db)
 	finishedProductRepo := repository.NewFinishedProductRepository(db)
+	purchaseOrderRepo := repository.NewPurchaseOrderRepository(db)
+	purchaseOrderItemRepo := repository.NewPurchaseOrderItemRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -27,6 +29,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseService := service.NewWarehouseService(warehouseRepo, warehouseLocationRepo)
 	warehouseLocationService := service.NewWarehouseLocationService(warehouseLocationRepo, warehouseRepo)
 	finishedProductService := service.NewFinishedProductService(finishedProductRepo)
+	purchaseOrderService := service.NewPurchaseOrderService(purchaseOrderRepo, purchaseOrderItemRepo, supplierRepo, warehouseRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -35,6 +38,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseHandler := handlers.NewWarehouseHandler(warehouseService)
 	warehouseLocationHandler := handlers.NewWarehouseLocationHandler(warehouseLocationService)
 	finishedProductHandler := handlers.NewFinishedProductHandler(finishedProductService)
+	purchaseOrderHandler := handlers.NewPurchaseOrderHandler(purchaseOrderService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -113,4 +117,23 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		productGroup.PUT("/:id", middleware.AuthMiddleware(authService), finishedProductHandler.Update)
 		productGroup.DELETE("/:id", middleware.AuthMiddleware(authService), finishedProductHandler.Delete)
 	}
+
+	// Purchase Orders routes
+	poGroup := v1.Group("/purchase-orders")
+	{
+		// Public endpoints
+		poGroup.GET("", purchaseOrderHandler.List)
+		poGroup.GET("/:id", purchaseOrderHandler.GetByID)
+
+		// Protected endpoints (require authentication)
+		poGroup.POST("", middleware.AuthMiddleware(authService), purchaseOrderHandler.Create)
+		poGroup.PUT("/:id", middleware.AuthMiddleware(authService), purchaseOrderHandler.Update)
+		poGroup.DELETE("/:id", middleware.AuthMiddleware(authService), purchaseOrderHandler.Delete)
+		
+		// Workflow endpoints
+		poGroup.POST("/:id/approve", middleware.AuthMiddleware(authService), purchaseOrderHandler.Approve)
+		poGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), purchaseOrderHandler.Cancel)
+	}
+
+	return router
 }

@@ -59,6 +59,22 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [0.7.0] - 2026-02-10
+### Added
+- **Purchase Orders Module (Phase 3)**:
+    - Backend: `PurchaseOrder` and `PurchaseOrderItem` models with workflow support.
+    - Backend: Automatic total amount calculations (subtotal, tax, discount, grand total).
+    - Backend: Workflow management (Draft → Approved → Cancelled).
+    - Backend: 7 API endpoints for full lifecycle management.
+    - Frontend: TypeScript types and API client.
+    - Frontend: React Query hooks for state management and workflow transitions.
+    - Frontend: `PurchaseOrderListPage` with filtering and status badges.
+    - Frontend: `PurchaseOrderForm` with dynamic item rows and real-time calculations.
+    - Frontend: `PurchaseOrderDetailPage` with workflow actions and confirmation modals.
+    - Frontend: `DashboardPage` integration with new module card.
+
+---
+
 ## [0.5.0] - 2026-02-09
 
 ### Added - Warehouses & Locations Module (Backend Complete ✅)

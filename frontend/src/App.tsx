@@ -18,6 +18,10 @@ import FinishedProductListPage from './pages/finished-products/FinishedProductLi
 import FinishedProductCreatePage from './pages/finished-products/FinishedProductCreatePage';
 import FinishedProductEditPage from './pages/finished-products/FinishedProductEditPage';
 import FinishedProductDetailPage from './pages/finished-products/FinishedProductDetailPage';
+import PurchaseOrderListPage from './pages/purchase-orders/PurchaseOrderListPage';
+import PurchaseOrderCreatePage from './pages/purchase-orders/PurchaseOrderCreatePage';
+import PurchaseOrderEditPage from './pages/purchase-orders/PurchaseOrderEditPage';
+import PurchaseOrderDetailPage from './pages/purchase-orders/PurchaseOrderDetailPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -63,6 +67,12 @@ function App() {
             <Route path="/finished-products/new" element={<FinishedProductCreatePage />} />
             <Route path="/finished-products/:id" element={<FinishedProductDetailPage />} />
             <Route path="/finished-products/:id/edit" element={<FinishedProductEditPage />} />
+
+            {/* Purchase Orders Routes */}
+            <Route path="/purchase-orders" element={<PurchaseOrderListPage />} />
+            <Route path="/purchase-orders/new" element={<PurchaseOrderCreatePage />} />
+            <Route path="/purchase-orders/:id" element={<PurchaseOrderDetailPage />} />
+            <Route path="/purchase-orders/:id/edit" element={<PurchaseOrderEditPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
