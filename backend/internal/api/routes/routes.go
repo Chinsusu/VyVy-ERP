@@ -29,6 +29,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	stockBalanceRepo := repository.NewStockBalanceRepository(db)
 	minRepo := repository.NewMaterialIssueNoteRepository(db)
 	stockReservationRepo := repository.NewStockReservationRepository(db)
+	doRepo := repository.NewDeliveryOrderRepository(db)
+	saRepo := repository.NewStockAdjustmentRepository(db)
+	stRepo := repository.NewStockTransferRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -42,6 +45,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	mrService := service.NewMaterialRequestService(db, mrRepo, mrItemRepo, warehouseRepo, materialRepo, stockBalanceRepo, stockReservationRepo)
 	minService := service.NewMaterialIssueNoteService(minRepo, mrRepo, materialRepo, stockBalanceRepo, stockReservationRepo, db)
 	stockService := service.NewStockService(stockBalanceRepo)
+	doService := service.NewDeliveryOrderService(db, doRepo, warehouseRepo, finishedProductRepo, stockBalanceRepo, stockReservationRepo)
+	saService := service.NewStockAdjustmentService(db, saRepo, warehouseRepo, materialRepo, finishedProductRepo, stockBalanceRepo)
+	stService := service.NewStockTransferService(db, stRepo, warehouseRepo, stockBalanceRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -55,6 +61,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	mrHandler := handlers.NewMaterialRequestHandler(mrService)
 	minHandler := handlers.NewMaterialIssueNoteHandler(minService)
 	stockHandler := handlers.NewStockHandler(stockService)
+	doHandler := handlers.NewDeliveryOrderHandler(doService)
+	inventoryHandler := handlers.NewInventoryHandler(saService, stService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -152,9 +160,24 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	}
 
 	// Stock / Inventory routes
-	inventoryGroup := v1.Group("/inventory")
+	invGroup := v1.Group("/inventory")
+	invGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		inventoryGroup.GET("/balance", stockHandler.GetBalance)
+		invGroup.GET("/balance", stockHandler.GetBalance)
+
+		// Adjustments
+		invGroup.GET("/adjustments", inventoryHandler.ListAdjustments)
+		invGroup.GET("/adjustments/:id", inventoryHandler.GetAdjustment)
+		invGroup.POST("/adjustments", inventoryHandler.CreateAdjustment)
+		invGroup.POST("/adjustments/:id/post", inventoryHandler.PostAdjustment)
+		invGroup.POST("/adjustments/:id/cancel", inventoryHandler.CancelAdjustment)
+
+		// Transfers
+		invGroup.GET("/transfers", inventoryHandler.ListTransfers)
+		invGroup.GET("/transfers/:id", inventoryHandler.GetTransfer)
+		invGroup.POST("/transfers", inventoryHandler.CreateTransfer)
+		invGroup.POST("/transfers/:id/post", inventoryHandler.PostTransfer)
+		invGroup.POST("/transfers/:id/cancel", inventoryHandler.CancelTransfer)
 	}
 
 	// Goods Receipt Note (GRN) routes
@@ -198,5 +221,19 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		minGroup.POST("", middleware.AuthMiddleware(authService), minHandler.Create)
 		minGroup.POST("/:id/post", middleware.AuthMiddleware(authService), minHandler.Post)
 		minGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), minHandler.Cancel)
+	}
+
+	// Delivery Order (DO) routes
+	doGroup := v1.Group("/delivery-orders")
+	{
+		// Public endpoints
+		doGroup.GET("", doHandler.List)
+		doGroup.GET("/:id", doHandler.GetByID)
+
+		// Protected endpoints
+		doGroup.POST("", middleware.AuthMiddleware(authService), doHandler.Create)
+		doGroup.PUT("/:id", middleware.AuthMiddleware(authService), doHandler.Update)
+		doGroup.POST("/:id/ship", middleware.AuthMiddleware(authService), doHandler.Ship)
+		doGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), doHandler.Cancel)
 	}
 }

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS materials (
     -- Stock control
     min_stock_level DECIMAL(15,3) DEFAULT 0,
     max_stock_level DECIMAL(15,3),
-    reor order_point DECIMAL(15,3),
+    reorder_point DECIMAL(15,3),
     reorder_quantity DECIMAL(15,3),
     
     -- Quality & Safety
@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS materials (
     created_by BIGINT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_by BIGINT,
+    deleted_at TIMESTAMP,
     
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
 );

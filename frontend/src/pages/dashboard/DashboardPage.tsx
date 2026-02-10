@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import { LogOut, User, Package, Users, Warehouse, ArrowRight, ShoppingCart, ClipboardCheck, FileText } from 'lucide-react';
+import { LogOut, User, Package, Users, Warehouse, ArrowRight, ShoppingCart, ClipboardCheck, FileText, Truck } from 'lucide-react';
 
 export default function DashboardPage() {
     const navigate = useNavigate();
@@ -168,11 +168,44 @@ export default function DashboardPage() {
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Material Issues</h3>
                         <p className="text-gray-600 text-sm">Issue materials to production</p>
                     </Link>
+
+                    {/* Delivery Orders Module */}
+                    <Link
+                        to="/delivery-orders"
+                        className="card card-hover p-6 group"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <Truck className="w-6 h-6 text-primary-600" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Sales & Delivery</h3>
+                        <p className="text-gray-600 text-sm">Manage product shipments to customers</p>
+                    </Link>
+
+                    {/* Inventory Management Module */}
+                    <Link
+                        to="/inventory/adjustments"
+                        className="card card-hover p-6 group border-l-4 border-l-primary-500"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
+                                <ClipboardCheck className="w-6 h-6 text-primary-600" />
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                            Inventory & Stock
+                            <span className="badge badge-success text-[10px] py-0 px-1">NEW</span>
+                        </h3>
+                        <p className="text-gray-600 text-sm">Stock adjustments, counts, and transfers</p>
+                    </Link>
                 </div>
 
                 <div className="mt-8 p-4 bg-primary-50 border border-primary-200 rounded-md">
                     <p className="text-sm text-primary-800">
-                        <strong>Note:</strong> We have entered Phase 4 (Production Flow). Material Requests are now available.
+                        <strong>Note:</strong> We are in Phase 6 (Inventory Management). Stock Adjustments and Transfers are now active.
                     </p>
                 </div>
             </main>

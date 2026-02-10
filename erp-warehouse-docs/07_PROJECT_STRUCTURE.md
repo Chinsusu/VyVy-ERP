@@ -481,7 +481,7 @@ DevOps:
 
 ---
 
-### Phase 6: Inventory Management (Sprint 11-12, 2-3 tuần)
+### Phase 6: Inventory Management (Sprint 11-12, 2-3 tuần) ✅
 
 **Backend:**
 1. Stock Balance view API
@@ -636,7 +636,7 @@ PORT=8080
 GIN_MODE=release
 
 # CORS
-ALLOWED_ORIGINS=http://localhost:3000,https://erp.company.com
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001,https://erp.company.com
 
 # Email (for notifications)
 SMTP_HOST=smtp.gmail.com

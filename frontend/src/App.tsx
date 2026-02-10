@@ -32,6 +32,16 @@ import MRDetailPage from './pages/material-requests/MRDetailPage';
 import MINListPage from './pages/material-issue-notes/MINListPage';
 import MINCreatePage from './pages/material-issue-notes/MINCreatePage';
 import MINDetailPage from './pages/material-issue-notes/MINDetailPage';
+import DOListPage from './pages/delivery-orders/DOListPage';
+import DOCreatePage from './pages/delivery-orders/DOCreatePage';
+import DOEditPage from './pages/delivery-orders/DOEditPage';
+import DODetailPage from './pages/delivery-orders/DODetailPage';
+import AdjustmentListPage from './pages/inventory/AdjustmentListPage';
+import AdjustmentDetailPage from './pages/inventory/AdjustmentDetailPage';
+import AdjustmentCreatePage from './pages/inventory/AdjustmentCreatePage';
+import TransferListPage from './pages/inventory/TransferListPage';
+import TransferDetailPage from './pages/inventory/TransferDetailPage';
+import TransferCreatePage from './pages/inventory/TransferCreatePage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -99,6 +109,21 @@ function App() {
             <Route path="/material-issue-notes" element={<MINListPage />} />
             <Route path="/material-issue-notes/new" element={<MINCreatePage />} />
             <Route path="/material-issue-notes/:id" element={<MINDetailPage />} />
+
+            {/* Delivery Orders Routes */}
+            <Route path="/delivery-orders" element={<DOListPage />} />
+            <Route path="/delivery-orders/create" element={<DOCreatePage />} />
+            <Route path="/delivery-orders/:id" element={<DODetailPage />} />
+            <Route path="/delivery-orders/:id/edit" element={<DOEditPage />} />
+
+            {/* Inventory Routes */}
+            <Route path="/inventory/adjustments" element={<AdjustmentListPage />} />
+            <Route path="/inventory/adjustments/new" element={<AdjustmentCreatePage />} />
+            <Route path="/inventory/adjustments/:id" element={<AdjustmentDetailPage />} />
+
+            <Route path="/inventory/transfers" element={<TransferListPage />} />
+            <Route path="/inventory/transfers/new" element={<TransferCreatePage />} />
+            <Route path="/inventory/transfers/:id" element={<TransferDetailPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

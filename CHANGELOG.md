@@ -7,6 +7,35 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc2] - 2026-02-10
+
+### Added
+- **Inventory Management (Phase 6)**:
+    - Backend: `StockAdjustment` and `StockTransfer` models with full transactional support.
+    - Backend: `StockAdjustmentService` and `StockTransferService` with Draft → Posted workflow.
+    - Backend: Automatic stock ledger and balance updates with FIFO tracking.
+    - Backend: Standardized `user_id` context handling (int64) across all inventory handlers.
+    - Frontend: `AdjustmentListPage`, `AdjustmentDetailPage`, and `AdjustmentCreatePage`.
+    - Frontend: `TransferListPage`, `TransferDetailPage`, and `TransferCreatePage`.
+    - Frontend: Real-time stock balance lookup during adjustment/transfer creation.
+    - Frontend: Fixed critical React-Hook-Form event binding bug in inventory forms.
+
+### Fixed
+- **Database Schema**: Surgically added missing `deleted_at` column to `materials` and `finished_products` via `fix_schema` utility.
+- **API Security**: Standardized context keys and type casting for `user_id` in inventory management handlers.
+
+## [1.0.0-rc1] - 2026-02-10
+
+### Added
+- **Sales & Delivery Flow (Phase 5)**:
+    - Backend: `DeliveryOrder` and `DeliveryOrderItem` models.
+    - Backend: `DeliveryOrderService` with Picking, Packing, and Shipping logic.
+    - Backend: Automated stock reduction and ledger updates for finished products.
+    - Backend: Cost tracking and transaction integrity for shipments.
+    - Frontend: `DOListPage`, `DODetailPage`, and `DOForm` for Sales Orders and Delivery Orders.
+    - Frontend: Integrated finished product picking with real-time stock balance validation.
+    - Frontend: Added "Sales & Delivery" navigation to the main Dashboard.
+
 ## [0.9.1] - 2026-02-10
 
 ### Added

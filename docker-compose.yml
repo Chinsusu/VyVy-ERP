@@ -49,23 +49,23 @@ services:
       - ./backend:/app
     command: go run cmd/api/main.go
 
-  # Frontend (React + Vite) - Temporarily disabled until frontend is created
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile.dev
-  #   container_name: vyvy_frontend
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     VITE_API_BASE_URL: http://localhost:8080/api/v1
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - vyvy-network
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
+  # Frontend (React + Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vyvy_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080/api/v1
+    depends_on:
+      - backend
+    networks:
+      - vyvy-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
 volumes:
   postgres_data:
