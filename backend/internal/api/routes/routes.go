@@ -18,6 +18,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	supplierRepo := repository.NewSupplierRepository(db)
 	warehouseRepo := repository.NewWarehouseRepository(db)
 	warehouseLocationRepo := repository.NewWarehouseLocationRepository(db)
+	finishedProductRepo := repository.NewFinishedProductRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -25,6 +26,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	supplierService := service.NewSupplierService(supplierRepo)
 	warehouseService := service.NewWarehouseService(warehouseRepo, warehouseLocationRepo)
 	warehouseLocationService := service.NewWarehouseLocationService(warehouseLocationRepo, warehouseRepo)
+	finishedProductService := service.NewFinishedProductService(finishedProductRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -32,6 +34,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	supplierHandler := handlers.NewSupplierHandler(supplierService)
 	warehouseHandler := handlers.NewWarehouseHandler(warehouseService)
 	warehouseLocationHandler := handlers.NewWarehouseLocationHandler(warehouseLocationService)
+	finishedProductHandler := handlers.NewFinishedProductHandler(finishedProductService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -96,5 +99,18 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		locationGroup.POST("", middleware.AuthMiddleware(authService), warehouseLocationHandler.Create)
 		locationGroup.PUT("/:id", middleware.AuthMiddleware(authService), warehouseLocationHandler.Update)
 		locationGroup.DELETE("/:id", middleware.AuthMiddleware(authService), warehouseLocationHandler.Delete)
+	}
+
+	// Finished Products routes
+	productGroup := v1.Group("/finished-products")
+	{
+		// Public endpoints
+		productGroup.GET("", finishedProductHandler.List)
+		productGroup.GET("/:id", finishedProductHandler.GetByID)
+
+		// Protected endpoints (require authentication)
+		productGroup.POST("", middleware.AuthMiddleware(authService), finishedProductHandler.Create)
+		productGroup.PUT("/:id", middleware.AuthMiddleware(authService), finishedProductHandler.Update)
+		productGroup.DELETE("/:id", middleware.AuthMiddleware(authService), finishedProductHandler.Delete)
 	}
 }
