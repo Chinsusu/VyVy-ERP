@@ -48,6 +48,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	doService := service.NewDeliveryOrderService(db, doRepo, warehouseRepo, finishedProductRepo, stockBalanceRepo, stockReservationRepo)
 	saService := service.NewStockAdjustmentService(db, saRepo, warehouseRepo, materialRepo, finishedProductRepo, stockBalanceRepo)
 	stService := service.NewStockTransferService(db, stRepo, warehouseRepo, stockBalanceRepo)
+	dashboardService := service.NewDashboardService(db)
+	reportService := service.NewReportService(db)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -63,6 +65,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	stockHandler := handlers.NewStockHandler(stockService)
 	doHandler := handlers.NewDeliveryOrderHandler(doService)
 	inventoryHandler := handlers.NewInventoryHandler(saService, stService)
+	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
+	reportHandler := handlers.NewReportHandler(reportService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -235,5 +239,19 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		doGroup.PUT("/:id", middleware.AuthMiddleware(authService), doHandler.Update)
 		doGroup.POST("/:id/ship", middleware.AuthMiddleware(authService), doHandler.Ship)
 		doGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), doHandler.Cancel)
+	}
+
+	// Dashboard & Report routes
+	dashGroup := v1.Group("/dashboard")
+	dashGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		dashGroup.GET("/stats", dashboardHandler.GetStats)
+	}
+
+	reportGroup := v1.Group("/reports")
+	reportGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		reportGroup.GET("/stock-movement", reportHandler.GetStockMovementReport)
+		reportGroup.GET("/inventory-value", reportHandler.GetInventoryValueReport)
 	}
 }

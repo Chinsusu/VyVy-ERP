@@ -1,19 +1,31 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import { LogOut, User, Package, Users, Warehouse, ArrowRight, ShoppingCart, ClipboardCheck, FileText, Truck } from 'lucide-react';
+import { useDashboard } from '../../hooks/useDashboard';
+import {
+    LogOut, User, Package, Users, Warehouse,
+    ShoppingCart, ClipboardCheck, FileText, Truck, RefreshCcw,
+    AlertTriangle, Calendar, DollarSign, TrendingUp, BarChart2
+} from 'lucide-react';
+import { format } from 'date-fns';
 
 export default function DashboardPage() {
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
+    const { stats, isLoading, refresh } = useDashboard();
 
     const handleLogout = () => {
         logout();
         navigate('/login');
     };
 
+    const currencyFormatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    });
+
     return (
         <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-sm border-b border-gray-200">
+            <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex items-center">
@@ -24,12 +36,12 @@ export default function DashboardPage() {
                                 <User className="w-5 h-5 text-gray-500" />
                                 <div className="text-sm">
                                     <p className="font-medium text-gray-900">{user?.full_name}</p>
-                                    <p className="text-gray-500">{user?.role}</p>
+                                    <p className="text-gray-500 capitalize">{user?.role}</p>
                                 </div>
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="btn-outline"
+                                className="btn-outline py-1.5"
                             >
                                 <LogOut className="w-4 h-4" />
                                 Logout
@@ -40,175 +52,203 @@ export default function DashboardPage() {
             </nav>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to VyVy ERP!</h2>
-                    <p className="text-gray-600">
-                        You are logged in as <span className="font-semibold">{user?.full_name}</span> ({user?.email}).
-                    </p>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-1">Dashboard</h2>
+                        <p className="text-gray-600">
+                            Welcome back, <span className="font-semibold">{user?.full_name}</span>. Here's what's happening today.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {stats?.last_updated_at && (
+                            <span className="text-xs text-gray-500">
+                                Last updated: {format(new Date(stats.last_updated_at), 'HH:mm:ss')}
+                            </span>
+                        )}
+                        <button
+                            onClick={refresh}
+                            disabled={isLoading}
+                            className="btn-outline bg-white"
+                            title="Refresh Statistics"
+                        >
+                            <RefreshCcw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                            Refresh
+                        </button>
+                    </div>
                 </div>
 
-                {/* Module Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Materials Module */}
-                    <Link
-                        to="/materials"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <Package className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Materials</h3>
-                        <p className="text-gray-600 text-sm">Manage raw materials and ingredients</p>
-                    </Link>
+                {/* Statistics Overview */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <StatCard
+                        title="Inventory Value"
+                        value={stats ? currencyFormatter.format(stats.inventory_value) : '...'}
+                        icon={<DollarSign className="w-5 h-5 text-emerald-600" />}
+                        bgColor="bg-emerald-50"
+                        isLoading={isLoading}
+                    />
+                    <StatCard
+                        title="Pending GRNs"
+                        value={stats?.pending_grns ?? '...'}
+                        icon={<ClipboardCheck className="w-5 h-5 text-amber-600" />}
+                        bgColor="bg-amber-50"
+                        isLoading={isLoading}
+                        link="/grns"
+                    />
+                    <StatCard
+                        title="Low Stock Items"
+                        value={stats?.low_stock_count ?? '...'}
+                        icon={<AlertTriangle className="w-5 h-5 text-rose-600" />}
+                        bgColor="bg-rose-50"
+                        isLoading={isLoading}
+                        alert={(stats?.low_stock_count ?? 0) > 0}
+                    />
+                    <StatCard
+                        title="Expiring Soon"
+                        value={stats?.expiring_soon_count ?? '...'}
+                        icon={<Calendar className="w-5 h-5 text-orange-600" />}
+                        bgColor="bg-orange-50"
+                        isLoading={isLoading}
+                        alert={(stats?.expiring_soon_count ?? 0) > 0}
+                    />
+                    <StatCard
+                        title="Purchase Orders"
+                        value={stats?.total_purchase_orders ?? '...'}
+                        icon={<ShoppingCart className="w-5 h-5 text-indigo-600" />}
+                        bgColor="bg-indigo-50"
+                        isLoading={isLoading}
+                        link="/purchase-orders"
+                    />
+                    <StatCard
+                        title="Material Requests"
+                        value={stats?.total_material_requests ?? '...'}
+                        icon={<FileText className="w-5 h-5 text-blue-600" />}
+                        bgColor="bg-blue-50"
+                        isLoading={isLoading}
+                        link="/material-requests"
+                    />
+                    <StatCard
+                        title="Delivery Orders"
+                        value={stats?.total_delivery_orders ?? '...'}
+                        icon={<Truck className="w-5 h-5 text-purple-600" />}
+                        bgColor="bg-purple-50"
+                        isLoading={isLoading}
+                        link="/delivery-orders"
+                    />
+                    <StatCard
+                        title="Total Receipts"
+                        value={stats?.total_purchase_orders ?? '...'}
+                        icon={<TrendingUp className="w-5 h-5 text-cyan-600" />}
+                        bgColor="bg-cyan-50"
+                        isLoading={isLoading}
+                    />
+                </div>
 
-                    {/* Suppliers Module */}
-                    <Link
-                        to="/suppliers"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <Users className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Suppliers</h3>
-                        <p className="text-gray-600 text-sm">Manage suppliers and vendors</p>
-                    </Link>
-
-                    {/* Warehouses Module */}
-                    <Link
-                        to="/warehouses"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <Warehouse className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Warehouses</h3>
-                        <p className="text-gray-600 text-sm">Manage warehouse facilities and locations</p>
-                    </Link>
-
-                    {/* Finished Products Module */}
-                    <Link
-                        to="/finished-products"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <Package className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Finished Products</h3>
-                        <p className="text-gray-600 text-sm">Manage finished products and inventory</p>
-                    </Link>
-
-                    {/* Purchase Orders Module */}
-                    <Link
-                        to="/purchase-orders"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <ShoppingCart className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Purchase Orders</h3>
-                        <p className="text-gray-600 text-sm">Manage procurement and supplier orders</p>
-                    </Link>
-
-                    {/* Goods Receipt Module */}
-                    <Link
-                        to="/grns"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <ClipboardCheck className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Goods Receipt</h3>
-                        <p className="text-gray-600 text-sm">Receive goods and manage quality control</p>
-                    </Link>
-
-                    {/* Material Requests Module */}
-                    <Link
-                        to="/material-requests"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <FileText className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Material Requests</h3>
-                        <p className="text-gray-600 text-sm">Request materials for production</p>
-                    </Link>
-
-                    {/* Material Issue Notes Module */}
-                    <Link
-                        to="/material-issue-notes"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <ClipboardCheck className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Material Issues</h3>
-                        <p className="text-gray-600 text-sm">Issue materials to production</p>
-                    </Link>
-
-                    {/* Delivery Orders Module */}
-                    <Link
-                        to="/delivery-orders"
-                        className="card card-hover p-6 group"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <Truck className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Sales & Delivery</h3>
-                        <p className="text-gray-600 text-sm">Manage product shipments to customers</p>
-                    </Link>
-
-                    {/* Inventory Management Module */}
-                    <Link
-                        to="/inventory/adjustments"
-                        className="card card-hover p-6 group border-l-4 border-l-primary-500"
-                    >
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-primary-600/10 rounded-lg group-hover:bg-primary-600/20 transition-colors">
-                                <ClipboardCheck className="w-6 h-6 text-primary-600" />
-                            </div>
-                            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                            Inventory & Stock
-                            <span className="badge badge-success text-[10px] py-0 px-1">NEW</span>
+                {/* Reports & Quick Actions */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                    <div className="lg:col-span-2">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <BarChart2 className="w-5 h-5 text-primary-600" />
+                            Inventory Reports
                         </h3>
-                        <p className="text-gray-600 text-sm">Stock adjustments, counts, and transfers</p>
-                    </Link>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Link to="/reports/stock-movement" className="card p-5 hover:border-primary-300 transition-colors group">
+                                <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-primary-600">Stock Movement</h4>
+                                <p className="text-sm text-gray-500">View incoming, outgoing, and adjustment history</p>
+                            </Link>
+                            <Link to="/reports/inventory-value" className="card p-5 hover:border-primary-300 transition-colors group">
+                                <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-primary-600">Inventory Valuation</h4>
+                                <p className="text-sm text-gray-500">Current stock value by category and warehouse</p>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <RefreshCcw className="w-5 h-5 text-primary-600" />
+                            Core Modules
+                        </h3>
+                        <div className="space-y-2">
+                            <QuickLink to="/inventory/adjustments" label="Inventory & Stock" icon={<Package className="w-4 h-4" />} badge="PH6" />
+                            <QuickLink to="/materials" label="Materials" icon={<Package className="w-4 h-4" />} />
+                            <QuickLink to="/suppliers" label="Suppliers" icon={<Users className="w-4 h-4" />} />
+                            <QuickLink to="/warehouses" label="Warehouses" icon={<Warehouse className="w-4 h-4" />} />
+                        </div>
+                    </div>
                 </div>
 
-                <div className="mt-8 p-4 bg-primary-50 border border-primary-200 rounded-md">
-                    <p className="text-sm text-primary-800">
-                        <strong>Note:</strong> We are in Phase 6 (Inventory Management). Stock Adjustments and Transfers are now active.
-                    </p>
+                <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg flex items-start gap-3">
+                    <div className="p-1 bg-primary-100 rounded text-primary-600 mt-0.5">
+                        <AlertTriangle className="w-4 h-4" />
+                    </div>
+                    <div>
+                        <p className="text-sm text-primary-800 font-medium">
+                            Phase 7 (Reports & Dashboard) Implementation
+                        </p>
+                        <p className="text-xs text-primary-700 mt-0.5">
+                            Interactive dashboard stats and inventory reports are now being implemented based on Phase 6 transaction data.
+                        </p>
+                    </div>
                 </div>
             </main>
         </div>
+    );
+}
+
+interface StatCardProps {
+    title: string;
+    value: string | number;
+    icon: React.ReactNode;
+    bgColor: string;
+    isLoading?: boolean;
+    link?: string;
+    alert?: boolean;
+}
+
+function StatCard({ title, value, icon, bgColor, isLoading, link, alert }: StatCardProps) {
+    const Content = (
+        <div className={`card overflow-hidden ${link ? 'hover:border-primary-300 transition-colors cursor-pointer' : ''} ${alert ? 'border-rose-200 ring-1 ring-rose-100' : ''}`}>
+            <div className={`h-1 ${bgColor.replace('50', '500')}`}></div>
+            <div className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                    <div className={`p-2 rounded-lg ${bgColor}`}>
+                        {icon}
+                    </div>
+                </div>
+                <div>
+                    <p className="text-sm font-medium text-gray-500 truncate">{title}</p>
+                    <div className="flex items-baseline gap-2">
+                        <p className={`text-2xl font-bold ${isLoading ? 'animate-pulse text-gray-300' : 'text-gray-900'}`}>
+                            {value}
+                        </p>
+                        {alert && !isLoading && (
+                            <span className="flex h-2 w-2 rounded-full bg-rose-500 animate-ping"></span>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    return link ? <Link to={link}>{Content}</Link> : Content;
+}
+
+function QuickLink({ to, label, icon, badge }: { to: string, label: string, icon: React.ReactNode, badge?: string }) {
+    return (
+        <Link
+            to={to}
+            className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all group"
+        >
+            <div className="flex items-center gap-3">
+                <span className="text-gray-400 group-hover:text-primary-500 transition-colors">
+                    {icon}
+                </span>
+                <span className="text-sm font-medium text-gray-700 group-hover:text-primary-800">{label}</span>
+            </div>
+            {badge && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded uppercase tracking-wider group-hover:bg-primary-100 group-hover:text-primary-600 transition-colors">
+                    {badge}
+                </span>
+            )}
+        </Link>
     );
 }

@@ -15,21 +15,21 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - vyvy-network
 
- # Backend API (Go + Gin)
+  # Backend API (Go + Gin)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: vyvy_backend
     ports:
-     - "8080:8080"
+      - "8080:8080"
     environment:
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
@@ -38,16 +38,13 @@ services:
       DATABASE_NAME: erp_warehouse
       DATABASE_SSLMODE: disable
       JWT_SECRET: dev-secret-key-change-in-production-abcdefghijklmnopqrstuvwxyz123456
-      GIN_MODE: debug
+      GIN_MODE: release
       PORT: 8080
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - vyvy-network
-    volumes:
-      - ./backend:/app
-    command: go run cmd/api/main.go
 
   # Frontend (React + Vite)
   frontend:
@@ -56,19 +53,17 @@ services:
       dockerfile: Dockerfile
     container_name: vyvy_frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       VITE_API_BASE_URL: http://localhost:8080/api/v1
     depends_on:
       - backend
     networks:
       - vyvy-network
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
 
 volumes:
   postgres_data:
+
 
 networks:
   vyvy-network:

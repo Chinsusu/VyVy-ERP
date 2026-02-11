@@ -42,6 +42,8 @@ import AdjustmentCreatePage from './pages/inventory/AdjustmentCreatePage';
 import TransferListPage from './pages/inventory/TransferListPage';
 import TransferDetailPage from './pages/inventory/TransferDetailPage';
 import TransferCreatePage from './pages/inventory/TransferCreatePage';
+import StockMovementReportPage from './pages/reports/StockMovementReportPage';
+import InventoryValueReportPage from './pages/reports/InventoryValueReportPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -124,6 +126,10 @@ function App() {
             <Route path="/inventory/transfers" element={<TransferListPage />} />
             <Route path="/inventory/transfers/new" element={<TransferCreatePage />} />
             <Route path="/inventory/transfers/:id" element={<TransferDetailPage />} />
+
+            {/* Report Routes */}
+            <Route path="/reports/stock-movement" element={<StockMovementReportPage />} />
+            <Route path="/reports/inventory-value" element={<InventoryValueReportPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

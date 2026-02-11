@@ -7,6 +7,24 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc3] - 2026-02-11
+
+### Added
+- **Reports & Dashboard (Phase 7)**:
+    - Backend: `DashboardService` providing consolidated stats (PO counts, Pending GRNs, Low Stock).
+    - Backend: `ReportService` implementation for Stock Movement and Inventory Value.
+    - Backend: New API endpoints: `/dashboard/stats`, `/reports/stock-movement`, `/reports/inventory-value`.
+    - Frontend: `DashboardPage` with real-time statistical cards and low stock alerts.
+    - Frontend: `StockMovementReportPage` with date range filtering and transaction history.
+    - Frontend: `InventoryValueReportPage` showing current stock valuation by warehouse.
+
+### Fixed
+- **Deployment & Infrastructure**:
+    - Backend: Updated `Dockerfile` to use Go 1.24.
+    - Frontend: Updated `Dockerfile` to use Node.js 20.
+    - Database: Fixed `stock_balances` table name mismatch in `GetInventoryValueReport` query.
+    - Docker Compose: Streamlined configuration for production-like deployment (removed dev volume mounts).
+
 ## [1.0.0-rc2] - 2026-02-10
 
 ### Added
