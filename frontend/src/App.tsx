@@ -44,6 +44,8 @@ import TransferDetailPage from './pages/inventory/TransferDetailPage';
 import TransferCreatePage from './pages/inventory/TransferCreatePage';
 import StockMovementReportPage from './pages/reports/StockMovementReportPage';
 import InventoryValueReportPage from './pages/reports/InventoryValueReportPage';
+import LowStockReportPage from './pages/reports/LowStockReportPage';
+import ExpiringSoonReportPage from './pages/reports/ExpiringSoonReportPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import './index.css';
 
@@ -130,6 +132,8 @@ function App() {
             {/* Report Routes */}
             <Route path="/reports/stock-movement" element={<StockMovementReportPage />} />
             <Route path="/reports/inventory-value" element={<InventoryValueReportPage />} />
+            <Route path="/reports/low-stock" element={<LowStockReportPage />} />
+            <Route path="/reports/expiring-soon" element={<ExpiringSoonReportPage />} />
           </Route>
 
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

@@ -36,3 +36,23 @@ type InventoryValueReportRow struct {
 	TotalValue    float64 `json:"total_value"`
 	Unit          string  `json:"unit"`
 }
+
+type LowStockReportRow struct {
+	ItemCode      string  `json:"item_code"`
+	ItemName      string  `json:"item_name"`
+	WarehouseName string  `json:"warehouse_name"`
+	Quantity      float64 `json:"quantity"`
+	ReorderPoint  float64 `json:"reorder_point"`
+	Unit          string  `json:"unit"`
+}
+
+type ExpiringSoonReportRow struct {
+	ItemCode      string    `json:"item_code"`
+	ItemName      string    `json:"item_name"`
+	WarehouseName string    `json:"warehouse_name"`
+	BatchNumber   string    `json:"batch_number"`
+	Quantity      float64   `json:"quantity"`
+	ExpiryDate    time.Time `json:"expiry_date"`
+	DaysToExpiry  int       `json:"days_to_expiry"`
+	Unit          string    `json:"unit"`
+}

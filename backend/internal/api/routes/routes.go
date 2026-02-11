@@ -253,5 +253,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	{
 		reportGroup.GET("/stock-movement", reportHandler.GetStockMovementReport)
 		reportGroup.GET("/inventory-value", reportHandler.GetInventoryValueReport)
+		reportGroup.GET("/low-stock", reportHandler.GetLowStockReport)
+		reportGroup.GET("/expiring-soon", reportHandler.GetExpiringSoonReport)
 	}
 }

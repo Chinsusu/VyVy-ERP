@@ -55,11 +55,25 @@ export default function InventoryValueReportPage() {
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <button className="btn-outline bg-white">
+                    <button
+                        onClick={() => {
+                            toast.error('PDF Export is coming soon. Please use CSV for now.');
+                        }}
+                        className="btn-outline bg-white"
+                    >
                         <Download className="w-4 h-4 mr-2" />
                         Export PDF
                     </button>
-                    <button className="btn-outline bg-white">
+                    <button
+                        onClick={() => {
+                            const queryParams = new URLSearchParams();
+                            if (filters.warehouse_id) queryParams.append('warehouse_id', filters.warehouse_id.toString());
+                            queryParams.append('export', 'csv');
+                            window.open(`${import.meta.env.VITE_API_URL}/reports/inventory-value?${queryParams.toString()}`, '_blank');
+                        }}
+                        className="btn-outline bg-white"
+                        disabled={data.length === 0}
+                    >
                         <Download className="w-4 h-4 mr-2" />
                         Export CSV
                     </button>

@@ -101,6 +101,7 @@ export default function DashboardPage() {
                         bgColor="bg-rose-50"
                         isLoading={isLoading}
                         alert={(stats?.low_stock_count ?? 0) > 0}
+                        link="/reports/low-stock"
                     />
                     <StatCard
                         title="Expiring Soon"
@@ -109,6 +110,7 @@ export default function DashboardPage() {
                         bgColor="bg-orange-50"
                         isLoading={isLoading}
                         alert={(stats?.expiring_soon_count ?? 0) > 0}
+                        link="/reports/expiring-soon"
                     />
                     <StatCard
                         title="Purchase Orders"
@@ -140,6 +142,7 @@ export default function DashboardPage() {
                         icon={<TrendingUp className="w-5 h-5 text-cyan-600" />}
                         bgColor="bg-cyan-50"
                         isLoading={isLoading}
+                        link="/grns"
                     />
                 </div>
 
@@ -158,6 +161,14 @@ export default function DashboardPage() {
                             <Link to="/reports/inventory-value" className="card p-5 hover:border-primary-300 transition-colors group">
                                 <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-primary-600">Inventory Valuation</h4>
                                 <p className="text-sm text-gray-500">Current stock value by category and warehouse</p>
+                            </Link>
+                            <Link to="/reports/low-stock" className="card p-5 hover:border-primary-300 transition-colors group">
+                                <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-primary-600">Low Stock Report</h4>
+                                <p className="text-sm text-gray-500">Items below reorder point requiring attention</p>
+                            </Link>
+                            <Link to="/reports/expiring-soon" className="card p-5 hover:border-primary-300 transition-colors group">
+                                <h4 className="font-semibold text-gray-900 mb-1 group-hover:text-primary-600">Expiring Items</h4>
+                                <p className="text-sm text-gray-500">Batches expiring within current period</p>
                             </Link>
                         </div>
                     </div>

@@ -59,6 +59,8 @@ func (s *dashboardService) GetDashboardStats() (*dto.DashboardStats, error) {
 type ReportService interface {
 	GetStockMovementReport(filters map[string]interface{}) ([]dto.StockMovementReportRow, error)
 	GetInventoryValueReport(filters map[string]interface{}) ([]dto.InventoryValueReportRow, error)
+	GetLowStockReport(filters map[string]interface{}) ([]dto.LowStockReportRow, error)
+	GetExpiringSoonReport(filters map[string]interface{}) ([]dto.ExpiringSoonReportRow, error)
 }
 
 type reportService struct {
@@ -124,6 +126,63 @@ func (s *reportService) GetInventoryValueReport(filters map[string]interface{}) 
 		`).
 		Joins("JOIN materials ON stock_balance.item_id = materials.id AND stock_balance.item_type = 'material'").
 		Joins("JOIN warehouses ON stock_balance.warehouse_id = warehouses.id")
+
+	if warehouseID, ok := filters["warehouse_id"].(uint); ok && warehouseID > 0 {
+		query = query.Where("stock_balance.warehouse_id = ?", warehouseID)
+	}
+
+	err := query.Scan(&rows).Error
+	return rows, err
+}
+
+func (s *reportService) GetLowStockReport(filters map[string]interface{}) ([]dto.LowStockReportRow, error) {
+	var rows []dto.LowStockReportRow
+
+	query := s.db.Table("materials").
+		Select(`
+			materials.code as item_code,
+			materials.trading_name as item_name,
+			warehouses.name as warehouse_name,
+			stock_balance.quantity as quantity,
+			materials.reorder_point as reorder_point,
+			materials.unit as unit
+		`).
+		Joins("JOIN stock_balance ON materials.id = stock_balance.item_id AND stock_balance.item_type = 'material'").
+		Joins("JOIN warehouses ON stock_balance.warehouse_id = warehouses.id").
+		Where("stock_balance.quantity < materials.reorder_point")
+
+	if warehouseID, ok := filters["warehouse_id"].(uint); ok && warehouseID > 0 {
+		query = query.Where("stock_balance.warehouse_id = ?", warehouseID)
+	}
+
+	err := query.Scan(&rows).Error
+	return rows, err
+}
+
+func (s *reportService) GetExpiringSoonReport(filters map[string]interface{}) ([]dto.ExpiringSoonReportRow, error) {
+	var rows []dto.ExpiringSoonReportRow
+	days := 30
+	if d, ok := filters["days"].(int); ok {
+		days = d
+	}
+
+	limitDate := time.Now().AddDate(0, 0, days)
+
+	query := s.db.Table("stock_balance").
+		Select(`
+			materials.code as item_code,
+			materials.trading_name as item_name,
+			warehouses.name as warehouse_name,
+			stock_balance.batch_number as batch_number,
+			stock_balance.quantity as quantity,
+			stock_balance.expiry_date as expiry_date,
+			EXTRACT(DAY FROM (stock_balance.expiry_date - NOW())) as days_to_expiry,
+			materials.unit as unit
+		`).
+		Joins("JOIN materials ON stock_balance.item_id = materials.id AND stock_balance.item_type = 'material'").
+		Joins("JOIN warehouses ON stock_balance.warehouse_id = warehouses.id").
+		Where("stock_balance.expiry_date IS NOT NULL AND stock_balance.expiry_date <= ?", limitDate).
+		Order("stock_balance.expiry_date ASC")
 
 	if warehouseID, ok := filters["warehouse_id"].(uint); ok && warehouseID > 0 {
 		query = query.Where("stock_balance.warehouse_id = ?", warehouseID)

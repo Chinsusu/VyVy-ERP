@@ -11,12 +11,13 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 - **Reports & Dashboard (Phase 7)**:
-    - Backend: `DashboardService` providing consolidated stats (PO counts, Pending GRNs, Low Stock).
-    - Backend: `ReportService` implementation for Stock Movement and Inventory Value.
-    - Backend: New API endpoints: `/dashboard/stats`, `/reports/stock-movement`, `/reports/inventory-value`.
-    - Frontend: `DashboardPage` with real-time statistical cards and low stock alerts.
-    - Frontend: `StockMovementReportPage` with date range filtering and transaction history.
-    - Frontend: `InventoryValueReportPage` showing current stock valuation by warehouse.
+    - Backend: `ReportService` expanded with `GetLowStockReport` and `GetExpiringSoonReport`.
+    - Backend: Server-side CSV export logic for all inventory reports.
+    - Backend: New API endpoints: `/api/v1/reports/low-stock`, `/api/v1/reports/expiring-soon`.
+    - Frontend: New dedicated report pages: `LowStockReportPage` and `ExpiringSoonReportPage`.
+    - Frontend: Actionable Dashboard stat cards with direct links to detailed reports (Low Stock, Expiring Soon, Receipts).
+    - Frontend: Integrated CSV Export functionality on all report pages.
+    - Frontend: Visual stock status indicators and shortage calculations.
 
 ### Fixed
 - **Deployment & Infrastructure**:

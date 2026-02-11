@@ -1,5 +1,10 @@
 package utils
 
+import (
+	"fmt"
+	"strconv"
+)
+
 type APIResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message,omitempty"`
@@ -83,4 +88,21 @@ func CalculatePagination(page, limit int, totalItems int64) Pagination {
 		TotalItems: totalItems,
 		TotalPages: totalPages,
 	}
+}
+
+// Type conversion helpers
+func StringToUint(s string) uint {
+	val, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return uint(val)
+}
+
+func FloatToString(f float64) string {
+	return fmt.Sprintf("%.2f", f)
+}
+
+func IntToString(i int) string {
+	return strconv.Itoa(i)
 }

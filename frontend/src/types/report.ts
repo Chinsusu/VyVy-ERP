@@ -24,4 +24,25 @@ export interface ReportFilter {
     start_date?: string;
     end_date?: string;
     warehouse_id?: number;
+    days?: number;
+}
+
+export interface LowStockReportRow {
+    item_code: string;
+    item_name: string;
+    warehouse_name: string;
+    quantity: number;
+    reorder_point: number;
+    unit: string;
+}
+
+export interface ExpiringSoonReportRow {
+    item_code: string;
+    item_name: string;
+    warehouse_name: string;
+    batch_number: string;
+    quantity: number;
+    expiry_date: string;
+    days_to_expiry: number;
+    unit: string;
 }
