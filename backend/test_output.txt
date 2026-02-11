@@ -1,0 +1,16 @@
+=== RUN   TestMaterialRequestWorkflowIntegration
+=== RUN   TestMaterialRequestWorkflowIntegration/Create_MR
+=== RUN   TestMaterialRequestWorkflowIntegration/Approve_MR
+=== RUN   TestMaterialRequestWorkflowIntegration/Verify_Reservation
+=== RUN   TestMaterialRequestWorkflowIntegration/Create_MIN
+=== RUN   TestMaterialRequestWorkflowIntegration/Post_MIN
+=== RUN   TestMaterialRequestWorkflowIntegration/Verify_Final_Balance
+--- PASS: TestMaterialRequestWorkflowIntegration (1.03s)
+    --- PASS: TestMaterialRequestWorkflowIntegration/Create_MR (0.01s)
+    --- PASS: TestMaterialRequestWorkflowIntegration/Approve_MR (0.02s)
+    --- PASS: TestMaterialRequestWorkflowIntegration/Verify_Reservation (0.00s)
+    --- PASS: TestMaterialRequestWorkflowIntegration/Create_MIN (0.01s)
+    --- PASS: TestMaterialRequestWorkflowIntegration/Post_MIN (0.01s)
+    --- PASS: TestMaterialRequestWorkflowIntegration/Verify_Final_Balance (0.00s)
+PASS
+ok  	github.com/VyVy-ERP/warehouse-backend/internal/api/tests	1.036s

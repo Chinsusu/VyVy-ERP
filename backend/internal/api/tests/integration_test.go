@@ -123,14 +123,14 @@ func TestMaterialIntegration(t *testing.T) {
 
 	// 2. List Materials
 	t.Run("GET /api/v1/materials - Success", func(t *testing.T) {
-		w := performRequest(router, "GET", "/api/v1/materials", nil, nil)
+		w := performRequest(router, "GET", "/api/v1/materials", nil, authHeader)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
 	// 3. Get Material by ID
 	t.Run("GET /api/v1/materials/:id - Success", func(t *testing.T) {
 		path := fmt.Sprintf("/api/v1/materials/%d", materialID)
-		w := performRequest(router, "GET", path, nil, nil)
+		w := performRequest(router, "GET", path, nil, authHeader)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
@@ -173,14 +173,14 @@ func TestSupplierIntegration(t *testing.T) {
 
 	// 2. List Suppliers
 	t.Run("GET /api/v1/suppliers - Success", func(t *testing.T) {
-		w := performRequest(router, "GET", "/api/v1/suppliers", nil, nil)
+		w := performRequest(router, "GET", "/api/v1/suppliers", nil, authHeader)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
 	// 3. Get Supplier by ID
 	t.Run("GET /api/v1/suppliers/:id - Success", func(t *testing.T) {
 		path := fmt.Sprintf("/api/v1/suppliers/%d", supplierID)
-		w := performRequest(router, "GET", path, nil, nil)
+		w := performRequest(router, "GET", path, nil, authHeader)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
@@ -232,7 +232,7 @@ func TestWarehouseIntegration(t *testing.T) {
 	// 3. List Locations for Warehouse
 	t.Run("GET /api/v1/warehouses/:id/locations - Success", func(t *testing.T) {
 		path := fmt.Sprintf("/api/v1/warehouses/%d/locations", warehouseID)
-		w := performRequest(router, "GET", path, nil, nil)
+		w := performRequest(router, "GET", path, nil, authHeader)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 }

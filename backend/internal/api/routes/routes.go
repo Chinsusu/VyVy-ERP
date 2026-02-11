@@ -80,90 +80,81 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		authGroup.GET("/me", middleware.AuthMiddleware(authService), authHandler.Me)
 	}
 
-	// Material routes
+	// Material routes - All protected
 	materialGroup := v1.Group("/materials")
+	materialGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		materialGroup.GET("", materialHandler.List)
 		materialGroup.GET("/:id", materialHandler.GetByID)
-
-		// Protected endpoints (require authentication)
-		materialGroup.POST("", middleware.AuthMiddleware(authService), materialHandler.Create)
-		materialGroup.PUT("/:id", middleware.AuthMiddleware(authService), materialHandler.Update)
-		materialGroup.DELETE("/:id", middleware.AuthMiddleware(authService), materialHandler.Delete)
+		materialGroup.POST("", materialHandler.Create)
+		materialGroup.PUT("/:id", materialHandler.Update)
+		materialGroup.DELETE("/:id", middleware.RequireRole("admin"), materialHandler.Delete)
 	}
 
-	// Supplier routes
+	// Supplier routes - All protected
 	supplierGroup := v1.Group("/suppliers")
+	supplierGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		supplierGroup.GET("", supplierHandler.List)
 		supplierGroup.GET("/:id", supplierHandler.GetByID)
-
-		// Protected endpoints (require authentication)
-		supplierGroup.POST("", middleware.AuthMiddleware(authService), supplierHandler.Create)
-		supplierGroup.PUT("/:id", middleware.AuthMiddleware(authService), supplierHandler.Update)
-		supplierGroup.DELETE("/:id", middleware.AuthMiddleware(authService), supplierHandler.Delete)
+		supplierGroup.POST("", supplierHandler.Create)
+		supplierGroup.PUT("/:id", supplierHandler.Update)
+		supplierGroup.DELETE("/:id", middleware.RequireRole("admin"), supplierHandler.Delete)
 	}
 
-	// Warehouse routes
+	// Warehouse routes - All protected
 	warehouseGroup := v1.Group("/warehouses")
+	warehouseGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		warehouseGroup.GET("", warehouseHandler.List)
 		warehouseGroup.GET("/:id", warehouseHandler.GetByID)
 		warehouseGroup.GET("/:id/locations", warehouseHandler.GetLocations)
 
-		// Protected endpoints (require authentication)
-		warehouseGroup.POST("", middleware.AuthMiddleware(authService), warehouseHandler.Create)
-		warehouseGroup.PUT("/:id", middleware.AuthMiddleware(authService), warehouseHandler.Update)
-		warehouseGroup.DELETE("/:id", middleware.AuthMiddleware(authService), warehouseHandler.Delete)
+		// Admin/Warehouse Admin roles
+		warehouseGroup.POST("", middleware.RequireRole("warehouse_admin"), warehouseHandler.Create)
+		warehouseGroup.PUT("/:id", middleware.RequireRole("warehouse_admin"), warehouseHandler.Update)
+		warehouseGroup.DELETE("/:id", middleware.RequireRole("admin"), warehouseHandler.Delete)
 	}
 
-	// Warehouse Location routes
+	// Warehouse Location routes - All protected
 	locationGroup := v1.Group("/warehouse-locations")
+	locationGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		locationGroup.GET("", warehouseLocationHandler.List)
 		locationGroup.GET("/:id", warehouseLocationHandler.GetByID)
 
-		// Protected endpoints (require authentication)
-		locationGroup.POST("", middleware.AuthMiddleware(authService), warehouseLocationHandler.Create)
-		locationGroup.PUT("/:id", middleware.AuthMiddleware(authService), warehouseLocationHandler.Update)
-		locationGroup.DELETE("/:id", middleware.AuthMiddleware(authService), warehouseLocationHandler.Delete)
+		locationGroup.POST("", middleware.RequireRole("warehouse_admin"), warehouseLocationHandler.Create)
+		locationGroup.PUT("/:id", middleware.RequireRole("warehouse_admin"), warehouseLocationHandler.Update)
+		locationGroup.DELETE("/:id", middleware.RequireRole("admin"), warehouseLocationHandler.Delete)
 	}
 
-	// Finished Products routes
+	// Finished Products routes - All protected
 	productGroup := v1.Group("/finished-products")
+	productGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		productGroup.GET("", finishedProductHandler.List)
 		productGroup.GET("/:id", finishedProductHandler.GetByID)
-
-		// Protected endpoints (require authentication)
-		productGroup.POST("", middleware.AuthMiddleware(authService), finishedProductHandler.Create)
-		productGroup.PUT("/:id", middleware.AuthMiddleware(authService), finishedProductHandler.Update)
-		productGroup.DELETE("/:id", middleware.AuthMiddleware(authService), finishedProductHandler.Delete)
+		productGroup.POST("", finishedProductHandler.Create)
+		productGroup.PUT("/:id", finishedProductHandler.Update)
+		productGroup.DELETE("/:id", middleware.RequireRole("admin"), finishedProductHandler.Delete)
 	}
 
-	// Purchase Orders routes
+	// Purchase Orders routes - All protected
 	poGroup := v1.Group("/purchase-orders")
+	poGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		poGroup.GET("", purchaseOrderHandler.List)
 		poGroup.GET("/:id", purchaseOrderHandler.GetByID)
-
-		// Protected endpoints (require authentication)
-		poGroup.POST("", middleware.AuthMiddleware(authService), purchaseOrderHandler.Create)
-		poGroup.PUT("/:id", middleware.AuthMiddleware(authService), purchaseOrderHandler.Update)
-		poGroup.DELETE("/:id", middleware.AuthMiddleware(authService), purchaseOrderHandler.Delete)
+		poGroup.POST("", purchaseOrderHandler.Create)
+		poGroup.PUT("/:id", purchaseOrderHandler.Update)
+		poGroup.DELETE("/:id", middleware.RequireRole("admin"), purchaseOrderHandler.Delete)
 		
 		// Workflow endpoints
-		poGroup.POST("/:id/approve", middleware.AuthMiddleware(authService), purchaseOrderHandler.Approve)
-		poGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), purchaseOrderHandler.Cancel)
+		poGroup.POST("/:id/approve", middleware.RequireRole("procurement_manager"), purchaseOrderHandler.Approve)
+		poGroup.POST("/:id/cancel", middleware.RequireRole("procurement_manager"), purchaseOrderHandler.Cancel)
 	}
 
-	// Stock / Inventory routes
+	// Stock / Inventory routes - All protected
 	invGroup := v1.Group("/inventory")
 	invGroup.Use(middleware.AuthMiddleware(authService))
 	{
@@ -173,75 +164,67 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		invGroup.GET("/adjustments", inventoryHandler.ListAdjustments)
 		invGroup.GET("/adjustments/:id", inventoryHandler.GetAdjustment)
 		invGroup.POST("/adjustments", inventoryHandler.CreateAdjustment)
-		invGroup.POST("/adjustments/:id/post", inventoryHandler.PostAdjustment)
-		invGroup.POST("/adjustments/:id/cancel", inventoryHandler.CancelAdjustment)
+		invGroup.POST("/adjustments/:id/post", middleware.RequireRole("warehouse_manager"), inventoryHandler.PostAdjustment)
+		invGroup.POST("/adjustments/:id/cancel", middleware.RequireRole("warehouse_manager"), inventoryHandler.CancelAdjustment)
 
 		// Transfers
 		invGroup.GET("/transfers", inventoryHandler.ListTransfers)
 		invGroup.GET("/transfers/:id", inventoryHandler.GetTransfer)
 		invGroup.POST("/transfers", inventoryHandler.CreateTransfer)
-		invGroup.POST("/transfers/:id/post", inventoryHandler.PostTransfer)
-		invGroup.POST("/transfers/:id/cancel", inventoryHandler.CancelTransfer)
+		invGroup.POST("/transfers/:id/post", middleware.RequireRole("warehouse_manager"), inventoryHandler.PostTransfer)
+		invGroup.POST("/transfers/:id/cancel", middleware.RequireRole("warehouse_manager"), inventoryHandler.CancelTransfer)
 	}
 
-	// Goods Receipt Note (GRN) routes
+	// Goods Receipt Note (GRN) routes - All protected
 	grnGroup := v1.Group("/grns")
+	grnGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		grnGroup.GET("", grnHandler.List)
 		grnGroup.GET("/:id", grnHandler.GetByID)
-
-		// Protected endpoints (require authentication)
-		grnGroup.POST("", middleware.AuthMiddleware(authService), grnHandler.Create)
-		grnGroup.POST("/:id/qc", middleware.AuthMiddleware(authService), grnHandler.UpdateQC)
-		grnGroup.POST("/:id/post", middleware.AuthMiddleware(authService), grnHandler.Post)
+		grnGroup.POST("", grnHandler.Create)
+		grnGroup.POST("/:id/qc", grnHandler.UpdateQC)
+		grnGroup.POST("/:id/post", middleware.RequireRole("warehouse_manager"), grnHandler.Post)
 	}
 
-	// Material Request (MR) routes
+	// Material Request (MR) routes - All protected
 	mrGroup := v1.Group("/material-requests")
+	mrGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		mrGroup.GET("", mrHandler.List)
 		mrGroup.GET("/:id", mrHandler.GetByID)
-
-		// Protected endpoints (require authentication)
-		mrGroup.POST("", middleware.AuthMiddleware(authService), mrHandler.Create)
-		mrGroup.PUT("/:id", middleware.AuthMiddleware(authService), mrHandler.Update)
-		mrGroup.DELETE("/:id", middleware.AuthMiddleware(authService), mrHandler.Delete)
+		mrGroup.POST("", mrHandler.Create)
+		mrGroup.PUT("/:id", mrHandler.Update)
+		mrGroup.DELETE("/:id", middleware.RequireRole("admin"), mrHandler.Delete)
 
 		// Workflow endpoints
-		mrGroup.POST("/:id/approve", middleware.AuthMiddleware(authService), mrHandler.Approve)
-		mrGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), mrHandler.Cancel)
+		mrGroup.POST("/:id/approve", middleware.RequireRole("warehouse_manager"), mrHandler.Approve)
+		mrGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), mrHandler.Cancel)
 	}
 
-	// Material Issue Note (MIN) routes
+	// Material Issue Note (MIN) routes - All protected
 	minGroup := v1.Group("/material-issue-notes")
+	minGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		minGroup.GET("", minHandler.List)
 		minGroup.GET("/:id", minHandler.GetByID)
-
-		// Protected endpoints (require authentication)
-		minGroup.POST("", middleware.AuthMiddleware(authService), minHandler.Create)
-		minGroup.POST("/:id/post", middleware.AuthMiddleware(authService), minHandler.Post)
-		minGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), minHandler.Cancel)
+		minGroup.POST("", minHandler.Create)
+		minGroup.POST("/:id/post", middleware.RequireRole("warehouse_manager"), minHandler.Post)
+		minGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), minHandler.Cancel)
 	}
 
-	// Delivery Order (DO) routes
+	// Delivery Order (DO) routes - All protected
 	doGroup := v1.Group("/delivery-orders")
+	doGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		// Public endpoints
 		doGroup.GET("", doHandler.List)
 		doGroup.GET("/:id", doHandler.GetByID)
-
-		// Protected endpoints
-		doGroup.POST("", middleware.AuthMiddleware(authService), doHandler.Create)
-		doGroup.PUT("/:id", middleware.AuthMiddleware(authService), doHandler.Update)
-		doGroup.POST("/:id/ship", middleware.AuthMiddleware(authService), doHandler.Ship)
-		doGroup.POST("/:id/cancel", middleware.AuthMiddleware(authService), doHandler.Cancel)
+		doGroup.POST("", doHandler.Create)
+		doGroup.PUT("/:id", doHandler.Update)
+		doGroup.POST("/:id/ship", middleware.RequireRole("warehouse_manager"), doHandler.Ship)
+		doGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), doHandler.Cancel)
 	}
 
-	// Dashboard & Report routes
+	// Dashboard & Report routes - All protected
 	dashGroup := v1.Group("/dashboard")
 	dashGroup.Use(middleware.AuthMiddleware(authService))
 	{
