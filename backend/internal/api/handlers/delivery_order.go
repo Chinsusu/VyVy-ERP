@@ -25,8 +25,9 @@ func (h *DeliveryOrderHandler) Create(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetUint("user_id")
-	do, err := h.doService.CreateDeliveryOrder(&req, userID)
+	val, _ := c.Get("user_id")
+	userID := val.(int64)
+	do, err := h.doService.CreateDeliveryOrder(&req, uint(userID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("CREATE_FAILED", err.Error()))
 		return
@@ -85,8 +86,9 @@ func (h *DeliveryOrderHandler) Update(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetUint("user_id")
-	do, err := h.doService.UpdateDeliveryOrder(uint(id), &req, userID)
+	val, _ := c.Get("user_id")
+	userID := val.(int64)
+	do, err := h.doService.UpdateDeliveryOrder(uint(id), &req, uint(userID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("UPDATE_FAILED", err.Error()))
 		return
@@ -108,8 +110,9 @@ func (h *DeliveryOrderHandler) Ship(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetUint("user_id")
-	do, err := h.doService.ShipDeliveryOrder(uint(id), &req, userID)
+	val, _ := c.Get("user_id")
+	userID := val.(int64)
+	do, err := h.doService.ShipDeliveryOrder(uint(id), &req, uint(userID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("SHIP_FAILED", err.Error()))
 		return
@@ -125,8 +128,9 @@ func (h *DeliveryOrderHandler) Cancel(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetUint("user_id")
-	do, err := h.doService.CancelDeliveryOrder(uint(id), userID)
+	val, _ := c.Get("user_id")
+	userID := val.(int64)
+	do, err := h.doService.CancelDeliveryOrder(uint(id), uint(userID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("CANCEL_FAILED", err.Error()))
 		return

@@ -13,7 +13,7 @@ type User struct {
 	PasswordHash string     `gorm:"size:255;not null" json:"-"` // Never expose password hash in JSON
 	FullName     string     `gorm:"size:255" json:"full_name"`
 	Role         string     `gorm:"size:50;not null;default:'warehouse_staff'" json:"role"`
-	IsActive     bool       `gorm:"default:true" json:"is_active"`
+	IsActive     *bool      `gorm:"default:true" json:"is_active"`
 	LastLoginAt  *time.Time `json:"last_login_at,omitempty"`
 	CreatedAt    time.Time  `gorm:"autoCreateTime" json:"created_at"`
 	CreatedBy    *int64     `json:"created_by,omitempty"`
@@ -49,7 +49,7 @@ type SafeUser struct {
 	Email       string     `json:"email"`
 	FullName    string     `json:"full_name"`
 	Role        string     `json:"role"`
-	IsActive    bool       `json:"is_active"`
+	IsActive    *bool      `json:"is_active"`
 	LastLoginAt *time.Time `json:"last_login_at,omitempty"`
 	CreatedAt   time.Time  `json:"created_at"`
 }

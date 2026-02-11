@@ -19,7 +19,7 @@ type Supplier struct {
 	Country       string     `json:"country" gorm:"default:'Vietnam'"`
 	PaymentTerms  *string    `json:"payment_terms"`
 	CreditLimit   *float64   `json:"credit_limit" gorm:"type:decimal(15,2)"`
-	IsActive      bool       `json:"is_active" gorm:"default:true"`
+	IsActive      *bool      `json:"is_active" gorm:"default:true"`
 	Notes         *string    `json:"notes"`
 	CreatedAt     time.Time  `json:"created_at"`
 	CreatedBy     *uint      `json:"created_by"`
@@ -47,7 +47,7 @@ type SafeSupplier struct {
 	Country       string    `json:"country"`
 	PaymentTerms  *string   `json:"payment_terms"`
 	CreditLimit   *float64  `json:"credit_limit"`
-	IsActive      bool      `json:"is_active"`
+	IsActive      *bool     `json:"is_active"`
 	Notes         *string   `json:"notes"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`

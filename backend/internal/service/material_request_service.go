@@ -288,7 +288,6 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint) (*
 			if err != nil {
 				return err
 			}
-
 			remainingToReserve := item.RequestedQuantity
 			
 			// Simple FIFO-ish reservation across batches/locations

@@ -35,7 +35,7 @@ type Material struct {
 	Hazardous          bool    `gorm:"default:false" json:"hazardous"`
 
 	// Status
-	IsActive bool    `gorm:"default:true;index" json:"is_active"`
+	IsActive *bool   `gorm:"default:true;index" json:"is_active"`
 	Notes    *string `gorm:"type:text" json:"notes,omitempty"`
 
 	// Audit fields
@@ -89,7 +89,7 @@ type SafeMaterial struct {
 	ShelfLifeDays      *int     `json:"shelf_life_days,omitempty"`
 	StorageConditions  *string  `json:"storage_conditions,omitempty"`
 	Hazardous          bool     `json:"hazardous"`
-	IsActive           bool     `json:"is_active"`
+	IsActive           *bool    `json:"is_active"`
 	Notes              *string  `json:"notes,omitempty"`
 	CreatedAt          string   `json:"created_at"`
 	UpdatedAt          string   `json:"updated_at"`

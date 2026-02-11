@@ -59,7 +59,7 @@ func (s *warehouseService) CreateWarehouse(req *dto.CreateWarehouseRequest, user
 		Address:       req.Address,
 		City:          req.City,
 		ManagerID:     req.ManagerID,
-		IsActive:      req.IsActive,
+		IsActive:      &req.IsActive,
 		Notes:         req.Notes,
 		CreatedBy:     &userID,
 		UpdatedBy:     &userID,
@@ -156,7 +156,7 @@ func (s *warehouseService) UpdateWarehouse(id uint, req *dto.UpdateWarehouseRequ
 		warehouse.ManagerID = req.ManagerID
 	}
 	if req.IsActive != nil {
-		warehouse.IsActive = *req.IsActive
+		warehouse.IsActive = req.IsActive
 	}
 	if req.Notes != nil {
 		warehouse.Notes = req.Notes

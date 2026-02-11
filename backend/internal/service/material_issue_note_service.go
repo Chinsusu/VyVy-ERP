@@ -102,11 +102,21 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 		for _, item := range min.Items {
 			// a. Get stock balance
 			var balance models.StockBalance
-			err := tx.Where("item_type = ? AND item_id = ? AND warehouse_id = ?", "material", item.MaterialID, min.WarehouseID).
-				Where("batch_number = ? AND warehouse_location_id = ?", item.BatchNumber, item.WarehouseLocationID).
-				First(&balance).Error
+			query := tx.Where("item_type = ? AND item_id = ? AND warehouse_id = ?", "material", item.MaterialID, min.WarehouseID)
+			
+			if item.WarehouseLocationID != nil {
+				query = query.Where("warehouse_location_id = ?", *item.WarehouseLocationID)
+			} else {
+				query = query.Where("warehouse_location_id IS NULL")
+			}
+			
+			if item.BatchNumber != "" {
+				query = query.Where("batch_number = ?", item.BatchNumber)
+			} else {
+				query = query.Where("(batch_number = '' OR batch_number IS NULL)")
+			}
 
-			if err != nil {
+			if err := query.First(&balance).Error; err != nil {
 				return fmt.Errorf("stock balance not found for material %d in specified batch/location", item.MaterialID)
 			}
 
@@ -116,9 +126,22 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 
 			// b. Find matching reservation for this MR
 			var reservation models.StockReservation
-			err = tx.Where("reference_type = ? AND reference_id = ? AND item_id = ? AND item_type = ?", "material_request", min.MaterialRequestID, item.MaterialID, "material").
-				Where("batch_number = ? AND warehouse_location_id = ? AND status = 'active'", item.BatchNumber, item.WarehouseLocationID).
-				First(&reservation).Error
+			resQuery := tx.Where("reference_type = ? AND reference_id = ? AND item_id = ? AND item_type = ?", "material_request", min.MaterialRequestID, item.MaterialID, "material").
+				Where("status = 'active'")
+
+			if item.WarehouseLocationID != nil {
+				resQuery = resQuery.Where("warehouse_location_id = ?", *item.WarehouseLocationID)
+			} else {
+				resQuery = resQuery.Where("warehouse_location_id IS NULL")
+			}
+			
+			if item.BatchNumber != "" {
+				resQuery = resQuery.Where("batch_number = ?", item.BatchNumber)
+			} else {
+				resQuery = resQuery.Where("(batch_number = '' OR batch_number IS NULL)")
+			}
+
+			err := resQuery.First(&reservation).Error
 
 			hasReservation := err == nil
 			

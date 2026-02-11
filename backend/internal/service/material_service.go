@@ -59,7 +59,7 @@ func (s *materialService) CreateMaterial(req dto.CreateMaterialRequest, userID i
 		ShelfLifeDays:     req.ShelfLifeDays,
 		StorageConditions: req.StorageConditions,
 		Hazardous:         req.Hazardous,
-		IsActive:          req.IsActive,
+		IsActive:          &req.IsActive,
 		Notes:             req.Notes,
 		CreatedBy:         &userID,
 		UpdatedBy:         &userID,
@@ -162,7 +162,7 @@ func (s *materialService) UpdateMaterial(id int64, req dto.UpdateMaterialRequest
 		material.Hazardous = *req.Hazardous
 	}
 	if req.IsActive != nil {
-		material.IsActive = *req.IsActive
+		material.IsActive = req.IsActive
 	}
 	if req.Notes != nil {
 		material.Notes = req.Notes

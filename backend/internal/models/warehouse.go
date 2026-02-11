@@ -13,7 +13,7 @@ type Warehouse struct {
 	Address       *string    `json:"address"`
 	City          *string    `json:"city"`
 	ManagerID     *uint      `json:"manager_id"`
-	IsActive      bool       `json:"is_active" gorm:"default:true"`
+	IsActive      *bool      `json:"is_active" gorm:"default:true"`
 	Notes         *string    `json:"notes"`
 	CreatedAt     time.Time  `json:"created_at"`
 	CreatedBy     *uint      `json:"created_by"`
@@ -39,7 +39,7 @@ type SafeWarehouse struct {
 	Address        *string   `json:"address"`
 	City           *string   `json:"city"`
 	ManagerID      *uint     `json:"manager_id"`
-	IsActive       bool      `json:"is_active"`
+	IsActive       *bool     `json:"is_active"`
 	Notes          *string   `json:"notes"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`

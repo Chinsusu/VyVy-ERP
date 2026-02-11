@@ -25,8 +25,10 @@ func (h *MaterialIssueNoteHandler) Create(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetUint("user_id")
-	min.CreatedBy = &userID
+	val, _ := c.Get("user_id")
+	userID := val.(int64)
+	uID := uint(userID)
+	min.CreatedBy = &uID
 
 	createdMIN, err := h.minService.Create(&min)
 	if err != nil {
@@ -100,8 +102,9 @@ func (h *MaterialIssueNoteHandler) Post(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetUint("user_id")
-	if err := h.minService.Post(uint(id), userID); err != nil {
+	val, _ := c.Get("user_id")
+	userID := val.(int64)
+	if err := h.minService.Post(uint(id), uint(userID)); err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("POST_FAILED", err.Error()))
 		return
 	}
@@ -116,8 +119,9 @@ func (h *MaterialIssueNoteHandler) Cancel(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetUint("user_id")
-	if err := h.minService.Cancel(uint(id), userID); err != nil {
+	val, _ := c.Get("user_id")
+	userID := val.(int64)
+	if err := h.minService.Cancel(uint(id), uint(userID)); err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("CANCEL_FAILED", err.Error()))
 		return
 	}

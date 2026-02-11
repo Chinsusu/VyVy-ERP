@@ -57,7 +57,7 @@ func (s *authService) Login(ctx context.Context, email, password string) (*Login
 	}
 
 	// Check if user is active
-	if !user.IsActive {
+	if user.IsActive != nil && !*user.IsActive {
 		return nil, ErrUserInactive
 	}
 
@@ -122,7 +122,7 @@ func (s *authService) RefreshToken(ctx context.Context, userID int64) (*LoginRes
 	}
 
 	// Check if user is still active
-	if !user.IsActive {
+	if user.IsActive != nil && !*user.IsActive {
 		return nil, ErrUserInactive
 	}
 

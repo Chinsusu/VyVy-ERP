@@ -7,6 +7,21 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc4] - 2026-02-11
+
+### Added
+- **API Integration Testing (Phase 8)**:
+    - Backend: Comprehensive integration tests for `Material`, `Supplier`, `Warehouse`, `Purchase Order`, `GRN`, and `Material Request` APIs.
+    - Backend: Verified end-to-end procurement workflow (PO -> GRN -> Stock Update).
+    - Backend: Verified end-to-end internal requisition workflow (MR -> Reservation -> MIN -> Stock Deduction).
+    - Backend: Implementation of `performRequest` and `setupTestApp` utilities for high-fidelity API testing.
+
+### Fixed
+- **API Security & Reliability**:
+    - Backend: Standardized `user_id` handling across all handlers by enforcing `int64` from JWT claims and safe casting to `uint` where required.
+    - Backend: Fixed critical bug in `MaterialIssueNoteService.Post` and `StockBalanceRepository` where `NULL` values in database queries caused failures in stock/reservation lookups.
+    - Backend: Corrected JWT configuration for test environment (standardized Expiry and Refresh settings).
+
 ## [1.0.0-rc3] - 2026-02-11
 
 ### Added

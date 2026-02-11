@@ -15,7 +15,7 @@ type WarehouseLocation struct {
 	Shelf        *string    `json:"shelf"`
 	Bin          *string    `json:"bin"`
 	LocationType string     `json:"location_type" gorm:"default:'storage'"`
-	IsActive     bool       `json:"is_active" gorm:"default:true"`
+	IsActive     *bool      `json:"is_active" gorm:"default:true"`
 	Notes        *string    `json:"notes"`
 	CreatedAt    time.Time  `json:"created_at"`
 	CreatedBy    *uint      `json:"created_by"`
@@ -42,7 +42,7 @@ type SafeWarehouseLocation struct {
 	Shelf        *string   `json:"shelf"`
 	Bin          *string   `json:"bin"`
 	LocationType string    `json:"location_type"`
-	IsActive     bool      `json:"is_active"`
+	IsActive     *bool     `json:"is_active"`
 	Notes        *string   `json:"notes"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`

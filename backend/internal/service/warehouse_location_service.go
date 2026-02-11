@@ -69,7 +69,7 @@ func (s *warehouseLocationService) CreateLocation(req *dto.CreateWarehouseLocati
 		Shelf:        req.Shelf,
 		Bin:          req.Bin,
 		LocationType: locationType,
-		IsActive:     req.IsActive,
+		IsActive:     &req.IsActive,
 		Notes:        req.Notes,
 		CreatedBy:    &userID,
 		UpdatedBy:    &userID,
@@ -164,7 +164,7 @@ func (s *warehouseLocationService) UpdateLocation(id uint, req *dto.UpdateWareho
 		location.LocationType = req.LocationType
 	}
 	if req.IsActive != nil {
-		location.IsActive = *req.IsActive
+		location.IsActive = req.IsActive
 	}
 	if req.Notes != nil {
 		location.Notes = req.Notes

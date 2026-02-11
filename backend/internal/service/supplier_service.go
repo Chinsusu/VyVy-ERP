@@ -59,7 +59,7 @@ func (s *supplierService) CreateSupplier(req *dto.CreateSupplierRequest, userID 
 		Country:       country,
 		PaymentTerms:  req.PaymentTerms,
 		CreditLimit:   req.CreditLimit,
-		IsActive:      req.IsActive,
+		IsActive:      &req.IsActive,
 		Notes:         req.Notes,
 		CreatedBy:     &userID,
 		UpdatedBy:     &userID,
@@ -157,7 +157,7 @@ func (s *supplierService) UpdateSupplier(id uint, req *dto.UpdateSupplierRequest
 		supplier.CreditLimit = req.CreditLimit
 	}
 	if req.IsActive != nil {
-		supplier.IsActive = *req.IsActive
+		supplier.IsActive = req.IsActive
 	}
 	if req.Notes != nil {
 		supplier.Notes = req.Notes
