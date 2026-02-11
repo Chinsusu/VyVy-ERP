@@ -12,6 +12,7 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Security Audit & API Hardening**: All API endpoints now require JWT authentication.
 - **RBAC Enforcement**: Implemented `RequireRole` middleware for sensitive operations (Delete, Approve, Post, etc.).
 - **Security Test Suite**: New `security_test.go` to verify access control and forbidden patterns.
+- **Database Performance Optimization**: Added composite indexes to `stock_ledger` and `stock_reservations` to accelerate historical lookups and reservation fulfillment.
 
 ### Changed
 - Updated all integration tests to support authenticated requests.
