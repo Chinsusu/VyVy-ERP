@@ -60,13 +60,15 @@ func (s *grnService) CreateGRN(req *dto.CreateGRNRequest, userID uint) (*models.
 		return nil, errors.New("GRN number already exists")
 	}
 
-	// Validate PO exists and is approved
-	po, err := s.poRepo.GetByID(req.PurchaseOrderID)
-	if err != nil {
-		return nil, errors.New("purchase order not found")
-	}
-	if po.Status != "approved" {
-		return nil, errors.New("can only create GRN for approved purchase orders")
+	// Validate PO exists and is approved (if PO is specified)
+	if req.PurchaseOrderID > 0 {
+		po, err := s.poRepo.GetByID(req.PurchaseOrderID)
+		if err != nil {
+			return nil, errors.New("purchase order not found")
+		}
+		if po.Status != "approved" {
+			return nil, errors.New("can only create GRN for approved purchase orders")
+		}
 	}
 
 	// Validate warehouse exists
@@ -77,13 +79,15 @@ func (s *grnService) CreateGRN(req *dto.CreateGRNRequest, userID uint) (*models.
 
 	grn := &models.GoodsReceiptNote{
 		GRNNumber:       req.GRNNumber,
-		PurchaseOrderID: req.PurchaseOrderID,
 		WarehouseID:     req.WarehouseID,
 		ReceiptDate:     req.ReceiptDate,
 		Status:          "pending_qc",
 		Notes:           req.Notes,
 		CreatedBy:       &userID,
 		UpdatedBy:       &userID,
+	}
+	if req.PurchaseOrderID > 0 {
+		grn.PurchaseOrderID = &req.PurchaseOrderID
 	}
 
 	// Start transaction

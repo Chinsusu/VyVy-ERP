@@ -46,13 +46,17 @@ func NewMaterialIssueNoteService(
 }
 
 func (s *materialIssueNoteService) Create(min *models.MaterialIssueNote) (*models.MaterialIssueNote, error) {
-	// 1. Validate MR status
-	mr, err := s.mrRepo.GetByID(min.MaterialRequestID)
-	if err != nil {
-		return nil, errors.New("material request not found")
-	}
-	if mr.Status != "approved" && mr.Status != "picking" {
-		return nil, errors.New("material request must be approved to issue")
+	// 1. Validate MR status (if MR is specified)
+	var mr *models.MaterialRequest
+	if min.MaterialRequestID != nil && *min.MaterialRequestID > 0 {
+		var err error
+		mr, err = s.mrRepo.GetByID(*min.MaterialRequestID)
+		if err != nil {
+			return nil, errors.New("material request not found")
+		}
+		if mr.Status != "approved" && mr.Status != "picking" {
+			return nil, errors.New("material request must be approved to issue")
+		}
 	}
 
 	// 2. Generate MIN number: MIN-YYYY-XXXXXX
@@ -69,7 +73,7 @@ func (s *materialIssueNoteService) Create(min *models.MaterialIssueNote) (*model
 	}
 
 	// 4. Update MR status to picking if it was approved
-	if mr.Status == "approved" {
+	if mr != nil && mr.Status == "approved" {
 		mr.Status = "picking"
 		s.mrRepo.Update(mr)
 	}
@@ -89,7 +93,12 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		// 1. Get MIN with items
 		var min models.MaterialIssueNote
-		if err := tx.Preload("Items").Preload("MaterialRequest.Items").First(&min, id).Error; err != nil {
+		query := tx.Preload("Items")
+		// Only preload MR if it exists
+		query = query.Preload("MaterialRequest", func(db *gorm.DB) *gorm.DB {
+			return db.Preload("Items")
+		})
+		if err := query.First(&min, id).Error; err != nil {
 			return errors.New("material issue note not found")
 		}
 
@@ -124,10 +133,12 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 				return fmt.Errorf("insufficient physical stock for material %d (quantity: %f, required: %f)", item.MaterialID, balance.Quantity, item.Quantity)
 			}
 
-			// b. Find matching reservation for this MR
+			// b. Find matching reservation for this MR (only if MR exists)
 			var reservation models.StockReservation
-			resQuery := tx.Where("reference_type = ? AND reference_id = ? AND item_id = ? AND item_type = ?", "material_request", min.MaterialRequestID, item.MaterialID, "material").
-				Where("status = 'active'")
+			hasReservation := false
+			if min.MaterialRequestID != nil {
+				resQuery := tx.Where("reference_type = ? AND reference_id = ? AND item_id = ? AND item_type = ?", "material_request", *min.MaterialRequestID, item.MaterialID, "material").
+					Where("status = 'active'")
 
 			if item.WarehouseLocationID != nil {
 				resQuery = resQuery.Where("warehouse_location_id = ?", *item.WarehouseLocationID)
@@ -142,8 +153,8 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 			}
 
 			err := resQuery.First(&reservation).Error
-
-			hasReservation := err == nil
+				hasReservation = err == nil
+			}
 			
 			// c. Calculate new balance for ledger entry
 			var prevBalance float64
@@ -206,12 +217,14 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 				return err
 			}
 
-			// f. Update MR item issued quantity
-			for _, mrItem := range min.MaterialRequest.Items {
-				if mrItem.ID == item.MRItemID {
-					mrItem.IssuedQuantity += item.Quantity
-					if err := tx.Save(mrItem).Error; err != nil {
-						return err
+			// f. Update MR item issued quantity (only if MR exists)
+			if min.MaterialRequest != nil {
+				for _, mrItem := range min.MaterialRequest.Items {
+					if mrItem.ID == item.MRItemID {
+						mrItem.IssuedQuantity += item.Quantity
+						if err := tx.Save(mrItem).Error; err != nil {
+							return err
+						}
 					}
 				}
 			}
@@ -226,18 +239,20 @@ func (s *materialIssueNoteService) Post(id uint, userID uint) error {
 			return err
 		}
 
-		// 4. Update MR overall status if fulfilled
-		allFulfilled := true
-		for _, mrItem := range min.MaterialRequest.Items {
-			if mrItem.IssuedQuantity < mrItem.RequestedQuantity {
-				allFulfilled = false
-				break
+		// 4. Update MR overall status if fulfilled (only if MR exists)
+		if min.MaterialRequest != nil {
+			allFulfilled := true
+			for _, mrItem := range min.MaterialRequest.Items {
+				if mrItem.IssuedQuantity < mrItem.RequestedQuantity {
+					allFulfilled = false
+					break
+				}
 			}
-		}
-		if allFulfilled {
-			min.MaterialRequest.Status = "issued"
-			if err := tx.Save(min.MaterialRequest).Error; err != nil {
-				return err
+			if allFulfilled {
+				min.MaterialRequest.Status = "issued"
+				if err := tx.Save(min.MaterialRequest).Error; err != nil {
+					return err
+				}
 			}
 		}
 

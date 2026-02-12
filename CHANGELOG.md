@@ -18,14 +18,29 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
     - **104 Materials** imported: 35 acids/actives/emulsifiers, 26 fragrances, 42 packaging items (tubes, bottles, jars, boxes, labels, bags), 1 semi-finished.
     - **41 Finished Products** imported: 18 đang bán, 9 ngưng bán, 10 sản phẩm quà/mini, 4 phụ kiện.
 
+- **Transactional Data Import (Phase 2)**:
+    - Created `seed_transactions.sql` (460+ lines) with purchase orders, receipts, issues, and stock balances.
+    - **15 Purchase Orders** imported: 11 material POs + 4 outsource POs, spanning Jan–Dec 2025.
+    - **13 PO Items**: detailed line items with quantities, unit prices, tax rates.
+    - **13 Goods Receipt Notes**: 1 opening balance (no PO) + 12 linked to POs.
+    - **13 Material Issue Notes**: 12 posted production issues + 1 draft pending approval.
+    - **27 MIN Items**: detailed material consumption for 4 key production batches.
+    - **17 Stock Balances**: 12 raw materials + 5 finished products with current quantities and costs.
+
 - **Migration `000026_add_supplier_group_and_product_fields`**:
     - `suppliers.supplier_group` (VARCHAR 50, indexed) — values: NGUYÊN_LIỆU, BAO_BÌ, GIA_CÔNG.
     - `finished_products.product_type` (VARCHAR 50, indexed) — values: SẢN_PHẨM_BÁN, SẢN_PHẨM_QUÀ, PHỤ_KIỆN.
     - `finished_products.sales_status` (VARCHAR 50, default ĐANG_BÁN) — values: ĐANG_BÁN, NGƯNG_BÁN, TẠM_NGƯNG.
 
+- **Migration `000027_upgrade_po_tracking_and_nullable_fks`**:
+    - PO multi-step tracking: `po_type`, `approval_status`, `order_status`, `receipt_status`, `payment_status`, `invoice_status`, `vat_rate`, `invoice_number`, `invoice_date`, `description`.
+    - GRN: `purchase_order_id` now nullable (supports opening balances/direct receipts).
+    - MIN: `material_request_id` now nullable (supports direct production issues).
+    - MIN Items: `mr_item_id` now nullable (supports direct issues without MR items).
+
 - **Implementation Plan** for 5-phase ERP expansion:
     - Phase 1 (✅): Import master data (suppliers, warehouses, materials, finished products).
-    - Phase 2: Import transactional data (PO, GRN, Material Issues).
+    - Phase 2 (✅): Import transactional data (PO, GRN, Material Issues).
     - Phase 3: Sales Channel module (Shopee, Tiktok, Facebook, Lazada).
     - Phase 4: Carrier Management (JNT, SAE) + shipping reconciliation.
     - Phase 5: Return Management (16-step hoàn hàng workflow).
@@ -33,6 +48,11 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Changed
 - **Supplier Model** (`supplier.go`): Added `SupplierGroup *string` field with SafeDTO and ToSafe updates.
 - **FinishedProduct Model** (`finished_product.go`): Added `ProductType string` and `SalesStatus string` fields with SafeDTO and ToSafe updates.
+- **PurchaseOrder Model** (`purchase_order.go`): Added 10 tracking fields (POType, ApprovalStatus, OrderStatus, ReceiptStatus, PaymentStatus, InvoiceStatus, VATRate, Description, InvoiceNumber, InvoiceDate) with SafeDTO updates.
+- **GoodsReceiptNote Model** (`grn.go`): `PurchaseOrderID` changed from `uint` to `*uint` for nullable FK support.
+- **MaterialIssueNote Model** (`material_issue_note.go`): `MaterialRequestID` changed from `uint` to `*uint` for nullable FK support.
+- **GRN Service** (`grn_service.go`): Updated `CreateGRN` to handle nullable PO FK — conditional PO validation and pointer assignment.
+- **MIN Service** (`material_issue_note_service.go`): Updated `Create` and `Post` to handle nullable MR FK — conditional MR validation, reservation lookup, and MR fulfillment tracking.
 
 ### Fixed
 - **Pre-existing bug** in `cmd/setup_admin/main.go`: `IsActive: true` → `IsActive: &isActive` (User.IsActive is `*bool`).
@@ -40,7 +60,8 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Verified
 - Go build passes cleanly (`go build ./...` — zero errors).
 - Migration 000026 applied to Docker PostgreSQL.
-- Seed data imported: 193 records across 4 tables.
+- Migration 000027 applied to Docker PostgreSQL (14 ALTER TABLE, 2 CREATE INDEX).
+- Seed data imported: 193 master records + 98 transactional records across 7 tables.
 
 ---
 

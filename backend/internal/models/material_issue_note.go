@@ -8,7 +8,7 @@ import (
 type MaterialIssueNote struct {
 	ID                uint      `gorm:"primaryKey" json:"id"`
 	MINNumber         string    `gorm:"column:min_number;uniqueIndex;size:50;not null" json:"min_number"`
-	MaterialRequestID uint      `gorm:"column:material_request_id;not null" json:"material_request_id"`
+	MaterialRequestID *uint     `gorm:"column:material_request_id" json:"material_request_id,omitempty"`
 	WarehouseID       uint      `gorm:"column:warehouse_id;not null" json:"warehouse_id"`
 
 	// Dates
@@ -87,7 +87,7 @@ func (MaterialIssueNoteItem) TableName() string {
 type SafeMaterialIssueNote struct {
 	ID                uint                          `json:"id"`
 	MINNumber         string                        `json:"min_number"`
-	MaterialRequestID uint                          `json:"material_request_id"`
+	MaterialRequestID *uint                         `json:"material_request_id,omitempty"`
 	MaterialRequest   *SafeMaterialRequest          `json:"material_request,omitempty"`
 	WarehouseID       uint                          `json:"warehouse_id"`
 	Warehouse         *SafeWarehouse                `json:"warehouse,omitempty"`

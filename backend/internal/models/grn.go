@@ -8,7 +8,7 @@ import (
 type GoodsReceiptNote struct {
 	ID              uint      `gorm:"primaryKey" json:"id"`
 	GRNNumber       string    `gorm:"column:grn_number;uniqueIndex;size:50;not null" json:"grn_number"`
-	PurchaseOrderID uint      `gorm:"column:purchase_order_id;not null" json:"purchase_order_id"`
+	PurchaseOrderID *uint     `gorm:"column:purchase_order_id" json:"purchase_order_id,omitempty"`
 	WarehouseID     uint      `gorm:"column:warehouse_id;not null" json:"warehouse_id"`
 
 	// Dates
@@ -56,7 +56,7 @@ func (GoodsReceiptNote) TableName() string {
 type SafeGoodsReceiptNote struct {
 	ID              uint                        `json:"id"`
 	GRNNumber       string                      `json:"grn_number"`
-	PurchaseOrderID uint                        `json:"purchase_order_id"`
+	PurchaseOrderID *uint                       `json:"purchase_order_id,omitempty"`
 	WarehouseID     uint                        `json:"warehouse_id"`
 	PurchaseOrder   *SafePurchaseOrder          `json:"purchase_order,omitempty"`
 	Warehouse       *SafeWarehouse              `json:"warehouse,omitempty"`
