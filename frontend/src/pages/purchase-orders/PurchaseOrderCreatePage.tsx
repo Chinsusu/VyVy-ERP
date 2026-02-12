@@ -1,8 +1,11 @@
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import PurchaseOrderForm from '../../components/purchase-orders/PurchaseOrderForm';
 
 export default function PurchaseOrderCreatePage() {
+    const { t } = useTranslation('purchaseOrders');
+    const { t: tc } = useTranslation('common');
     return (
         <div className="animate-fade-in">
             <div>

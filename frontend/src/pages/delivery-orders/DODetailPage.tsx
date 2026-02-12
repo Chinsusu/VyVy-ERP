@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     ArrowLeft,
     CheckCircle,
@@ -21,6 +22,8 @@ import {
 import type { DeliveryOrderItem } from '../../types/deliveryOrder';
 
 export default function DODetailPage() {
+    const { t } = useTranslation('deliveryOrders');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const doId = parseInt(id || '0', 10);
     const navigate = useNavigate();

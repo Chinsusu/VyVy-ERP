@@ -1,0 +1,12 @@
+{
+    "title": "Đăng nhập vào tài khoản",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "emailPlaceholder": "admin@vyvy.com",
+    "signIn": "Đăng nhập",
+    "signingIn": "Đang đăng nhập...",
+    "demoCredentials": "Tài khoản demo",
+    "version": "VyVy ERP v1.0.0-rc6 • Mô-đun Kho",
+    "brandName": "VyVy ERP",
+    "brandSubtitle": "Hệ thống Quản lý Kho hàng"
+}

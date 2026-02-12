@@ -1,9 +1,12 @@
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { useFinishedProduct } from '../../hooks/useFinishedProducts';
 import FinishedProductForm from '../../components/finished-products/FinishedProductForm';
 
 export default function FinishedProductEditPage() {
+    const { t } = useTranslation('finishedProducts');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const productId = parseInt(id || '0', 10);
 

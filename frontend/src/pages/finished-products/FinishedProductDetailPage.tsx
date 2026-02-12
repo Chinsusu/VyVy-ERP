@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -13,6 +14,8 @@ import {
 import { useFinishedProduct, useDeleteFinishedProduct } from '../../hooks/useFinishedProducts';
 
 export default function FinishedProductDetailPage() {
+    const { t } = useTranslation('finishedProducts');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const productId = parseInt(id || '0', 10);

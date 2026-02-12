@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -22,6 +23,8 @@ import {
 import type { PurchaseOrderItem } from '../../types/purchaseOrder';
 
 export default function PurchaseOrderDetailPage() {
+    const { t } = useTranslation('purchaseOrders');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const poId = parseInt(id || '0', 10);

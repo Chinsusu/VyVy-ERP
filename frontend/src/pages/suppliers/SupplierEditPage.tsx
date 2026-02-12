@@ -1,9 +1,12 @@
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { useSupplier } from '../../hooks/useSuppliers';
 import SupplierForm from '../../components/suppliers/SupplierForm';
 
 export default function SupplierEditPage() {
+    const { t } = useTranslation('suppliers');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const supplierId = parseInt(id || '0', 10);
 

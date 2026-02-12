@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Plus, Search, FileText } from 'lucide-react';
 import { useMaterialRequests } from '../../hooks/useMaterialRequests';
 import type { MaterialRequest, MaterialRequestFilters } from '../../types/materialRequest';
 
 export default function MRListPage() {
+    const { t } = useTranslation('materialRequests');
+    const { t: tc } = useTranslation('common');
     const [filters, setFilters] = useState<MaterialRequestFilters>({
         page: 1,
         page_size: 10,

@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Package, Plus, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMaterials } from '../../hooks/useMaterials';
 import type { MaterialFilters } from '../../types/material';
 
 export default function MaterialListPage() {
+    const { t } = useTranslation('materials');
+    const { t: tc } = useTranslation('common');
     const [filters, setFilters] = useState<MaterialFilters>({
         page: 1,
         page_size: 20,

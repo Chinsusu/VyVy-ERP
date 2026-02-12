@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { reportApi } from '../../api/reports';
 import type { StockMovementReportRow, ReportFilter } from '../../types/report';
 import { useWarehouses } from '../../hooks/useWarehouses';
@@ -9,6 +10,8 @@ import toast from 'react-hot-toast';
 import type { Warehouse } from '../../types/warehouse';
 
 export default function StockMovementReportPage() {
+    const { t } = useTranslation('reports');
+    const { t: tc } = useTranslation('common');
     const { data: warehouseResponse } = useWarehouses();
     const warehouses = warehouseResponse?.data || [];
     const [data, setData] = useState<StockMovementReportRow[]>([]);

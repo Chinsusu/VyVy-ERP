@@ -1,0 +1,23 @@
+{
+    "title": "Material Issue Notes",
+    "subtitle": "Manage material issues for production",
+    "addNew": "Create Issue Note",
+    "createTitle": "Create New Issue Note",
+    "createSubtitle": "Create a MIN from an approved Material Request",
+    "detail": "Issue Note Detail",
+    "loadingList": "Loading issue notes...",
+    "errorLoading": "Error loading issue notes",
+    "searchPlaceholder": "Search by MIN number...",
+    "minNumber": "MIN Number",
+    "mrReference": "MR Reference",
+    "warehouse": "Warehouse",
+    "issuedDate": "Issued Date",
+    "issuedBy": "Issued By",
+    "items": "Issued Items",
+    "material": "Material",
+    "requestedQty": "Requested Qty",
+    "issuedQty": "Issued Qty",
+    "batchNumber": "Batch Number",
+    "postMin": "Post MIN",
+    "cancelMin": "Cancel MIN"
+}

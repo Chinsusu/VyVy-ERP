@@ -1,4 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useCreateTransfer } from '../../hooks/useInventory';
 import { useWarehouses } from '../../hooks/useWarehouses';
@@ -33,6 +34,8 @@ interface TransferForm {
 }
 
 export default function TransferCreatePage() {
+    const { t } = useTranslation('inventory');
+    const { t: tc } = useTranslation('common');
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
     const createMutation = useCreateTransfer();

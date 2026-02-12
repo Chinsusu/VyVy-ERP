@@ -1,0 +1,44 @@
+{
+    "groups": {
+        "overview": "Overview",
+        "masterData": "Master Data",
+        "purchasing": "Purchasing",
+        "production": "Production",
+        "sales": "Sales",
+        "inventory": "Inventory",
+        "reports": "Reports"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "materials": "Materials",
+        "finishedProducts": "Finished Products",
+        "suppliers": "Suppliers",
+        "warehouses": "Warehouses",
+        "purchaseOrders": "Purchase Orders",
+        "goodsReceipt": "Goods Receipt",
+        "materialRequests": "Material Requests",
+        "issueNotes": "Issue Notes",
+        "deliveryOrders": "Delivery Orders",
+        "adjustments": "Adjustments",
+        "transfers": "Transfers",
+        "stockMovement": "Stock Movement",
+        "inventoryValue": "Inventory Value",
+        "lowStock": "Low Stock",
+        "expiringSoon": "Expiring Soon"
+    },
+    "header": {
+        "notifications": "Notifications",
+        "profile": "Profile",
+        "signOut": "Sign out",
+        "collapse": "Collapse",
+        "noAlerts": "No alerts — all clear ✨",
+        "lowStockItems": "{{count}} items below reorder point",
+        "requiresReorder": "Requires reordering",
+        "batchesExpiring": "{{count}} batches expiring soon",
+        "within30Days": "Within 30 days"
+    },
+    "brand": {
+        "name": "VyVy ERP",
+        "subtitle": "Warehouse"
+    }
+}

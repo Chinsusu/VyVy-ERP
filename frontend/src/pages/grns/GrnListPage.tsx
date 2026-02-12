@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Plus, Search, CheckCircle, Clock, AlertTriangle, Package } from 'lucide-react';
 import { useGrns } from '../../hooks/useGrns';
 import type { GRNFilters } from '../../types/grn';
 
 export default function GrnListPage() {
+    const { t } = useTranslation('grns');
+    const { t: tc } = useTranslation('common');
     const [filters, setFilters] = useState<GRNFilters>({
         page: 1,
         page_size: 10,

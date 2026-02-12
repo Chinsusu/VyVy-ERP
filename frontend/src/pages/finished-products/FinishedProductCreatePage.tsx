@@ -1,8 +1,11 @@
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import FinishedProductForm from '../../components/finished-products/FinishedProductForm';
 
 export default function FinishedProductCreatePage() {
+    const { t } = useTranslation('finishedProducts');
+    const { t: tc } = useTranslation('common');
     return (
         <div className="animate-fade-in">
             <div>

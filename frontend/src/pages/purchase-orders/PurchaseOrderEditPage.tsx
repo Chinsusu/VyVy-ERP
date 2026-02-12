@@ -1,9 +1,12 @@
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { usePurchaseOrder } from '../../hooks/usePurchaseOrders';
 import PurchaseOrderForm from '../../components/purchase-orders/PurchaseOrderForm';
 
 export default function PurchaseOrderEditPage() {
+    const { t } = useTranslation('purchaseOrders');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const poId = parseInt(id || '0', 10);
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -16,6 +17,8 @@ import { formatLocationHierarchy } from '../../types/warehouseLocation';
 import type { CreateWarehouseLocationInput } from '../../types/warehouseLocation';
 
 export default function WarehouseDetailPage() {
+    const { t } = useTranslation('warehouses');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const warehouseId = parseInt(id || '0', 10);

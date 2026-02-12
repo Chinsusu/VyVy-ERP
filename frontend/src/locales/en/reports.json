@@ -1,0 +1,53 @@
+{
+    "stockMovement": {
+        "title": "Stock Movement Report",
+        "subtitle": "Track inventory movements across warehouses",
+        "date": "Date",
+        "material": "Material",
+        "transactionType": "Transaction Type",
+        "reference": "Reference",
+        "warehouse": "Warehouse",
+        "qtyIn": "Qty In",
+        "qtyOut": "Qty Out",
+        "balance": "Balance",
+        "batchNumber": "Batch Number",
+        "noMovements": "No stock movements found for the selected filters"
+    },
+    "inventoryValue": {
+        "title": "Inventory Valuation Report",
+        "subtitle": "Current financial value of physical inventory",
+        "material": "Material",
+        "warehouse": "Warehouse",
+        "qty": "Quantity",
+        "unitCost": "Unit Cost",
+        "totalValue": "Total Value",
+        "category": "Category",
+        "grandTotal": "Grand Total",
+        "calculatingValues": "Calculating values..."
+    },
+    "lowStock": {
+        "title": "Low Stock Report",
+        "subtitle": "Items below reorder point",
+        "checkingLevels": "Checking inventory levels...",
+        "material": "Material",
+        "currentStock": "Current Stock",
+        "reorderPoint": "Reorder Point",
+        "minStock": "Min Stock",
+        "deficit": "Deficit",
+        "category": "Category",
+        "actionRequired": "Action required to update stock",
+        "allStocked": "All items are above reorder point ✓"
+    },
+    "expiringSoon": {
+        "title": "Expiring Items Report",
+        "subtitle": "Batches expiring within period",
+        "material": "Material",
+        "batchNumber": "Batch Number",
+        "expiryDate": "Expiry Date",
+        "daysRemaining": "Days Remaining",
+        "qty": "Quantity",
+        "warehouse": "Warehouse",
+        "withinDays": "Within (days)",
+        "noExpiring": "No items expiring within the selected period ✓"
+    }
+}

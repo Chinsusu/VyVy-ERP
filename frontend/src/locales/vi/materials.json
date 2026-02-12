@@ -1,0 +1,43 @@
+{
+    "title": "Nguyên vật liệu",
+    "subtitle": "Quản lý nguyên liệu thô và thành phần",
+    "addNew": "Thêm nguyên liệu",
+    "editTitle": "Chỉnh sửa nguyên liệu",
+    "createTitle": "Tạo nguyên liệu mới",
+    "deleteTitle": "Xóa nguyên liệu",
+    "deleteMsg": "Bạn có chắc chắn muốn xóa nguyên liệu này? Hành động này không thể hoàn tác.",
+    "detail": "Chi tiết nguyên liệu",
+    "loadingList": "Đang tải nguyên vật liệu...",
+    "errorLoading": "Lỗi tải nguyên vật liệu",
+    "searchPlaceholder": "Tìm theo mã, tên hoặc barcode...",
+    "code": "Mã nguyên liệu",
+    "name": "Tên nguyên liệu",
+    "barcode": "Mã vạch",
+    "inciName": "Tên INCI",
+    "category": "Danh mục",
+    "unit": "Đơn vị tính",
+    "costPrice": "Giá nhập",
+    "sellingPrice": "Giá bán",
+    "minStock": "Tồn kho tối thiểu",
+    "maxStock": "Tồn kho tối đa",
+    "reorderPoint": "Mức đặt lại",
+    "reorderQty": "Số lượng đặt lại",
+    "currentStock": "Tồn kho hiện tại",
+    "shelfLife": "Hạn sử dụng (Ngày)",
+    "storageCondition": "Điều kiện bảo quản",
+    "qualityStandard": "Tiêu chuẩn chất lượng",
+    "categories": {
+        "raw_material": "Nguyên liệu thô",
+        "packaging": "Bao bì",
+        "consumable": "Vật tư tiêu hao",
+        "spare_part": "Phụ tùng"
+    },
+    "units": {
+        "KG": "Kilogram",
+        "L": "Lít",
+        "PCS": "Cái",
+        "BOX": "Hộp",
+        "CTN": "Thùng",
+        "M": "Mét"
+    }
+}

@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Users, Plus, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSuppliers } from '../../hooks/useSuppliers';
 import type { SupplierFilters } from '../../types/supplier';
 
 export default function SupplierListPage() {
+    const { t } = useTranslation('suppliers');
+    const { t: tc } = useTranslation('common');
     const [filters, setFilters] = useState<SupplierFilters>({
         page: 1,
         page_size: 20,

@@ -1,0 +1,23 @@
+{
+    "title": "Phiếu xuất kho",
+    "subtitle": "Quản lý phiếu xuất vật tư cho sản xuất",
+    "addNew": "Tạo phiếu xuất",
+    "createTitle": "Tạo phiếu xuất mới",
+    "createSubtitle": "Tạo phiếu xuất từ yêu cầu vật tư đã duyệt",
+    "detail": "Chi tiết phiếu xuất",
+    "loadingList": "Đang tải phiếu xuất...",
+    "errorLoading": "Lỗi tải phiếu xuất",
+    "searchPlaceholder": "Tìm theo số MIN...",
+    "minNumber": "Số MIN",
+    "mrReference": "Tham chiếu MR",
+    "warehouse": "Kho",
+    "issuedDate": "Ngày xuất",
+    "issuedBy": "Người xuất",
+    "items": "Hàng hóa xuất",
+    "material": "Nguyên liệu",
+    "requestedQty": "SL yêu cầu",
+    "issuedQty": "SL xuất",
+    "batchNumber": "Số lô",
+    "postMin": "Ghi sổ phiếu xuất",
+    "cancelMin": "Hủy phiếu xuất"
+}

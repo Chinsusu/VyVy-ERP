@@ -1,0 +1,12 @@
+{
+    "title": "Sign in to your account",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "admin@vyvy.com",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "demoCredentials": "Demo credentials",
+    "version": "VyVy ERP v1.0.0-rc6 • Warehouse Module",
+    "brandName": "VyVy ERP",
+    "brandSubtitle": "Warehouse Management System"
+}

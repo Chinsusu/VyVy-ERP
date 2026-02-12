@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2, Building2, Mail, Phone, MapPin, CreditCard, FileText } from 'lucide-react';
 import { useSupplier, useDeleteSupplier } from '../../hooks/useSuppliers';
 
 export default function SupplierDetailPage() {
+    const { t } = useTranslation('suppliers');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const supplierId = parseInt(id || '0', 10);

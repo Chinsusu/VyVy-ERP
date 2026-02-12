@@ -7,6 +7,32 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc8] - 2026-02-12
+
+### Added
+- **Vietnamese i18n Support (`react-i18next`)**:
+    - Installed `react-i18next`, `i18next`, `i18next-browser-languagedetector`.
+    - Created `src/lib/i18n.ts` with 15 namespaces, `localStorage` language detection (key: `vyvy-lang`), bundled EN/VI resources.
+    - 30 translation JSON files: `src/locales/en/` and `src/locales/vi/` covering `common`, `sidebar`, `login`, `dashboard`, `materials`, `suppliers`, `warehouses`, `purchaseOrders`, `grns`, `materialRequests`, `mins`, `deliveryOrders`, `inventory`, `reports`, `finishedProducts`.
+
+- **Language Switcher**:
+    - Globe icon + flag button at the bottom of the sidebar (AppLayout) to toggle EN ↔ VI.
+    - Globe toggle on the Login page (top-right corner) for pre-authentication switching.
+    - Language preference persisted in `localStorage` and restored on page load.
+
+### Changed
+- **AppLayout.tsx**: All sidebar nav labels, header text, alert messages now use `t()` translation keys from `sidebar` namespace.
+- **LoginPage.tsx**: All form labels, button text, placeholders, and demo credentials text translated via `login` namespace.
+- **DashboardPage.tsx**: All stat card titles, report descriptions, quick access labels, master data labels translated via `dashboard` namespace.
+- **44 Module Pages**: `useTranslation` hooks injected across all materials, suppliers, warehouses, purchase orders, GRNs, material requests, MINs, delivery orders, inventory, and reports pages.
+
+### Verified
+- TypeScript build clean (`npx tsc --noEmit` — zero errors).
+- Browser: Language switch works instantly, preference persists on refresh.
+- Visual: Login, Dashboard, sidebar all display correctly in Vietnamese.
+
+---
+
 ## [1.0.0-rc7] - 2026-02-12
 
 ### Added

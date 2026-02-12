@@ -1,4 +1,5 @@
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAdjustment, usePostAdjustment, useCancelAdjustment } from '../../hooks/useInventory';
 import { useAuthStore } from '../../stores/authStore';
 import {
@@ -11,6 +12,8 @@ import toast from 'react-hot-toast';
 import type { StockAdjustmentItem } from '../../types/inventory';
 
 export default function AdjustmentDetailPage() {
+    const { t } = useTranslation('inventory');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();

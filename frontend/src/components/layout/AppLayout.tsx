@@ -1,76 +1,78 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
 import { useAlertSummary } from '../../hooks/useAlerts';
+import { LANGUAGES } from '../../lib/i18n';
 import {
     LayoutDashboard, Package, Users, Warehouse, ShoppingBag,
     ShoppingCart, ClipboardCheck, FileText, Send, Truck,
     ArrowLeftRight, BarChart3, TrendingDown, Clock,
     Bell, LogOut, ChevronLeft, Menu, User,
-    AlertTriangle, Calendar, BoxesIcon, Activity
+    AlertTriangle, Calendar, BoxesIcon, Activity, Globe
 } from 'lucide-react';
 
 interface NavItem {
-    label: string;
+    labelKey: string;
     path: string;
     icon: React.ReactNode;
 }
 
 interface NavGroup {
-    title: string;
+    titleKey: string;
     items: NavItem[];
 }
 
 const navGroups: NavGroup[] = [
     {
-        title: 'Overview',
+        titleKey: 'groups.overview',
         items: [
-            { label: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+            { labelKey: 'nav.dashboard', path: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
         ],
     },
     {
-        title: 'Master Data',
+        titleKey: 'groups.masterData',
         items: [
-            { label: 'Materials', path: '/materials', icon: <Package className="w-5 h-5" /> },
-            { label: 'Finished Products', path: '/finished-products', icon: <ShoppingBag className="w-5 h-5" /> },
-            { label: 'Suppliers', path: '/suppliers', icon: <Users className="w-5 h-5" /> },
-            { label: 'Warehouses', path: '/warehouses', icon: <Warehouse className="w-5 h-5" /> },
+            { labelKey: 'nav.materials', path: '/materials', icon: <Package className="w-5 h-5" /> },
+            { labelKey: 'nav.finishedProducts', path: '/finished-products', icon: <ShoppingBag className="w-5 h-5" /> },
+            { labelKey: 'nav.suppliers', path: '/suppliers', icon: <Users className="w-5 h-5" /> },
+            { labelKey: 'nav.warehouses', path: '/warehouses', icon: <Warehouse className="w-5 h-5" /> },
         ],
     },
     {
-        title: 'Purchasing',
+        titleKey: 'groups.purchasing',
         items: [
-            { label: 'Purchase Orders', path: '/purchase-orders', icon: <ShoppingCart className="w-5 h-5" /> },
-            { label: 'Goods Receipt', path: '/grns', icon: <ClipboardCheck className="w-5 h-5" /> },
+            { labelKey: 'nav.purchaseOrders', path: '/purchase-orders', icon: <ShoppingCart className="w-5 h-5" /> },
+            { labelKey: 'nav.goodsReceipt', path: '/grns', icon: <ClipboardCheck className="w-5 h-5" /> },
         ],
     },
     {
-        title: 'Production',
+        titleKey: 'groups.production',
         items: [
-            { label: 'Material Requests', path: '/material-requests', icon: <FileText className="w-5 h-5" /> },
-            { label: 'Issue Notes', path: '/material-issue-notes', icon: <Send className="w-5 h-5" /> },
+            { labelKey: 'nav.materialRequests', path: '/material-requests', icon: <FileText className="w-5 h-5" /> },
+            { labelKey: 'nav.issueNotes', path: '/material-issue-notes', icon: <Send className="w-5 h-5" /> },
         ],
     },
     {
-        title: 'Sales',
+        titleKey: 'groups.sales',
         items: [
-            { label: 'Delivery Orders', path: '/delivery-orders', icon: <Truck className="w-5 h-5" /> },
+            { labelKey: 'nav.deliveryOrders', path: '/delivery-orders', icon: <Truck className="w-5 h-5" /> },
         ],
     },
     {
-        title: 'Inventory',
+        titleKey: 'groups.inventory',
         items: [
-            { label: 'Adjustments', path: '/inventory/adjustments', icon: <BoxesIcon className="w-5 h-5" /> },
-            { label: 'Transfers', path: '/inventory/transfers', icon: <ArrowLeftRight className="w-5 h-5" /> },
+            { labelKey: 'nav.adjustments', path: '/inventory/adjustments', icon: <BoxesIcon className="w-5 h-5" /> },
+            { labelKey: 'nav.transfers', path: '/inventory/transfers', icon: <ArrowLeftRight className="w-5 h-5" /> },
         ],
     },
     {
-        title: 'Reports',
+        titleKey: 'groups.reports',
         items: [
-            { label: 'Stock Movement', path: '/reports/stock-movement', icon: <Activity className="w-5 h-5" /> },
-            { label: 'Inventory Value', path: '/reports/inventory-value', icon: <BarChart3 className="w-5 h-5" /> },
-            { label: 'Low Stock', path: '/reports/low-stock', icon: <TrendingDown className="w-5 h-5" /> },
-            { label: 'Expiring Soon', path: '/reports/expiring-soon', icon: <Clock className="w-5 h-5" /> },
+            { labelKey: 'nav.stockMovement', path: '/reports/stock-movement', icon: <Activity className="w-5 h-5" /> },
+            { labelKey: 'nav.inventoryValue', path: '/reports/inventory-value', icon: <BarChart3 className="w-5 h-5" /> },
+            { labelKey: 'nav.lowStock', path: '/reports/low-stock', icon: <TrendingDown className="w-5 h-5" /> },
+            { labelKey: 'nav.expiringSoon', path: '/reports/expiring-soon', icon: <Clock className="w-5 h-5" /> },
         ],
     },
 ];
@@ -84,6 +86,14 @@ export default function AppLayout() {
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
     const { summary: alertSummary } = useAlertSummary();
+    const { t, i18n } = useTranslation('sidebar');
+
+    const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0];
+    const nextLang = LANGUAGES.find(l => l.code !== i18n.language) || LANGUAGES[1];
+
+    const toggleLanguage = () => {
+        i18n.changeLanguage(nextLang.code);
+    };
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -120,8 +130,8 @@ export default function AppLayout() {
                                 <span className="text-white font-bold text-sm">V</span>
                             </div>
                             <div>
-                                <h1 className="text-base font-bold text-slate-900 leading-none">VyVy ERP</h1>
-                                <p className="text-[10px] text-slate-400 font-medium tracking-wider uppercase">Warehouse</p>
+                                <h1 className="text-base font-bold text-slate-900 leading-none">{t('brand.name')}</h1>
+                                <p className="text-[10px] text-slate-400 font-medium tracking-wider uppercase">{t('brand.subtitle')}</p>
                             </div>
                         </Link>
                     )}
@@ -137,10 +147,10 @@ export default function AppLayout() {
                 {/* Navigation */}
                 <nav className="flex-1 overflow-y-auto sidebar-scrollbar py-4 px-3">
                     {navGroups.map((group) => (
-                        <div key={group.title} className="mb-1">
+                        <div key={group.titleKey} className="mb-1">
                             {!collapsed && (
                                 <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 px-3 mb-1.5 mt-3 first:mt-0">
-                                    {group.title}
+                                    {t(group.titleKey)}
                                 </p>
                             )}
                             {collapsed && <div className="my-2 border-t border-slate-100" />}
@@ -154,7 +164,7 @@ export default function AppLayout() {
                                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                                         } ${collapsed ? 'justify-center px-0' : ''}`
                                     }
-                                    title={collapsed ? item.label : undefined}
+                                    title={collapsed ? t(item.labelKey) : undefined}
                                 >
                                     {({ isActive }) => (
                                         <>
@@ -164,7 +174,7 @@ export default function AppLayout() {
                                             <span className={`shrink-0 ${isActive ? 'text-violet-600' : 'text-slate-400 group-hover:text-slate-600'}`}>
                                                 {item.icon}
                                             </span>
-                                            {!collapsed && <span>{item.label}</span>}
+                                            {!collapsed && <span>{t(item.labelKey)}</span>}
                                         </>
                                     )}
                                 </NavLink>
@@ -173,14 +183,23 @@ export default function AppLayout() {
                     ))}
                 </nav>
 
-                {/* Collapse Button */}
-                <div className="border-t border-slate-100 p-3 shrink-0">
+                {/* Language Toggle + Collapse Button */}
+                <div className="border-t border-slate-100 p-3 shrink-0 space-y-1">
+                    <button
+                        onClick={toggleLanguage}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+                        title={`Switch to ${nextLang.label}`}
+                    >
+                        <Globe className="w-4 h-4" />
+                        {!collapsed && <span>{currentLang.flag} {currentLang.label}</span>}
+                        {collapsed && <span className="text-xs">{currentLang.flag}</span>}
+                    </button>
                     <button
                         onClick={() => setCollapsed(!collapsed)}
                         className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
                     >
                         <ChevronLeft className={`w-4 h-4 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`} />
-                        {!collapsed && <span>Collapse</span>}
+                        {!collapsed && <span>{t('header.collapse')}</span>}
                     </button>
                 </div>
             </aside>
@@ -207,7 +226,7 @@ export default function AppLayout() {
                             <button
                                 onClick={() => setShowAlertDropdown(!showAlertDropdown)}
                                 className="relative p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                                title="Notifications"
+                                title={t('header.notifications')}
                             >
                                 <Bell className="w-5 h-5" />
                                 {totalAlerts > 0 && (
@@ -220,7 +239,7 @@ export default function AppLayout() {
                             {showAlertDropdown && (
                                 <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 animate-slide-up overflow-hidden">
                                     <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
-                                        <h4 className="font-semibold text-slate-900 text-sm">Notifications</h4>
+                                        <h4 className="font-semibold text-slate-900 text-sm">{t('header.notifications')}</h4>
                                     </div>
                                     <div className="max-h-64 overflow-y-auto">
                                         {(alertSummary?.low_stock_count ?? 0) > 0 && (
@@ -234,9 +253,9 @@ export default function AppLayout() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-medium text-slate-900">
-                                                        {alertSummary!.low_stock_count} items below reorder point
+                                                        {t('header.lowStockItems', { count: alertSummary!.low_stock_count })}
                                                     </p>
-                                                    <p className="text-xs text-slate-500 mt-0.5">Requires reordering</p>
+                                                    <p className="text-xs text-slate-500 mt-0.5">{t('header.requiresReorder')}</p>
                                                 </div>
                                             </Link>
                                         )}
@@ -251,15 +270,15 @@ export default function AppLayout() {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-medium text-slate-900">
-                                                        {alertSummary!.expiring_soon_count} batches expiring soon
+                                                        {t('header.batchesExpiring', { count: alertSummary!.expiring_soon_count })}
                                                     </p>
-                                                    <p className="text-xs text-slate-500 mt-0.5">Within 30 days</p>
+                                                    <p className="text-xs text-slate-500 mt-0.5">{t('header.within30Days')}</p>
                                                 </div>
                                             </Link>
                                         )}
                                         {totalAlerts === 0 && (
                                             <div className="p-6 text-center text-sm text-slate-400">
-                                                No alerts — all clear ✨
+                                                {t('header.noAlerts')}
                                             </div>
                                         )}
                                     </div>
@@ -299,14 +318,14 @@ export default function AppLayout() {
                                             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors"
                                         >
                                             <User className="w-4 h-4" />
-                                            Profile
+                                            {t('header.profile')}
                                         </button>
                                         <button
                                             onClick={handleLogout}
                                             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
                                         >
                                             <LogOut className="w-4 h-4" />
-                                            Sign out
+                                            {t('header.signOut')}
                                         </button>
                                     </div>
                                 </div>

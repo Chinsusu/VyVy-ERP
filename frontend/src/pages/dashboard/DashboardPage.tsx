@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useDashboard } from '../../hooks/useDashboard';
 import {
     Package, Users, Warehouse,
@@ -11,6 +12,8 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 
 export default function DashboardPage() {
     const { stats, isLoading, refresh } = useDashboard();
+    const { t } = useTranslation('dashboard');
+    const { t: tc } = useTranslation('common');
 
     const currencyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -34,25 +37,25 @@ export default function DashboardPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 mb-1">Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 mb-1">{t('title')}</h1>
                     <p className="text-sm text-slate-500">
-                        Overview of your warehouse operations
+                        {t('subtitle')}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
                     {stats?.last_updated_at && (
                         <span className="text-xs text-slate-400">
-                            Updated {format(new Date(stats.last_updated_at), 'HH:mm:ss')}
+                            {t('updated')} {format(new Date(stats.last_updated_at), 'HH:mm:ss')}
                         </span>
                     )}
                     <button
                         onClick={refresh}
                         disabled={isLoading}
                         className="btn btn-secondary btn-sm"
-                        title="Refresh"
+                        title={tc('refresh')}
                     >
                         <RefreshCcw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-                        Refresh
+                        {tc('refresh')}
                     </button>
                 </div>
             </div>
@@ -60,20 +63,20 @@ export default function DashboardPage() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <StatCard
-                    title="Inventory Value"
+                    title={t('inventoryValue')}
                     value={stats ? currencyFormatter.format(stats.inventory_value) : '$0'}
                     icon={<DollarSign className="w-5 h-5" />}
                     color="emerald"
                 />
                 <StatCard
-                    title="Pending GRNs"
+                    title={t('pendingGrns')}
                     value={stats?.pending_grns ?? 0}
                     icon={<ClipboardCheck className="w-5 h-5" />}
                     color="amber"
                     link="/grns"
                 />
                 <StatCard
-                    title="Low Stock Items"
+                    title={t('lowStockItems')}
                     value={stats?.low_stock_count ?? 0}
                     icon={<AlertTriangle className="w-5 h-5" />}
                     color="rose"
@@ -81,7 +84,7 @@ export default function DashboardPage() {
                     alert={(stats?.low_stock_count ?? 0) > 0}
                 />
                 <StatCard
-                    title="Expiring Soon"
+                    title={t('expiringSoon')}
                     value={stats?.expiring_soon_count ?? 0}
                     icon={<Calendar className="w-5 h-5" />}
                     color="orange"
@@ -95,32 +98,32 @@ export default function DashboardPage() {
                 <div className="lg:col-span-2">
                     <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <BarChart2 className="w-4 h-4" />
-                        Reports & Analytics
+                        {t('reportsAnalytics')}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <ReportCard
                             to="/reports/stock-movement"
                             icon={<Activity className="w-5 h-5 text-indigo-500" />}
-                            title="Stock Movement"
-                            desc="Incoming, outgoing, and adjustment history"
+                            title={t('stockMovement')}
+                            desc={t('stockMovementDesc')}
                         />
                         <ReportCard
                             to="/reports/inventory-value"
                             icon={<DollarSign className="w-5 h-5 text-emerald-500" />}
-                            title="Inventory Valuation"
-                            desc="Stock value by category and warehouse"
+                            title={t('inventoryValuation')}
+                            desc={t('inventoryValuationDesc')}
                         />
                         <ReportCard
                             to="/reports/low-stock"
                             icon={<TrendingUp className="w-5 h-5 text-rose-500" />}
-                            title="Low Stock Report"
-                            desc="Items below reorder point"
+                            title={t('lowStockReport')}
+                            desc={t('lowStockReportDesc')}
                         />
                         <ReportCard
                             to="/reports/expiring-soon"
                             icon={<Calendar className="w-5 h-5 text-orange-500" />}
-                            title="Expiring Items"
-                            desc="Batches expiring within period"
+                            title={t('expiringItems')}
+                            desc={t('expiringItemsDesc')}
                         />
                     </div>
                 </div>
@@ -128,26 +131,26 @@ export default function DashboardPage() {
                 <div>
                     <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <RefreshCcw className="w-4 h-4" />
-                        Quick Access
+                        {t('quickAccess')}
                     </h3>
                     <div className="space-y-2">
-                        <QuickLink to="/purchase-orders" label="Purchase Orders" icon={<ShoppingCart className="w-4 h-4" />} count={stats?.total_purchase_orders} />
-                        <QuickLink to="/material-requests" label="Material Requests" icon={<FileText className="w-4 h-4" />} count={stats?.total_material_requests} />
-                        <QuickLink to="/delivery-orders" label="Delivery Orders" icon={<Truck className="w-4 h-4" />} count={stats?.total_delivery_orders} />
-                        <QuickLink to="/inventory/adjustments" label="Adjustments" icon={<BoxesIcon className="w-4 h-4" />} />
-                        <QuickLink to="/inventory/transfers" label="Transfers" icon={<ArrowLeftRight className="w-4 h-4" />} />
+                        <QuickLink to="/purchase-orders" label={t('purchaseOrders')} icon={<ShoppingCart className="w-4 h-4" />} count={stats?.total_purchase_orders} />
+                        <QuickLink to="/material-requests" label={t('materialRequests')} icon={<FileText className="w-4 h-4" />} count={stats?.total_material_requests} />
+                        <QuickLink to="/delivery-orders" label={t('deliveryOrders')} icon={<Truck className="w-4 h-4" />} count={stats?.total_delivery_orders} />
+                        <QuickLink to="/inventory/adjustments" label={t('adjustments')} icon={<BoxesIcon className="w-4 h-4" />} />
+                        <QuickLink to="/inventory/transfers" label={t('transfers')} icon={<ArrowLeftRight className="w-4 h-4" />} />
                     </div>
                 </div>
             </div>
 
             {/* Master Data */}
             <div>
-                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Master Data</h3>
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{t('masterData')}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <MasterDataCard to="/materials" icon={<Package className="w-5 h-5 text-violet-500" />} label="Materials" />
-                    <MasterDataCard to="/suppliers" icon={<Users className="w-5 h-5 text-blue-500" />} label="Suppliers" />
-                    <MasterDataCard to="/warehouses" icon={<Warehouse className="w-5 h-5 text-teal-500" />} label="Warehouses" />
-                    <MasterDataCard to="/finished-products" icon={<Package className="w-5 h-5 text-amber-500" />} label="Products" />
+                    <MasterDataCard to="/materials" icon={<Package className="w-5 h-5 text-violet-500" />} label={t('materials')} />
+                    <MasterDataCard to="/suppliers" icon={<Users className="w-5 h-5 text-blue-500" />} label={t('suppliers')} />
+                    <MasterDataCard to="/warehouses" icon={<Warehouse className="w-5 h-5 text-teal-500" />} label={t('warehouses')} />
+                    <MasterDataCard to="/finished-products" icon={<Package className="w-5 h-5 text-amber-500" />} label={t('products')} />
                 </div>
             </div>
         </div>

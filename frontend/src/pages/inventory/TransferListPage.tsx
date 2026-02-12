@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTransfers } from '../../hooks/useInventory';
 import { useAuthStore } from '../../stores/authStore';
@@ -11,6 +12,8 @@ import { format } from 'date-fns';
 import type { StockTransfer } from '../../types/inventory';
 
 export default function TransferListPage() {
+    const { t } = useTranslation('inventory');
+    const { t: tc } = useTranslation('common');
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
     const [currentPage, setCurrentPage] = useState(1);

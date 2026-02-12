@@ -1,8 +1,11 @@
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import GrnForm from '../../components/grns/GrnForm';
 
 export default function GrnCreatePage() {
+    const { t } = useTranslation('grns');
+    const { t: tc } = useTranslation('common');
     return (
         <div className="animate-fade-in">
             <div>

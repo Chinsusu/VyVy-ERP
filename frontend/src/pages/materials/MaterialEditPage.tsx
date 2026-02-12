@@ -1,9 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Package } from 'lucide-react';
 import { useMaterial } from '../../hooks/useMaterials';
 import MaterialForm from '../../components/materials/MaterialForm';
 
 export default function MaterialEditPage() {
+    const { t } = useTranslation('materials');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { data: material, isLoading, error } = useMaterial(parseInt(id || '0'));

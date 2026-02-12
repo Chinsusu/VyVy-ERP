@@ -1,0 +1,44 @@
+{
+    "groups": {
+        "overview": "Tổng quan",
+        "masterData": "Dữ liệu chính",
+        "purchasing": "Mua hàng",
+        "production": "Sản xuất",
+        "sales": "Bán hàng",
+        "inventory": "Tồn kho",
+        "reports": "Báo cáo"
+    },
+    "nav": {
+        "dashboard": "Bảng điều khiển",
+        "materials": "Nguyên vật liệu",
+        "finishedProducts": "Thành phẩm",
+        "suppliers": "Nhà cung cấp",
+        "warehouses": "Kho hàng",
+        "purchaseOrders": "Đơn mua hàng",
+        "goodsReceipt": "Phiếu nhập kho",
+        "materialRequests": "Yêu cầu vật tư",
+        "issueNotes": "Phiếu xuất kho",
+        "deliveryOrders": "Đơn giao hàng",
+        "adjustments": "Điều chỉnh",
+        "transfers": "Chuyển kho",
+        "stockMovement": "Biến động kho",
+        "inventoryValue": "Giá trị tồn kho",
+        "lowStock": "Tồn kho thấp",
+        "expiringSoon": "Sắp hết hạn"
+    },
+    "header": {
+        "notifications": "Thông báo",
+        "profile": "Hồ sơ",
+        "signOut": "Đăng xuất",
+        "collapse": "Thu gọn",
+        "noAlerts": "Không có cảnh báo — tất cả ổn ✨",
+        "lowStockItems": "{{count}} mặt hàng dưới mức đặt lại",
+        "requiresReorder": "Cần đặt hàng lại",
+        "batchesExpiring": "{{count}} lô sắp hết hạn",
+        "within30Days": "Trong vòng 30 ngày"
+    },
+    "brand": {
+        "name": "VyVy ERP",
+        "subtitle": "Quản lý kho"
+    }
+}

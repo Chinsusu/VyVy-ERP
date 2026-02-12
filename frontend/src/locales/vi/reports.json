@@ -1,0 +1,53 @@
+{
+    "stockMovement": {
+        "title": "Báo cáo biến động kho",
+        "subtitle": "Theo dõi biến động hàng tồn kho giữa các kho",
+        "date": "Ngày",
+        "material": "Nguyên liệu",
+        "transactionType": "Loại giao dịch",
+        "reference": "Tham chiếu",
+        "warehouse": "Kho",
+        "qtyIn": "SL nhập",
+        "qtyOut": "SL xuất",
+        "balance": "Tồn",
+        "batchNumber": "Số lô",
+        "noMovements": "Không tìm thấy biến động kho cho bộ lọc đã chọn"
+    },
+    "inventoryValue": {
+        "title": "Báo cáo giá trị tồn kho",
+        "subtitle": "Giá trị tài chính hiện tại của hàng tồn kho",
+        "material": "Nguyên liệu",
+        "warehouse": "Kho",
+        "qty": "Số lượng",
+        "unitCost": "Đơn giá",
+        "totalValue": "Tổng giá trị",
+        "category": "Danh mục",
+        "grandTotal": "Tổng cộng",
+        "calculatingValues": "Đang tính toán giá trị..."
+    },
+    "lowStock": {
+        "title": "Báo cáo tồn kho thấp",
+        "subtitle": "Mặt hàng dưới mức đặt lại",
+        "checkingLevels": "Đang kiểm tra mức tồn kho...",
+        "material": "Nguyên liệu",
+        "currentStock": "Tồn hiện tại",
+        "reorderPoint": "Mức đặt lại",
+        "minStock": "Tồn tối thiểu",
+        "deficit": "Thiếu hụt",
+        "category": "Danh mục",
+        "actionRequired": "Cần bổ sung hàng",
+        "allStocked": "Tất cả mặt hàng đều trên mức đặt lại ✓"
+    },
+    "expiringSoon": {
+        "title": "Báo cáo hàng sắp hết hạn",
+        "subtitle": "Các lô hàng hết hạn trong kỳ",
+        "material": "Nguyên liệu",
+        "batchNumber": "Số lô",
+        "expiryDate": "Ngày hết hạn",
+        "daysRemaining": "Số ngày còn lại",
+        "qty": "Số lượng",
+        "warehouse": "Kho",
+        "withinDays": "Trong (ngày)",
+        "noExpiring": "Không có mặt hàng hết hạn trong kỳ đã chọn ✓"
+    }
+}

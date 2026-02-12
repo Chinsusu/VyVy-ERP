@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Package, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { useMaterial, useDeleteMaterial } from '../../hooks/useMaterials';
 
 export default function MaterialDetailPage() {
+    const { t } = useTranslation('materials');
+    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { data: material, isLoading, error } = useMaterial(parseInt(id || '0'));

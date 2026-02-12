@@ -1,0 +1,43 @@
+{
+    "title": "Materials",
+    "subtitle": "Manage your raw materials and ingredients",
+    "addNew": "Add Material",
+    "editTitle": "Edit Material",
+    "createTitle": "Create New Material",
+    "deleteTitle": "Delete Material",
+    "deleteMsg": "Are you sure you want to delete this material? This action cannot be undone.",
+    "detail": "Material Detail",
+    "loadingList": "Loading materials...",
+    "errorLoading": "Error loading materials",
+    "searchPlaceholder": "Search by code, name, or barcode...",
+    "code": "Material Code",
+    "name": "Material Name",
+    "barcode": "Barcode",
+    "inciName": "INCI Name",
+    "category": "Category",
+    "unit": "Unit of Measure",
+    "costPrice": "Cost Price",
+    "sellingPrice": "Selling Price",
+    "minStock": "Min Stock Level",
+    "maxStock": "Max Stock Level",
+    "reorderPoint": "Reorder Point",
+    "reorderQty": "Reorder Quantity",
+    "currentStock": "Current Stock",
+    "shelfLife": "Shelf Life (Days)",
+    "storageCondition": "Storage Condition",
+    "qualityStandard": "Quality Standard",
+    "categories": {
+        "raw_material": "Raw Material",
+        "packaging": "Packaging",
+        "consumable": "Consumable",
+        "spare_part": "Spare Part"
+    },
+    "units": {
+        "KG": "Kilogram",
+        "L": "Liter",
+        "PCS": "Pieces",
+        "BOX": "Box",
+        "CTN": "Carton",
+        "M": "Meter"
+    }
+}
