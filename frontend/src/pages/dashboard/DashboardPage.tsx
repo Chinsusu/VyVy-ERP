@@ -1,17 +1,33 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useDashboard } from '../../hooks/useDashboard';
+import { useAlertSummary } from '../../hooks/useAlerts';
 import {
     LogOut, User, Package, Users, Warehouse,
     ShoppingCart, ClipboardCheck, FileText, Truck, RefreshCcw,
-    AlertTriangle, Calendar, DollarSign, TrendingUp, BarChart2
+    AlertTriangle, Calendar, DollarSign, TrendingUp, BarChart2, Bell
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useState, useRef, useEffect } from 'react';
 
 export default function DashboardPage() {
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
     const { stats, isLoading, refresh } = useDashboard();
+    const { summary: alertSummary } = useAlertSummary();
+    const [showAlertDropdown, setShowAlertDropdown] = useState(false);
+    const alertRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (alertRef.current && !alertRef.current.contains(event.target as Node)) {
+                setShowAlertDropdown(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -32,6 +48,71 @@ export default function DashboardPage() {
                             <h1 className="text-xl font-bold text-primary-600">VyVy ERP</h1>
                         </div>
                         <div className="flex items-center gap-4">
+                            {/* Alert Bell */}
+                            <div className="relative" ref={alertRef}>
+                                <button
+                                    onClick={() => setShowAlertDropdown(!showAlertDropdown)}
+                                    className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                    title="Alerts"
+                                >
+                                    <Bell className="w-5 h-5" />
+                                    {(alertSummary?.total_alerts ?? 0) > 0 && (
+                                        <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
+                                            {alertSummary!.total_alerts > 9 ? '9+' : alertSummary!.total_alerts}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {showAlertDropdown && (
+                                    <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                                        <div className="p-3 border-b border-gray-100">
+                                            <h4 className="font-semibold text-gray-900 text-sm">Notifications</h4>
+                                        </div>
+                                        <div className="max-h-64 overflow-y-auto">
+                                            {(alertSummary?.low_stock_count ?? 0) > 0 && (
+                                                <Link
+                                                    to="/reports/low-stock"
+                                                    className="flex items-start gap-3 p-3 hover:bg-gray-50 transition-colors"
+                                                    onClick={() => setShowAlertDropdown(false)}
+                                                >
+                                                    <div className="p-1.5 bg-rose-100 rounded-lg">
+                                                        <AlertTriangle className="w-4 h-4 text-rose-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">
+                                                            {alertSummary!.low_stock_count} items below reorder point
+                                                        </p>
+                                                        <p className="text-xs text-gray-500 mt-0.5">Requires reordering</p>
+                                                    </div>
+                                                </Link>
+                                            )}
+                                            {(alertSummary?.expiring_soon_count ?? 0) > 0 && (
+                                                <Link
+                                                    to="/reports/expiring-soon"
+                                                    className="flex items-start gap-3 p-3 hover:bg-gray-50 transition-colors"
+                                                    onClick={() => setShowAlertDropdown(false)}
+                                                >
+                                                    <div className="p-1.5 bg-orange-100 rounded-lg">
+                                                        <Calendar className="w-4 h-4 text-orange-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">
+                                                            {alertSummary!.expiring_soon_count} batches expiring soon
+                                                        </p>
+                                                        <p className="text-xs text-gray-500 mt-0.5">Within 30 days</p>
+                                                    </div>
+                                                </Link>
+                                            )}
+                                            {(alertSummary?.total_alerts ?? 0) === 0 && (
+                                                <div className="p-4 text-center text-sm text-gray-500">
+                                                    No alerts at this time
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="flex items-center gap-2">
                                 <User className="w-5 h-5 text-gray-500" />
                                 <div className="text-sm">
@@ -137,8 +218,8 @@ export default function DashboardPage() {
                         link="/delivery-orders"
                     />
                     <StatCard
-                        title="Total Receipts"
-                        value={stats?.total_purchase_orders ?? '...'}
+                        title="Goods Receipts"
+                        value={stats?.pending_grns ?? '...'}
                         icon={<TrendingUp className="w-5 h-5 text-cyan-600" />}
                         bgColor="bg-cyan-50"
                         isLoading={isLoading}

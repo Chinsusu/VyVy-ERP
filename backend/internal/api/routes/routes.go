@@ -50,6 +50,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	stService := service.NewStockTransferService(db, stRepo, warehouseRepo, stockBalanceRepo)
 	dashboardService := service.NewDashboardService(db)
 	reportService := service.NewReportService(db)
+	alertService := service.NewAlertService(db)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -67,6 +68,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	inventoryHandler := handlers.NewInventoryHandler(saService, stService)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
 	reportHandler := handlers.NewReportHandler(reportService)
+	alertHandler := handlers.NewAlertHandler(alertService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -238,5 +240,14 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		reportGroup.GET("/inventory-value", reportHandler.GetInventoryValueReport)
 		reportGroup.GET("/low-stock", reportHandler.GetLowStockReport)
 		reportGroup.GET("/expiring-soon", reportHandler.GetExpiringSoonReport)
+	}
+
+	// Alert routes - All protected
+	alertGroup := v1.Group("/alerts")
+	alertGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		alertGroup.GET("/summary", alertHandler.GetAlertSummary)
+		alertGroup.GET("/low-stock", alertHandler.GetLowStockAlerts)
+		alertGroup.GET("/expiring-soon", alertHandler.GetExpiringSoonAlerts)
 	}
 }

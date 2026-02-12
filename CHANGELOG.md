@@ -7,6 +7,41 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc6] - 2026-02-12
+
+### Added
+- **Alert System (Phase 7 Enhancement)**:
+    - Backend: `AlertService` with `GetAlertSummary`, `GetLowStockAlerts`, `GetExpiringSoonAlerts(days)`.
+    - Backend: `AlertHandler` with 3 new endpoints: `/api/v1/alerts/summary`, `/alerts/low-stock`, `/alerts/expiring-soon`.
+    - Frontend: TypeScript types (`alert.ts`), API module (`alerts.ts`), React Query hooks (`useAlerts.ts`) with 5-min auto-refresh.
+    - Frontend: Dashboard notification bell (🔔) with badge count and dropdown linking to report pages.
+
+- **Nginx Reverse Proxy (Phase 9 - Deployment)**:
+    - New `nginx.conf` with API reverse proxy (`/api/` → `backend:8080`) and SPA `try_files` routing.
+    - New `.env.production` with relative API URL (`/api/v1`) so all requests go through Nginx.
+    - Updated `Dockerfile` to include custom Nginx configuration.
+    - Static asset caching headers and gzip compression enabled.
+
+### Changed
+- **Port Security Hardening**:
+    - Removed PostgreSQL port 5432 from host exposure (internal Docker network only).
+    - Removed Backend port 8080 from host exposure (all API traffic routed through Nginx on port 3000).
+    - Killed stray Vite dev server on port 3001.
+    - **Only port 3000 is now exposed** — single entry point through Nginx reverse proxy.
+- **Dashboard**: Fixed "Total Receipts" stat card duplicating PO count → renamed to "Goods Receipts" showing pending GRN count.
+
+### Fixed
+- **Stock Movement Report**: Query used incorrect transaction types (`'receipt'` → `'GRN'`, `'issue'` → `'MIN','issue'`), causing the report to return empty results.
+- **Frontend API URL**: Changed from hardcoded `http://localhost:8080/api/v1` to relative `/api/v1` via `.env.production`, enabling proper Nginx proxy routing.
+- **SPA Routing**: Direct URL navigation (e.g., `/reports/stock-movement`) no longer returns Nginx 404.
+
+### Verified
+- **E2E Tests**: 27/28 API tests passed (login, dashboard, 3 alerts, 4 reports, 4 CSV exports, 10 list endpoints, MIN workflow with stock verification).
+- **Browser Tests**: Login → Dashboard → GRNs → Stock Movement Report all working through Nginx proxy.
+- **Docker Build**: Both `vyvy-erp_backend` and `vyvy-erp_frontend` images build successfully.
+
+---
+
 ## [1.0.0-rc5] - 2026-02-11
 ### Added
 - **Security Audit & API Hardening**: All API endpoints now require JWT authentication.

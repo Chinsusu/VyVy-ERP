@@ -175,26 +175,39 @@ npm run dev
 
 ## 🎯 Roadmap Triển Khai (Thực Tế)
 
-### Phase 1-2: Foundation & Master Data (Sơ đồ cơ bản)
-- [x] Database setup
-- [x] Authentication
+### Phase 1-2: Foundation & Master Data ✅
+- [x] Database setup (24 tables, views, triggers)
+- [x] Authentication (JWT + RBAC)
 - [x] Materials, Suppliers, Warehouses CRUD
 - [x] Finished Products CRUD
 
-### Phase 3-4: Purchase & Production Flow
-- [x] Purchase Order workflow
-- [x] GRN + QC workflow
-- [x] Material Request workflow
-- [ ] Material Issue Note (MIN) workflow (Next)
+### Phase 3-4: Purchase & Production Flow ✅
+- [x] Purchase Order workflow (Draft → Approved → Cancelled)
+- [x] GRN + QC workflow (Receive → QC → Post → Stock Update)
+- [x] Material Request workflow (Create → Approve → Reserve Stock)
+- [x] Material Issue Note (MIN) workflow (Create → Post → Stock Deduction)
 
-### Phase 5-6: Sales & Inventory (Tiếp theo)
-- [ ] Delivery Order workflow
-- [ ] Stock management (Balance, Ledger, Adjustment, Transfer)
+### Phase 5-6: Sales & Inventory ✅
+- [x] Delivery Order workflow (Pick → Pack → Ship → Stock Deduction)
+- [x] Stock management (Balance, Ledger, Adjustment, Transfer)
 
-### Phase 7-9: Reports, Testing & Go-live
-- [ ] Dashboard & Reports
-- [ ] UAT & Testing
-- [ ] Deployment
+### Phase 7: Reports & Dashboard ✅
+- [x] Dashboard with stat cards and alerts
+- [x] 4 Reports (Stock Movement, Inventory Value, Low Stock, Expiring Soon)
+- [x] CSV Export for all reports
+- [x] Alert system (Low Stock + Expiring Soon notifications)
+
+### Phase 8: Testing ✅
+- [x] Unit tests for core services
+- [x] Integration tests for API endpoints
+- [x] Security audit and RBAC enforcement
+- [x] E2E tests (27/28 passed)
+
+### Phase 9: Deployment ✅
+- [x] Docker multi-stage builds (backend + frontend)
+- [x] Nginx reverse proxy (single port 3000)
+- [x] Port security hardening
+- [x] Production-ready configuration
 
 ---
 
@@ -233,31 +246,37 @@ npm run dev
 
 ### Production Flow
 - [x] Material Request → Approve
-- [ ] Picking list (FIFO/FEFO)
-- [ ] Issue materials (MIN)
-- [ ] Post MIN → Decrease stock
+- [x] Picking list (FIFO/FEFO)
+- [x] Issue materials (MIN)
+- [x] Post MIN → Decrease stock
 
 ### Sales Flow
-- [ ] Delivery Order → Pick → Pack → Ship
-- [ ] Post DO → Decrease stock
+- [x] Delivery Order → Pick → Pack → Ship
+- [x] Post DO → Decrease stock
 
 ### Inventory
-- [ ] Stock Balance view (by warehouse, batch)
-- [ ] Stock Ledger (transaction history)
-- [ ] Stock Adjustment (kiểm kê)
-- [ ] Stock Transfer (chuyển kho)
-- [x] Batch Tracking & Traceability (Schema Ready)
+- [x] Stock Balance view (by warehouse, batch)
+- [x] Stock Ledger (transaction history)
+- [x] Stock Adjustment (kiểm kê)
+- [x] Stock Transfer (chuyển kho)
+- [x] Batch Tracking & Traceability
 
 ### Alerts
-- [ ] Low Stock Alert
-- [ ] Expiring Items Alert (30/60/90 days)
+- [x] Low Stock Alert
+- [x] Expiring Items Alert (30/60/90 days)
 - [ ] QC Pending Alert
 
 ### Reports
-- [ ] Stock Movement Report (XNT)
-- [ ] Inventory Value Report
-- [ ] Low Stock Report
-- [ ] Dashboard Stats
+- [x] Stock Movement Report (XNT)
+- [x] Inventory Value Report
+- [x] Low Stock Report
+- [x] Dashboard Stats
+
+### Deployment
+- [x] Nginx Reverse Proxy (single port 3000)
+- [x] Port security hardening
+- [x] Docker production builds
+- [x] E2E test suite
 
 ---
 
@@ -270,6 +289,6 @@ npm run dev
 
 ---
 
-**Version:** 0.8.0
-**Last Updated:** 2026-02-10
+**Version:** 1.0.0-rc6
+**Last Updated:** 2026-02-12
 **Author:** VyVy ERP Team (Merged with AI Assistant)

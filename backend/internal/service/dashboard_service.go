@@ -83,8 +83,8 @@ func (s *reportService) GetStockMovementReport(filters map[string]interface{}) (
 			materials.trading_name as item_name,
 			warehouses.name as warehouse_name,
 			materials.unit as unit,
-			SUM(CASE WHEN transaction_type = 'receipt' THEN quantity ELSE 0 END) as received_qty,
-			SUM(CASE WHEN transaction_type = 'issue' THEN ABS(quantity) ELSE 0 END) as issued_qty,
+			SUM(CASE WHEN transaction_type = 'GRN' THEN quantity ELSE 0 END) as received_qty,
+			SUM(CASE WHEN transaction_type IN ('MIN', 'issue') THEN ABS(quantity) ELSE 0 END) as issued_qty,
 			SUM(CASE WHEN transaction_type = 'adjustment' THEN quantity ELSE 0 END) as adjusted_qty,
 			SUM(CASE WHEN transaction_type IN ('transfer_in', 'transfer_out') THEN quantity ELSE 0 END) as transferred_qty
 		`).
