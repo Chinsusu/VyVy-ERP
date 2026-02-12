@@ -7,6 +7,32 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc11] - 2026-02-12
+
+### Added
+- **Return Management Module (Phase 5 — Backend)**:
+    - Migration `000030`: Created `return_orders` and `return_order_items` tables with 6 indexes.
+    - Full CRUD: Model (with `ToSafe()` DTOs), Repository, Service, Handler, Routes (`/api/v1/return-orders`).
+    - 6-step return workflow: `pending → approved → receiving → inspecting → completed` (cancel from any non-final state).
+    - Service methods: Create, Approve, Receive, InspectItem, Complete, Cancel — with status validation, quantity checks, and audit tracking.
+    - 10 API endpoints with RBAC (approve/complete require `warehouse_manager` role).
+    - Return number auto-generation (`RO-YYYYMMDD-XXXX`).
+
+- **Return Management Module (Phase 5 — Frontend)**:
+    - TypeScript types (`returnOrder.ts`): 7 interfaces for orders, items, and workflow requests.
+    - API client (`returnOrders.ts`): 10 methods covering CRUD + all workflow actions.
+    - React Query hooks (`useReturnOrders.ts`): 9 hooks for data fetching and mutations.
+    - **ReturnOrderListPage**: Status/type filters, pagination, Vietnamese labels, color-coded status badges.
+    - **ReturnOrderCreatePage**: DO lookup (validates shipped/delivered status), item picker from DO items with max qty, carrier/tracking/resolution fields.
+    - **ReturnOrderDetailPage**: Full workflow action buttons, summary cards (total returned/restocked/scrapped/refund), inspection modal per item with restocked/scrapped split and warehouse assignment.
+    - Sidebar navigation: "Hoàn hàng" under "Bán hàng" group with `RotateCcw` icon.
+    - i18n: `returnOrders` key in EN + VI `sidebar.json`.
+
+- **Delivery Order Integration**:
+    - "Tạo đơn hoàn" button on `DODetailPage` for shipped/delivered orders, linking to return order creation with pre-filled DO ID.
+
+---
+
 ## [1.0.0-rc10] - 2026-02-12
 
 ### Added
