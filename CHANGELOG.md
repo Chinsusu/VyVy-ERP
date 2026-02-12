@@ -7,6 +7,43 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc9] - 2026-02-12
+
+### Added
+- **Spreadsheet Data Analysis & Master Data Import (Phase 1)**:
+    - Analyzed 5 Google Spreadsheets (27 sheets) covering raw materials, packaging, fragrances, finished products, shipping reconciliation, and return workflows.
+    - Created comprehensive `seed_data.sql` (270 lines) with real business data from spreadsheets — idempotent via `ON CONFLICT`.
+    - **38 Suppliers** imported: 16 nguyên liệu, 14 bao bì, 5 gia công, 3 khác.
+    - **10 Warehouses** imported: Kho Tổng, Lab, Kho Mỹ (thuê ngoài), + 5 outsource manufacturing facilities (TAMI, Chemlink, Mộc Hoa, Lyona, Nguyễn Trắc).
+    - **104 Materials** imported: 35 acids/actives/emulsifiers, 26 fragrances, 42 packaging items (tubes, bottles, jars, boxes, labels, bags), 1 semi-finished.
+    - **41 Finished Products** imported: 18 đang bán, 9 ngưng bán, 10 sản phẩm quà/mini, 4 phụ kiện.
+
+- **Migration `000026_add_supplier_group_and_product_fields`**:
+    - `suppliers.supplier_group` (VARCHAR 50, indexed) — values: NGUYÊN_LIỆU, BAO_BÌ, GIA_CÔNG.
+    - `finished_products.product_type` (VARCHAR 50, indexed) — values: SẢN_PHẨM_BÁN, SẢN_PHẨM_QUÀ, PHỤ_KIỆN.
+    - `finished_products.sales_status` (VARCHAR 50, default ĐANG_BÁN) — values: ĐANG_BÁN, NGƯNG_BÁN, TẠM_NGƯNG.
+
+- **Implementation Plan** for 5-phase ERP expansion:
+    - Phase 1 (✅): Import master data (suppliers, warehouses, materials, finished products).
+    - Phase 2: Import transactional data (PO, GRN, Material Issues).
+    - Phase 3: Sales Channel module (Shopee, Tiktok, Facebook, Lazada).
+    - Phase 4: Carrier Management (JNT, SAE) + shipping reconciliation.
+    - Phase 5: Return Management (16-step hoàn hàng workflow).
+
+### Changed
+- **Supplier Model** (`supplier.go`): Added `SupplierGroup *string` field with SafeDTO and ToSafe updates.
+- **FinishedProduct Model** (`finished_product.go`): Added `ProductType string` and `SalesStatus string` fields with SafeDTO and ToSafe updates.
+
+### Fixed
+- **Pre-existing bug** in `cmd/setup_admin/main.go`: `IsActive: true` → `IsActive: &isActive` (User.IsActive is `*bool`).
+
+### Verified
+- Go build passes cleanly (`go build ./...` — zero errors).
+- Migration 000026 applied to Docker PostgreSQL.
+- Seed data imported: 193 records across 4 tables.
+
+---
+
 ## [1.0.0-rc8] - 2026-02-12
 
 ### Added

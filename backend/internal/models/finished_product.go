@@ -12,6 +12,8 @@ type FinishedProduct struct {
 	NameEn      string `gorm:"column:name_en;size:255" json:"name_en,omitempty"`
 	Category    string `gorm:"column:category;size:100" json:"category,omitempty"`
 	SubCategory string `gorm:"column:sub_category;size:100" json:"sub_category,omitempty"`
+	ProductType string `gorm:"column:product_type;size:50;index" json:"product_type,omitempty"`
+	SalesStatus string `gorm:"column:sales_status;size:50;default:'ĐANG_BÁN'" json:"sales_status,omitempty"`
 	Unit        string `gorm:"column:unit;size:20;not null;default:PCS" json:"unit"`
 
 	// Pricing
@@ -61,6 +63,8 @@ type SafeFinishedProduct struct {
 	NameEn      string   `json:"name_en,omitempty"`
 	Category    string   `json:"category,omitempty"`
 	SubCategory string   `json:"sub_category,omitempty"`
+	ProductType string   `json:"product_type,omitempty"`
+	SalesStatus string   `json:"sales_status,omitempty"`
 	Unit        string   `json:"unit"`
 	StandardCost *float64 `json:"standard_cost,omitempty"`
 	SellingPrice *float64 `json:"selling_price,omitempty"`
@@ -88,6 +92,8 @@ func (fp *FinishedProduct) ToSafe() *SafeFinishedProduct {
 		NameEn:      fp.NameEn,
 		Category:    fp.Category,
 		SubCategory: fp.SubCategory,
+		ProductType: fp.ProductType,
+		SalesStatus: fp.SalesStatus,
 		Unit:        fp.Unit,
 		StandardCost: fp.StandardCost,
 		SellingPrice: fp.SellingPrice,

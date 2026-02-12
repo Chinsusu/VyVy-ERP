@@ -19,6 +19,7 @@ type Supplier struct {
 	Country       string     `json:"country" gorm:"default:'Vietnam'"`
 	PaymentTerms  *string    `json:"payment_terms"`
 	CreditLimit   *float64   `json:"credit_limit" gorm:"type:decimal(15,2)"`
+	SupplierGroup *string    `json:"supplier_group" gorm:"type:varchar(50);index"`
 	IsActive      *bool      `json:"is_active" gorm:"default:true"`
 	Notes         *string    `json:"notes"`
 	CreatedAt     time.Time  `json:"created_at"`
@@ -47,6 +48,7 @@ type SafeSupplier struct {
 	Country       string    `json:"country"`
 	PaymentTerms  *string   `json:"payment_terms"`
 	CreditLimit   *float64  `json:"credit_limit"`
+	SupplierGroup *string   `json:"supplier_group,omitempty"`
 	IsActive      *bool     `json:"is_active"`
 	Notes         *string   `json:"notes"`
 	CreatedAt     time.Time `json:"created_at"`
@@ -69,6 +71,7 @@ func (s *Supplier) ToSafe() *SafeSupplier {
 		Country:       s.Country,
 		PaymentTerms:  s.PaymentTerms,
 		CreditLimit:   s.CreditLimit,
+		SupplierGroup: s.SupplierGroup,
 		IsActive:      s.IsActive,
 		Notes:         s.Notes,
 		CreatedAt:     s.CreatedAt,

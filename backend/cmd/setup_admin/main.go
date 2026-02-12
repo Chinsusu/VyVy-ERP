@@ -19,12 +19,13 @@ func main() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
+	isActive := true
 	admin := &models.User{
 		Username: "admin",
 		Email:    "admin@vyvy.com",
 		FullName: "Administrator",
 		Role:     "admin",
-		IsActive: true,
+		IsActive: &isActive,
 	}
 	admin.HashPassword("password123")
 
