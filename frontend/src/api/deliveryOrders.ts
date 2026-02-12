@@ -11,6 +11,7 @@ export const deliveryOrdersAPI = {
     list: async (filter: DeliveryOrderFilter) => {
         const params = new URLSearchParams();
         if (filter.warehouse_id) params.append('warehouse_id', filter.warehouse_id.toString());
+        if (filter.sales_channel_id) params.append('sales_channel_id', filter.sales_channel_id.toString());
         if (filter.status) params.append('status', filter.status);
         if (filter.do_number) params.append('do_number', filter.do_number);
         if (filter.customer_name) params.append('customer_name', filter.customer_name);

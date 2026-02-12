@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, Package, Tag, Plus, Trash2 } from 'lucide-react';
+import { Save, Package, Tag, Plus, Trash2, Store } from 'lucide-react';
 import { useWarehouses, useWarehouseLocations } from '../../hooks/useWarehouses';
 import { useFinishedProducts } from '../../hooks/useFinishedProducts';
 import { useStockBalance } from '../../hooks/useStockBalance';
 import { useCreateDeliveryOrder, useUpdateDeliveryOrder, useDeliveryOrder } from '../../hooks/useDeliveryOrders';
+import { useSalesChannels } from '../../hooks/useSalesChannels';
 import type { CreateDeliveryOrderRequest, CreateDeliveryOrderItem } from '../../types/deliveryOrder';
 
 interface DOFormProps {
@@ -16,11 +17,14 @@ export default function DOForm({ isEdit = false }: DOFormProps) {
     const { id } = useParams();
     const { data: existingDO, isLoading: isLoadingDO } = useDeliveryOrder(Number(id));
     const { data: warehouses } = useWarehouses();
+    const { data: channelsData } = useSalesChannels({ is_active: true });
+    const salesChannels = channelsData?.data || [];
     const createMutation = useCreateDeliveryOrder();
     const updateMutation = useUpdateDeliveryOrder();
 
     const [formData, setFormData] = useState<Omit<CreateDeliveryOrderRequest, 'items'>>({
         warehouse_id: 0,
+        sales_channel_id: undefined,
         customer_name: '',
         customer_address: '',
         delivery_date: new Date().toISOString().split('T')[0],
@@ -38,6 +42,7 @@ export default function DOForm({ isEdit = false }: DOFormProps) {
         if (isEdit && existingDO) {
             setFormData({
                 warehouse_id: existingDO.warehouse_id,
+                sales_channel_id: existingDO.sales_channel_id || undefined,
                 customer_name: existingDO.customer_name,
                 customer_address: existingDO.customer_address || '',
                 delivery_date: new Date(existingDO.delivery_date).toISOString().split('T')[0],
@@ -91,6 +96,7 @@ export default function DOForm({ isEdit = false }: DOFormProps) {
 
         const payload: CreateDeliveryOrderRequest = {
             ...formData,
+            sales_channel_id: formData.sales_channel_id || undefined,
             items: items.map(item => ({
                 finished_product_id: Number(item.finished_product_id),
                 quantity: Number(item.quantity),
@@ -159,6 +165,21 @@ export default function DOForm({ isEdit = false }: DOFormProps) {
                         <option value={0}>Select Warehouse</option>
                         {warehouses?.data.map((w: any) => (
                             <option key={w.id} value={w.id}>{w.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className="label flex items-center gap-1">
+                        <Store className="w-4 h-4" /> Sales Channel
+                    </label>
+                    <select
+                        className="select w-full"
+                        value={formData.sales_channel_id || ''}
+                        onChange={(e) => setFormData({ ...formData, sales_channel_id: e.target.value ? Number(e.target.value) : undefined })}
+                    >
+                        <option value="">-- No Channel --</option>
+                        {salesChannels.map((ch: any) => (
+                            <option key={ch.id} value={ch.id}>{ch.code} - {ch.name}</option>
                         ))}
                     </select>
                 </div>

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Package, Plus } from 'lucide-react';
+import { Search, Package, Plus, Store } from 'lucide-react';
 import { useDeliveryOrders } from '../../hooks/useDeliveryOrders';
+import { useSalesChannels } from '../../hooks/useSalesChannels';
 import type { DeliveryOrder, DeliveryOrderFilter } from '../../types/deliveryOrder';
 
 export default function DOListPage() {
@@ -11,6 +12,8 @@ export default function DOListPage() {
     });
 
     const { data, isLoading, error } = useDeliveryOrders(filter);
+    const { data: channelsData } = useSalesChannels({ is_active: true });
+    const salesChannels = channelsData?.data || [];
     const deliveryOrders = data?.items || [];
     const totalItems = data?.total || 0;
     const totalPages = Math.ceil(totalItems / (filter.limit || 10));
@@ -76,7 +79,7 @@ export default function DOListPage() {
                     </form>
 
                     {/* Additional Filters */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                             <select
@@ -90,6 +93,21 @@ export default function DOListPage() {
                                 <option value="shipped">Shipped</option>
                                 <option value="delivered">Delivered</option>
                                 <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                                <Store className="w-4 h-4" /> Sales Channel
+                            </label>
+                            <select
+                                className="input"
+                                value={filter.sales_channel_id || ''}
+                                onChange={(e) => setFilter({ ...filter, sales_channel_id: e.target.value ? Number(e.target.value) : undefined, offset: 0 })}
+                            >
+                                <option value="">All Channels</option>
+                                {salesChannels.map((ch: any) => (
+                                    <option key={ch.id} value={ch.id}>{ch.name}</option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -132,6 +150,7 @@ export default function DOListPage() {
                                         <tr>
                                             <th>DO Number</th>
                                             <th>Customer</th>
+                                            <th>Channel</th>
                                             <th>Warehouse</th>
                                             <th>Delivery Date</th>
                                             <th>Status</th>
@@ -150,6 +169,16 @@ export default function DOListPage() {
                                                 <td>
                                                     <div className="text-sm font-medium text-gray-900">{doItem.customer_name}</div>
                                                     <div className="text-xs text-gray-500 truncate max-w-xs">{doItem.customer_address}</div>
+                                                </td>
+                                                <td>
+                                                    {doItem.sales_channel_name ? (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-medium border border-purple-200">
+                                                            <Store className="w-3 h-3" />
+                                                            {doItem.sales_channel_name}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-400 text-xs">—</span>
+                                                    )}
                                                 </td>
                                                 <td>{doItem.warehouse_name || '-'}</td>
                                                 <td>{new Date(doItem.delivery_date).toLocaleDateString('vi-VN')}</td>

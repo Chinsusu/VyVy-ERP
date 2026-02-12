@@ -11,7 +11,8 @@ import {
     Clock,
     Plus,
     User,
-    MapPin
+    MapPin,
+    Store
 } from 'lucide-react';
 import {
     useDeliveryOrder,
@@ -178,6 +179,19 @@ export default function DODetailPage() {
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase font-semibold">Shipping Method</p>
                                             <p className="font-medium text-gray-900">{doData.shipping_method || 'Standard'}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <Store className="w-5 h-5 text-gray-400 mt-0.5" />
+                                        <div>
+                                            <p className="text-xs text-gray-500 uppercase font-semibold">Sales Channel</p>
+                                            {doData.sales_channel_name ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 text-sm font-medium border border-purple-200">
+                                                    {doData.sales_channel_name}
+                                                </span>
+                                            ) : (
+                                                <p className="font-medium text-gray-400">No channel</p>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-3">

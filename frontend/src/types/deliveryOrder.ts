@@ -5,6 +5,8 @@ export interface DeliveryOrder {
     do_number: string;
     warehouse_id: number;
     warehouse_name?: string;
+    sales_channel_id?: number;
+    sales_channel_name?: string;
     customer_name: string;
     customer_address?: string;
     delivery_date: string;
@@ -39,6 +41,7 @@ export interface DeliveryOrderItem {
 
 export interface CreateDeliveryOrderRequest {
     warehouse_id: number;
+    sales_channel_id?: number;
     customer_name: string;
     customer_address?: string;
     delivery_date: string; // YYYY-MM-DD
@@ -58,6 +61,7 @@ export interface CreateDeliveryOrderItem {
 
 export interface DeliveryOrderFilter {
     warehouse_id?: number;
+    sales_channel_id?: number;
     status?: string;
     do_number?: string;
     customer_name?: string;
@@ -66,6 +70,7 @@ export interface DeliveryOrderFilter {
 }
 
 export interface UpdateDeliveryOrderRequest {
+    sales_channel_id?: number;
     customer_name?: string;
     customer_address?: string;
     delivery_date?: string;
