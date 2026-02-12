@@ -9,7 +9,7 @@ import {
     ShoppingCart, ClipboardCheck, FileText, Send, Truck, Store,
     ArrowLeftRight, BarChart3, TrendingDown, Clock,
     Bell, LogOut, ChevronLeft, Menu, User,
-    AlertTriangle, Calendar, BoxesIcon, Activity, Globe
+    AlertTriangle, Calendar, BoxesIcon, Activity, Globe, FileCheck
 } from 'lucide-react';
 
 interface NavItem {
@@ -58,6 +58,8 @@ const navGroups: NavGroup[] = [
         items: [
             { labelKey: 'nav.deliveryOrders', path: '/delivery-orders', icon: <Truck className="w-5 h-5" /> },
             { labelKey: 'nav.salesChannels', path: '/sales-channels', icon: <Store className="w-5 h-5" /> },
+            { labelKey: 'nav.carriers', path: '/carriers', icon: <Package className="w-5 h-5" /> },
+            { labelKey: 'nav.reconciliation', path: '/reconciliations', icon: <FileCheck className="w-5 h-5" /> },
         ],
     },
     {

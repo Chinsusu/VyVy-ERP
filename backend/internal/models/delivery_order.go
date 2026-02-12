@@ -29,6 +29,9 @@ type DeliveryOrder struct {
 
 	// Sales Channel
 	SalesChannelID  *uint     `gorm:"column:sales_channel_id" json:"sales_channel_id,omitempty"`
+
+	// Carrier
+	CarrierID       *uint     `gorm:"column:carrier_id" json:"carrier_id,omitempty"`
 	
 	// Additional info
 	Notes           string    `gorm:"column:notes;type:text" json:"notes,omitempty"`
@@ -42,6 +45,7 @@ type DeliveryOrder struct {
 	// Relationships
 	Warehouse       Warehouse           `gorm:"foreignKey:WarehouseID" json:"warehouse,omitempty"`
 	SalesChannel    *SalesChannel       `gorm:"foreignKey:SalesChannelID" json:"sales_channel,omitempty"`
+	Carrier         *Carrier            `gorm:"foreignKey:CarrierID" json:"carrier,omitempty"`
 	PostedByUser    *User               `gorm:"foreignKey:PostedBy" json:"posted_by_user,omitempty"`
 	CreatedByUser   *User               `gorm:"foreignKey:CreatedBy" json:"created_by_user,omitempty"`
 	UpdatedByUser   *User               `gorm:"foreignKey:UpdatedBy" json:"updated_by_user,omitempty"`
@@ -108,6 +112,8 @@ type SafeDeliveryOrder struct {
 	TrackingNumber  string                `json:"tracking_number,omitempty"`
 	SalesChannelID  *uint                 `json:"sales_channel_id,omitempty"`
 	SalesChannelName string               `json:"sales_channel_name,omitempty"`
+	CarrierID       *uint                 `json:"carrier_id,omitempty"`
+	CarrierName     string                `json:"carrier_name,omitempty"`
 	Notes           string                `json:"notes,omitempty"`
 	CreatedAt       time.Time             `json:"created_at"`
 	CreatedByName   string                `json:"created_by_name,omitempty"`
@@ -148,6 +154,7 @@ func (do *DeliveryOrder) ToSafe() *SafeDeliveryOrder {
 		ShippingMethod:  do.ShippingMethod,
 		TrackingNumber:  do.TrackingNumber,
 		SalesChannelID:  do.SalesChannelID,
+		CarrierID:       do.CarrierID,
 		Notes:           do.Notes,
 		CreatedAt:       do.CreatedAt,
 		UpdatedAt:       do.UpdatedAt,
@@ -155,6 +162,9 @@ func (do *DeliveryOrder) ToSafe() *SafeDeliveryOrder {
 
 	if do.SalesChannel != nil {
 		safe.SalesChannelName = do.SalesChannel.Name
+	}
+	if do.Carrier != nil {
+		safe.CarrierName = do.Carrier.Name
 	}
 	if do.PostedByUser != nil {
 		safe.PostedByName = do.PostedByUser.FullName

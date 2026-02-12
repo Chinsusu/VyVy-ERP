@@ -75,6 +75,7 @@ func (s *deliveryOrderService) CreateDeliveryOrder(req *dto.CreateDeliveryOrderR
 		DeliveryDate:    deliveryDate,
 		ShippingMethod:  req.ShippingMethod,
 		SalesChannelID:  req.SalesChannelID,
+		CarrierID:       req.CarrierID,
 		Notes:           req.Notes,
 		Status:          "draft",
 		CreatedBy:       &userID,
@@ -136,6 +137,9 @@ func (s *deliveryOrderService) ListDeliveryOrders(filter *dto.DeliveryOrderFilte
 	if filter.SalesChannelID > 0 {
 		filters["sales_channel_id"] = filter.SalesChannelID
 	}
+	if filter.CarrierID > 0 {
+		filters["carrier_id"] = filter.CarrierID
+	}
 
 	dos, total, err := s.doRepo.List(filters, filter.Offset, filter.Limit)
 	if err != nil {
@@ -184,6 +188,9 @@ func (s *deliveryOrderService) UpdateDeliveryOrder(id uint, req *dto.UpdateDeliv
 	}
 	if req.SalesChannelID != nil {
 		do.SalesChannelID = req.SalesChannelID
+	}
+	if req.CarrierID != nil {
+		do.CarrierID = req.CarrierID
 	}
 
 	do.UpdatedBy = &userID

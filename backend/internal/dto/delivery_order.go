@@ -7,6 +7,7 @@ type CreateDeliveryOrderRequest struct {
 	DeliveryDate    string                   `json:"delivery_date" binding:"required"` // YYYY-MM-DD
 	ShippingMethod  string                   `json:"shipping_method"`
 	SalesChannelID  *uint                    `json:"sales_channel_id"`
+	CarrierID       *uint                    `json:"carrier_id"`
 	Notes           string                   `json:"notes"`
 	Items           []CreateDeliveryOrderItem `json:"items" binding:"required,gt=0"`
 }
@@ -26,6 +27,7 @@ type DeliveryOrderFilterRequest struct {
 	DONumber       string `form:"do_number"`
 	CustomerName   string `form:"customer_name"`
 	SalesChannelID uint   `form:"sales_channel_id"`
+	CarrierID      uint   `form:"carrier_id"`
 	Offset         int    `form:"offset,default=0"`
 	Limit        int    `form:"limit,default=20"`
 }
@@ -37,6 +39,7 @@ type UpdateDeliveryOrderRequest struct {
 	ShippingMethod  string                   `json:"shipping_method"`
 	TrackingNumber  string                   `json:"tracking_number"`
 	SalesChannelID  *uint                    `json:"sales_channel_id"`
+	CarrierID       *uint                    `json:"carrier_id"`
 	Notes           string                   `json:"notes"`
 	Items           []CreateDeliveryOrderItem `json:"items"`
 }

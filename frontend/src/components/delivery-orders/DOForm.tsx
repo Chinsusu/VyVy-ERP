@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, Package, Tag, Plus, Trash2, Store } from 'lucide-react';
+import { Save, Package, Tag, Plus, Trash2, Store, Truck } from 'lucide-react';
 import { useWarehouses, useWarehouseLocations } from '../../hooks/useWarehouses';
 import { useFinishedProducts } from '../../hooks/useFinishedProducts';
 import { useStockBalance } from '../../hooks/useStockBalance';
 import { useCreateDeliveryOrder, useUpdateDeliveryOrder, useDeliveryOrder } from '../../hooks/useDeliveryOrders';
 import { useSalesChannels } from '../../hooks/useSalesChannels';
+import { useCarriers } from '../../hooks/useCarriers';
 import type { CreateDeliveryOrderRequest, CreateDeliveryOrderItem } from '../../types/deliveryOrder';
 
 interface DOFormProps {
@@ -19,12 +20,15 @@ export default function DOForm({ isEdit = false }: DOFormProps) {
     const { data: warehouses } = useWarehouses();
     const { data: channelsData } = useSalesChannels({ is_active: true });
     const salesChannels = channelsData?.data || [];
+    const { data: carriersData } = useCarriers({ is_active: true });
+    const carriers = carriersData?.data || [];
     const createMutation = useCreateDeliveryOrder();
     const updateMutation = useUpdateDeliveryOrder();
 
     const [formData, setFormData] = useState<Omit<CreateDeliveryOrderRequest, 'items'>>({
         warehouse_id: 0,
         sales_channel_id: undefined,
+        carrier_id: undefined,
         customer_name: '',
         customer_address: '',
         delivery_date: new Date().toISOString().split('T')[0],
@@ -180,6 +184,21 @@ export default function DOForm({ isEdit = false }: DOFormProps) {
                         <option value="">-- No Channel --</option>
                         {salesChannels.map((ch: any) => (
                             <option key={ch.id} value={ch.id}>{ch.code} - {ch.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className="label flex items-center gap-1">
+                        <Truck className="w-4 h-4" /> Carrier
+                    </label>
+                    <select
+                        className="select w-full"
+                        value={formData.carrier_id || ''}
+                        onChange={(e) => setFormData({ ...formData, carrier_id: e.target.value ? Number(e.target.value) : undefined })}
+                    >
+                        <option value="">-- No Carrier --</option>
+                        {carriers.map((c: any) => (
+                            <option key={c.id} value={c.id}>{c.code} - {c.name}</option>
                         ))}
                     </select>
                 </div>

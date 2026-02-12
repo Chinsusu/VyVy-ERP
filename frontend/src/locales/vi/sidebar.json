@@ -20,6 +20,8 @@
         "issueNotes": "Phiếu xuất kho",
         "deliveryOrders": "Đơn giao hàng",
         "salesChannels": "Kênh bán hàng",
+        "carriers": "Đơn vị vận chuyển",
+        "reconciliation": "Đối soát vận đơn",
         "adjustments": "Điều chỉnh",
         "transfers": "Chuyển kho",
         "stockMovement": "Biến động kho",

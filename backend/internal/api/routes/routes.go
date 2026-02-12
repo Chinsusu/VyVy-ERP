@@ -33,6 +33,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	saRepo := repository.NewStockAdjustmentRepository(db)
 	stRepo := repository.NewStockTransferRepository(db)
 	salesChannelRepo := repository.NewSalesChannelRepository(db)
+	carrierRepo := repository.NewCarrierRepository(db)
+	reconRepo := repository.NewReconciliationRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -53,6 +55,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	reportService := service.NewReportService(db)
 	alertService := service.NewAlertService(db)
 	salesChannelService := service.NewSalesChannelService(salesChannelRepo)
+	carrierService := service.NewCarrierService(carrierRepo)
+	reconService := service.NewReconciliationService(reconRepo, carrierRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -72,6 +76,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	reportHandler := handlers.NewReportHandler(reportService)
 	alertHandler := handlers.NewAlertHandler(alertService)
 	salesChannelHandler := handlers.NewSalesChannelHandler(salesChannelService)
+	carrierHandler := handlers.NewCarrierHandler(carrierService)
+	reconHandler := handlers.NewReconciliationHandler(reconService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -263,5 +269,27 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		alertGroup.GET("/summary", alertHandler.GetAlertSummary)
 		alertGroup.GET("/low-stock", alertHandler.GetLowStockAlerts)
 		alertGroup.GET("/expiring-soon", alertHandler.GetExpiringSoonAlerts)
+	}
+	// Carrier routes - All protected
+	carrierGroup := v1.Group("/carriers")
+	carrierGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		carrierGroup.GET("", carrierHandler.List)
+		carrierGroup.GET("/:id", carrierHandler.GetByID)
+		carrierGroup.POST("", carrierHandler.Create)
+		carrierGroup.PUT("/:id", carrierHandler.Update)
+		carrierGroup.DELETE("/:id", middleware.RequireRole("admin"), carrierHandler.Delete)
+	}
+
+	// Reconciliation routes - All protected
+	reconGroup := v1.Group("/reconciliations")
+	reconGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		reconGroup.GET("", reconHandler.List)
+		reconGroup.GET("/:id", reconHandler.GetByID)
+		reconGroup.POST("", reconHandler.Create)
+		reconGroup.POST("/:id/items", reconHandler.AddItems)
+		reconGroup.PUT("/:id/confirm", middleware.RequireRole("warehouse_manager"), reconHandler.Confirm)
+		reconGroup.DELETE("/:id", middleware.RequireRole("admin"), reconHandler.Delete)
 	}
 }

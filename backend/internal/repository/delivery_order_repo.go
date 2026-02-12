@@ -32,6 +32,7 @@ func (r *deliveryOrderRepository) GetByID(id uint) (*models.DeliveryOrder, error
 		Preload("Items.Location").
 		Preload("Warehouse").
 		Preload("SalesChannel").
+		Preload("Carrier").
 		Preload("PostedByUser").
 		Preload("CreatedByUser").
 		Preload("UpdatedByUser").
@@ -48,6 +49,7 @@ func (r *deliveryOrderRepository) GetByNumber(doNumber string) (*models.Delivery
 		Preload("Items.Location").
 		Preload("Warehouse").
 		Preload("SalesChannel").
+		Preload("Carrier").
 		Where("do_number = ?", doNumber).First(&do).Error
 	if err != nil {
 		return nil, err
@@ -76,6 +78,9 @@ func (r *deliveryOrderRepository) List(filters map[string]interface{}, offset, l
 	if salesChannelID, ok := filters["sales_channel_id"]; ok {
 		query = query.Where("sales_channel_id = ?", salesChannelID)
 	}
+	if carrierID, ok := filters["carrier_id"]; ok {
+		query = query.Where("carrier_id = ?", carrierID)
+	}
 
 	err := query.Count(&total).Error
 	if err != nil {
@@ -84,6 +89,7 @@ func (r *deliveryOrderRepository) List(filters map[string]interface{}, offset, l
 
 	err = query.Preload("Warehouse").
 		Preload("SalesChannel").
+		Preload("Carrier").
 		Offset(offset).Limit(limit).
 		Order("created_at DESC").
 		Find(&dos).Error

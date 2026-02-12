@@ -40,6 +40,13 @@ import SalesChannelListPage from './pages/sales-channels/SalesChannelListPage';
 import SalesChannelCreatePage from './pages/sales-channels/SalesChannelCreatePage';
 import SalesChannelDetailPage from './pages/sales-channels/SalesChannelDetailPage';
 import SalesChannelEditPage from './pages/sales-channels/SalesChannelEditPage';
+import CarrierListPage from './pages/carriers/CarrierListPage';
+import CarrierCreatePage from './pages/carriers/CarrierCreatePage';
+import CarrierEditPage from './pages/carriers/CarrierEditPage';
+import CarrierDetailPage from './pages/carriers/CarrierDetailPage';
+import ReconciliationListPage from './pages/reconciliations/ReconciliationListPage';
+import ReconciliationCreatePage from './pages/reconciliations/ReconciliationCreatePage';
+import ReconciliationDetailPage from './pages/reconciliations/ReconciliationDetailPage';
 import AdjustmentListPage from './pages/inventory/AdjustmentListPage';
 import AdjustmentDetailPage from './pages/inventory/AdjustmentDetailPage';
 import AdjustmentCreatePage from './pages/inventory/AdjustmentCreatePage';
@@ -129,6 +136,17 @@ function App() {
             <Route path="/sales-channels/new" element={<SalesChannelCreatePage />} />
             <Route path="/sales-channels/:id" element={<SalesChannelDetailPage />} />
             <Route path="/sales-channels/:id/edit" element={<SalesChannelEditPage />} />
+
+            {/* Carrier Routes */}
+            <Route path="/carriers" element={<CarrierListPage />} />
+            <Route path="/carriers/new" element={<CarrierCreatePage />} />
+            <Route path="/carriers/:id" element={<CarrierDetailPage />} />
+            <Route path="/carriers/:id/edit" element={<CarrierEditPage />} />
+
+            {/* Reconciliation Routes */}
+            <Route path="/reconciliations" element={<ReconciliationListPage />} />
+            <Route path="/reconciliations/new" element={<ReconciliationCreatePage />} />
+            <Route path="/reconciliations/:id" element={<ReconciliationDetailPage />} />
 
             {/* Inventory Routes */}
             <Route path="/inventory/adjustments" element={<AdjustmentListPage />} />

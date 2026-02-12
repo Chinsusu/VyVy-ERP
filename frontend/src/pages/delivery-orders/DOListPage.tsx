@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Package, Plus, Store } from 'lucide-react';
+import { Search, Package, Plus, Store, Truck } from 'lucide-react';
 import { useDeliveryOrders } from '../../hooks/useDeliveryOrders';
 import { useSalesChannels } from '../../hooks/useSalesChannels';
+import { useCarriers } from '../../hooks/useCarriers';
 import type { DeliveryOrder, DeliveryOrderFilter } from '../../types/deliveryOrder';
 
 export default function DOListPage() {
@@ -14,6 +15,8 @@ export default function DOListPage() {
     const { data, isLoading, error } = useDeliveryOrders(filter);
     const { data: channelsData } = useSalesChannels({ is_active: true });
     const salesChannels = channelsData?.data || [];
+    const { data: carriersData } = useCarriers({ is_active: true });
+    const carriers = carriersData?.data || [];
     const deliveryOrders = data?.items || [];
     const totalItems = data?.total || 0;
     const totalPages = Math.ceil(totalItems / (filter.limit || 10));
@@ -111,6 +114,21 @@ export default function DOListPage() {
                             </select>
                         </div>
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                                <Truck className="w-4 h-4" /> Carrier
+                            </label>
+                            <select
+                                className="input"
+                                value={filter.carrier_id || ''}
+                                onChange={(e) => setFilter({ ...filter, carrier_id: e.target.value ? Number(e.target.value) : undefined, offset: 0 })}
+                            >
+                                <option value="">All Carriers</option>
+                                {carriers.map((c: any) => (
+                                    <option key={c.id} value={c.id}>{c.code} - {c.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Limit</label>
                             <select
                                 className="input"
@@ -151,6 +169,7 @@ export default function DOListPage() {
                                             <th>DO Number</th>
                                             <th>Customer</th>
                                             <th>Channel</th>
+                                            <th>Carrier</th>
                                             <th>Warehouse</th>
                                             <th>Delivery Date</th>
                                             <th>Status</th>
@@ -175,6 +194,16 @@ export default function DOListPage() {
                                                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 text-xs font-medium border border-purple-200">
                                                             <Store className="w-3 h-3" />
                                                             {doItem.sales_channel_name}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-400 text-xs">—</span>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    {doItem.carrier_name ? (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-medium border border-blue-200">
+                                                            <Truck className="w-3 h-3" />
+                                                            {doItem.carrier_name}
                                                         </span>
                                                     ) : (
                                                         <span className="text-gray-400 text-xs">—</span>

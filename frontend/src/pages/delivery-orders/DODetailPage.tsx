@@ -195,6 +195,19 @@ export default function DODetailPage() {
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-3">
+                                        <Truck className="w-5 h-5 text-gray-400 mt-0.5" />
+                                        <div>
+                                            <p className="text-xs text-gray-500 uppercase font-semibold">Carrier</p>
+                                            {doData.carrier_name ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-sm font-medium border border-blue-200">
+                                                    {doData.carrier_name}
+                                                </span>
+                                            ) : (
+                                                <p className="font-medium text-gray-400">No carrier</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-3">
                                         <ClipboardCheck className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase font-semibold">Tracking Number</p>

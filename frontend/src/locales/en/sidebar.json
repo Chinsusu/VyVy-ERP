@@ -20,6 +20,8 @@
         "issueNotes": "Issue Notes",
         "deliveryOrders": "Delivery Orders",
         "salesChannels": "Sales Channels",
+        "carriers": "Carriers",
+        "reconciliation": "Reconciliation",
         "adjustments": "Adjustments",
         "transfers": "Transfers",
         "stockMovement": "Stock Movement",
