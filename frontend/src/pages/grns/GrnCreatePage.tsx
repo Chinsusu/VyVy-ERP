@@ -4,8 +4,8 @@ import GrnForm from '../../components/grns/GrnForm';
 
 export default function GrnCreatePage() {
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 {/* Header */}
                 <div className="mb-6">
                     <Link

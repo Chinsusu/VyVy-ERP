@@ -4,8 +4,8 @@ import FinishedProductForm from '../../components/finished-products/FinishedProd
 
 export default function FinishedProductCreatePage() {
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-5xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 {/* Header */}
                 <div className="mb-6">
                     <Link

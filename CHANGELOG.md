@@ -7,7 +7,49 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc7] - 2026-02-12
+
+### Added
+- **Premium Design System (`index.css`)**:
+    - CSS variables for spacing, radius, transitions, shadows, sidebar/header dimensions.
+    - Gradient buttons (`btn-primary`, `btn-success`, `btn-danger`), glassmorphism cards, skeleton loading with shimmer animation.
+    - Enhanced table styles with sticky headers, striped rows, hover effects.
+    - Modal overlay with backdrop blur and slide-in animation.
+    - Utility classes: `.glass`, `.gradient-primary`, `.gradient-mesh`, `.animate-fade-in`, `.animate-slide-up`.
+    - Custom scrollbar styling for sidebar.
+
+- **AppLayout — Persistent Sidebar + Header (`AppLayout.tsx`)**:
+    - Collapsible sidebar with 7 navigation groups and 17 items (Overview, Master Data, Purchasing, Production, Sales, Inventory, Reports).
+    - Active route highlighting with purple accent.
+    - Frosted glass header bar with notification bell (alert count badge) and user avatar dropdown.
+    - Smooth collapse/expand transitions.
+
+- **Reusable UI Components**:
+    - `PageHeader.tsx`: Standardized page titles with icon, subtitle, back link, and action buttons.
+    - `StatusBadge.tsx`: Unified workflow status display (draft, approved, posted, shipped, etc.) with dot indicators.
+    - `ConfirmModal.tsx`: Confirmation modal with danger/warning/primary variants, backdrop blur, slide-in animation.
+    - `LoadingSkeleton.tsx`: Shimmer skeleton placeholders (card, table, detail, text variants).
+
+- **Development Environment**:
+    - `.env.development` with `VITE_API_BASE_URL=/api/v1` for Vite proxy to Docker backend.
+
+### Changed
+- **Login Page**: Complete redesign with animated mesh gradient background, glassmorphism card, inline input icons (mail/lock), show/hide password toggle, demo credentials section, version footer.
+- **Dashboard Page**: Removed inline navigation (now handled by sidebar), upgraded stat cards with gradient color accents and pulse indicators, added Reports & Analytics section with descriptive cards, Quick Access links with item counts, Master Data grid cards.
+- **ProtectedRoute**: Now wraps all authenticated routes with `AppLayout` for persistent sidebar/header.
+- **All 25+ Pages**: Removed standalone `min-h-screen bg-gray-50` wrappers and `max-w-*` containers (now handled by AppLayout), added `animate-fade-in` page transitions.
+- **Tailwind CSS Integration**: Switched from `@tailwindcss/postcss` (v4.0.0, buggy) to `@tailwindcss/vite` plugin for reliable Tailwind v4 + Vite v7 compatibility.
+- **Vite Config**: Added `@tailwindcss/vite` plugin and API proxy (`/api` → Docker backend).
+- **PostCSS Config**: Emptied (Tailwind now handled by Vite plugin).
+
+### Fixed
+- **Tailwind v4 Utility Classes**: Fixed `@tailwindcss/postcss` v4.0.0 `Missing field 'negated' on ScannerOptions.sources` error by upgrading to `@tailwindcss/vite` plugin.
+- **Dev Server API Proxy**: Frontend dev server now correctly proxies `/api` requests to the Docker backend container.
+
+---
+
 ## [1.0.0-rc6] - 2026-02-12
+
 
 ### Added
 - **Alert System (Phase 7 Enhancement)**:

@@ -24,8 +24,8 @@ export default function MaterialListPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto">
+            <div className="animate-fade-in p-6">
+                <div>
                     <div className="flex items-center justify-center h-64">
                         <div className="text-gray-500">Loading materials...</div>
                     </div>
@@ -36,8 +36,8 @@ export default function MaterialListPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto">
+            <div className="animate-fade-in p-6">
+                <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                         Error loading materials: {(error as Error).message}
                     </div>
@@ -50,8 +50,8 @@ export default function MaterialListPage() {
     const pagination = data?.pagination;
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center justify-between">

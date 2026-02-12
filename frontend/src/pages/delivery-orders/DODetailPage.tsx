@@ -31,7 +31,7 @@ export default function DODetailPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="animate-fade-in flex items-center justify-center">
                 <div className="text-gray-500">Loading Delivery Order...</div>
             </div>
         );
@@ -39,8 +39,8 @@ export default function DODetailPage() {
 
     if (error || !doData) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto">
+            <div className="animate-fade-in p-6">
+                <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                         Error loading Delivery Order: {error?.message || 'Order not found'}
                     </div>
@@ -89,8 +89,8 @@ export default function DODetailPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-12">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="animate-fade-in pb-12">
+            <div>
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div className="flex items-center gap-4">

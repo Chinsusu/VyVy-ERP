@@ -11,7 +11,7 @@ export default function PurchaseOrderEditPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+            <div className="animate-fade-in p-6 flex items-center justify-center">
                 <div className="text-gray-500 text-lg">Loading order details...</div>
             </div>
         );
@@ -19,8 +19,8 @@ export default function PurchaseOrderEditPage() {
 
     if (error || !po) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto">
+            <div className="animate-fade-in p-6">
+                <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                         {error ? `Error: ${(error as Error).message}` : 'Purchase Order not found'}
                     </div>
@@ -39,8 +39,8 @@ export default function PurchaseOrderEditPage() {
     // Check if editable
     if (po.status !== 'draft') {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto">
+            <div className="animate-fade-in p-6">
+                <div>
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-amber-800">
                         <h2 className="text-xl font-bold mb-2">Order Not Editable</h2>
                         <p>Only Purchase Orders in <strong>Draft</strong> status can be edited. This order is currently <strong>{po.status}</strong>.</p>
@@ -58,8 +58,8 @@ export default function PurchaseOrderEditPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 {/* Header */}
                 <div className="mb-6">
                     <Link

@@ -4,8 +4,8 @@ import PurchaseOrderForm from '../../components/purchase-orders/PurchaseOrderFor
 
 export default function PurchaseOrderCreatePage() {
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 {/* Header */}
                 <div className="mb-6">
                     <Link

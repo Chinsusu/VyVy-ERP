@@ -42,9 +42,9 @@ export default function TransferListPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 text-slate-900">
+        <div className="animate-fade-in text-slate-900">
             <nav className="bg-white shadow-sm border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className=" px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex items-center gap-4">
                             <Link to="/dashboard" className="text-gray-500 hover:text-primary-600 transition-colors">
@@ -68,7 +68,7 @@ export default function TransferListPage() {
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main className=" px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-900">Stock Transfers</h2>

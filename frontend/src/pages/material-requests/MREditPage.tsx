@@ -11,7 +11,7 @@ export default function MREditPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="animate-fade-in flex items-center justify-center">
                 <div className="text-gray-500">Loading Material Request...</div>
             </div>
         );
@@ -19,8 +19,8 @@ export default function MREditPage() {
 
     if (error || !mr) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto">
+            <div className="animate-fade-in p-6">
+                <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                         Error loading Material Request: {error?.message || 'Request not found'}
                     </div>
@@ -30,8 +30,8 @@ export default function MREditPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 <div className="mb-6">
                     <Link
                         to={`/material-requests/${mrId}`}

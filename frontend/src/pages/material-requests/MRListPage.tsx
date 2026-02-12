@@ -42,8 +42,8 @@ export default function MRListPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>

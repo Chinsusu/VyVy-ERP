@@ -4,8 +4,8 @@ import MINForm from '../../components/material-issue-notes/MINForm';
 
 export default function MINCreatePage() {
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 <div className="mb-6">
                     <Link
                         to="/material-issue-notes"

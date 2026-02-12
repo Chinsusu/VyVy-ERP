@@ -10,8 +10,8 @@ export default function MaterialEditPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-5xl mx-auto">
+            <div className="animate-fade-in p-6">
+                <div>
                     <div className="flex items-center justify-center h-64">
                         <div className="text-gray-500">Loading material...</div>
                     </div>
@@ -22,8 +22,8 @@ export default function MaterialEditPage() {
 
     if (error || !material) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-5xl mx-auto">
+            <div className="animate-fade-in p-6">
+                <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                         Error loading material: {error ? (error as Error).message : 'Material not found'}
                     </div>
@@ -33,8 +33,8 @@ export default function MaterialEditPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-5xl mx-auto p-6">
+        <div className="animate-fade-in">
+            <div>
                 {/* Header */}
                 <div className="mb-8">
                     <button
