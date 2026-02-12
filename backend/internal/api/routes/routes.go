@@ -35,6 +35,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	salesChannelRepo := repository.NewSalesChannelRepository(db)
 	carrierRepo := repository.NewCarrierRepository(db)
 	reconRepo := repository.NewReconciliationRepository(db)
+	roRepo := repository.NewReturnOrderRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -57,6 +58,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	salesChannelService := service.NewSalesChannelService(salesChannelRepo)
 	carrierService := service.NewCarrierService(carrierRepo)
 	reconService := service.NewReconciliationService(reconRepo, carrierRepo)
+	roService := service.NewReturnOrderService(db, roRepo, doRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -78,6 +80,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	salesChannelHandler := handlers.NewSalesChannelHandler(salesChannelService)
 	carrierHandler := handlers.NewCarrierHandler(carrierService)
 	reconHandler := handlers.NewReconciliationHandler(reconService)
+	roHandler := handlers.NewReturnOrderHandler(roService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -291,5 +294,23 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		reconGroup.POST("/:id/items", reconHandler.AddItems)
 		reconGroup.PUT("/:id/confirm", middleware.RequireRole("warehouse_manager"), reconHandler.Confirm)
 		reconGroup.DELETE("/:id", middleware.RequireRole("admin"), reconHandler.Delete)
+	}
+
+	// Return Order routes - All protected
+	roGroup := v1.Group("/return-orders")
+	roGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		roGroup.GET("", roHandler.List)
+		roGroup.GET("/:id", roHandler.GetByID)
+		roGroup.POST("", roHandler.Create)
+		roGroup.PUT("/:id", roHandler.Update)
+		roGroup.DELETE("/:id", middleware.RequireRole("admin"), roHandler.Delete)
+
+		// Workflow endpoints
+		roGroup.POST("/:id/approve", middleware.RequireRole("warehouse_manager"), roHandler.Approve)
+		roGroup.POST("/:id/receive", roHandler.Receive)
+		roGroup.PUT("/:id/items/:itemId/inspect", roHandler.InspectItem)
+		roGroup.POST("/:id/complete", middleware.RequireRole("warehouse_manager"), roHandler.Complete)
+		roGroup.POST("/:id/cancel", roHandler.Cancel)
 	}
 }

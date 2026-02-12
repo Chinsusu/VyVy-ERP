@@ -47,6 +47,9 @@ import CarrierDetailPage from './pages/carriers/CarrierDetailPage';
 import ReconciliationListPage from './pages/reconciliations/ReconciliationListPage';
 import ReconciliationCreatePage from './pages/reconciliations/ReconciliationCreatePage';
 import ReconciliationDetailPage from './pages/reconciliations/ReconciliationDetailPage';
+import ReturnOrderListPage from './pages/return-orders/ReturnOrderListPage';
+import ReturnOrderCreatePage from './pages/return-orders/ReturnOrderCreatePage';
+import ReturnOrderDetailPage from './pages/return-orders/ReturnOrderDetailPage';
 import AdjustmentListPage from './pages/inventory/AdjustmentListPage';
 import AdjustmentDetailPage from './pages/inventory/AdjustmentDetailPage';
 import AdjustmentCreatePage from './pages/inventory/AdjustmentCreatePage';
@@ -147,6 +150,11 @@ function App() {
             <Route path="/reconciliations" element={<ReconciliationListPage />} />
             <Route path="/reconciliations/new" element={<ReconciliationCreatePage />} />
             <Route path="/reconciliations/:id" element={<ReconciliationDetailPage />} />
+
+            {/* Return Order Routes */}
+            <Route path="/return-orders" element={<ReturnOrderListPage />} />
+            <Route path="/return-orders/new" element={<ReturnOrderCreatePage />} />
+            <Route path="/return-orders/:id" element={<ReturnOrderDetailPage />} />
 
             {/* Inventory Routes */}
             <Route path="/inventory/adjustments" element={<AdjustmentListPage />} />

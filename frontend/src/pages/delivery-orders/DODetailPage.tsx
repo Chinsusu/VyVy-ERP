@@ -14,6 +14,7 @@ import {
     MapPin,
     Store
 } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import {
     useDeliveryOrder,
     useShipDeliveryOrder,
@@ -144,6 +145,15 @@ export default function DODetailPage() {
                                 </button>
                             </>
                         ) : null}
+                        {(doData.status === 'shipped' || doData.status === 'delivered') && (
+                            <Link
+                                to={`/return-orders/new?do_id=${doData.id}`}
+                                className="btn btn-secondary text-orange-600 border-orange-100 hover:bg-orange-50 flex items-center gap-2"
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                                Tạo đơn hoàn
+                            </Link>
+                        )}
                     </div>
                 </div>
 

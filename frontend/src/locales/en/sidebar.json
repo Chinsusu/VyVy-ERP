@@ -22,6 +22,7 @@
         "salesChannels": "Sales Channels",
         "carriers": "Carriers",
         "reconciliation": "Reconciliation",
+        "returnOrders": "Return Orders",
         "adjustments": "Adjustments",
         "transfers": "Transfers",
         "stockMovement": "Stock Movement",
