@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Search, Package, Plus } from 'lucide-react';
 import { useDeliveryOrders } from '../../hooks/useDeliveryOrders';
 import type { DeliveryOrder, DeliveryOrderFilter } from '../../types/deliveryOrder';
 
 export default function DOListPage() {
-    const { t } = useTranslation('deliveryOrders');
-    const { t: tc } = useTranslation('common');
     const [filter, setFilter] = useState<DeliveryOrderFilter>({
         offset: 0,
         limit: 10,

@@ -1,11 +1,8 @@
 import { ArrowLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import MINForm from '../../components/material-issue-notes/MINForm';
 
 export default function MINCreatePage() {
-    const { t } = useTranslation('mins');
-    const { t: tc } = useTranslation('common');
     return (
         <div className="animate-fade-in">
             <div>

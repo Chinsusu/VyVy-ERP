@@ -1,12 +1,9 @@
 import { useParams, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import { useMaterialRequest } from '../../hooks/useMaterialRequests';
 import MRForm from '../../components/material-requests/MRForm';
 
 export default function MREditPage() {
-    const { t } = useTranslation('materialRequests');
-    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const mrId = parseInt(id || '0', 10);
 

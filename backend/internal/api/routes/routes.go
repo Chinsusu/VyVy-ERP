@@ -32,6 +32,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	doRepo := repository.NewDeliveryOrderRepository(db)
 	saRepo := repository.NewStockAdjustmentRepository(db)
 	stRepo := repository.NewStockTransferRepository(db)
+	salesChannelRepo := repository.NewSalesChannelRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -51,6 +52,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	dashboardService := service.NewDashboardService(db)
 	reportService := service.NewReportService(db)
 	alertService := service.NewAlertService(db)
+	salesChannelService := service.NewSalesChannelService(salesChannelRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -69,6 +71,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	dashboardHandler := handlers.NewDashboardHandler(dashboardService)
 	reportHandler := handlers.NewReportHandler(reportService)
 	alertHandler := handlers.NewAlertHandler(alertService)
+	salesChannelHandler := handlers.NewSalesChannelHandler(salesChannelService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -224,6 +227,17 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		doGroup.PUT("/:id", doHandler.Update)
 		doGroup.POST("/:id/ship", middleware.RequireRole("warehouse_manager"), doHandler.Ship)
 		doGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), doHandler.Cancel)
+	}
+
+	// Sales Channel routes - All protected
+	scGroup := v1.Group("/sales-channels")
+	scGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		scGroup.GET("", salesChannelHandler.List)
+		scGroup.GET("/:id", salesChannelHandler.GetByID)
+		scGroup.POST("", salesChannelHandler.Create)
+		scGroup.PUT("/:id", salesChannelHandler.Update)
+		scGroup.DELETE("/:id", middleware.RequireRole("admin"), salesChannelHandler.Delete)
 	}
 
 	// Dashboard & Report routes - All protected

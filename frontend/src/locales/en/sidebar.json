@@ -19,6 +19,7 @@
         "materialRequests": "Material Requests",
         "issueNotes": "Issue Notes",
         "deliveryOrders": "Delivery Orders",
+        "salesChannels": "Sales Channels",
         "adjustments": "Adjustments",
         "transfers": "Transfers",
         "stockMovement": "Stock Movement",

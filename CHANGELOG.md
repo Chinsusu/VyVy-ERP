@@ -7,6 +7,33 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc10] - 2026-02-12
+
+### Added
+- **Sales Channel Module (Phase 3 — Backend)**:
+    - Migration `000028`: Created `sales_channels` table + added `sales_channel_id` FK to `delivery_orders`.
+    - Full CRUD: Model, Repository, DTO, Service, Handler, Routes (`/api/v1/sales-channels`).
+    - Integrated Sales Channel into Delivery Order module (filter, display, association).
+    - Seed data: 5 sales channels (Shopee, Tiktok Shop, Facebook, Lazada, Chi nhánh).
+    - New report endpoint: `/api/v1/reports/sales-by-channel`.
+
+- **Sales Channel Module (Phase 3 — Frontend)**:
+    - TypeScript types (`salesChannel.ts`), API client, React Query hooks.
+    - 4 pages: List, Create, Edit, Detail — with search, filter, pagination.
+    - Sidebar navigation: "Kênh bán hàng" under "Bán hàng" group with Store icon.
+    - i18n: Full Vietnamese + English translations (`salesChannels.json`).
+
+- **`DEV_GUIDE.md`** — Standardized development documentation:
+    - Port mapping: 5173 (dev), 3000 (prod), 8080 (backend), 5432 (DB).
+    - Development vs Production mode instructions.
+    - Docker config, testing commands, troubleshooting, project structure.
+
+### Fixed
+- **23+ pre-existing TS6133 errors** — Removed unused `useTranslation` imports/declarations across supplier, warehouse, report, material, purchase-order, GRN, material-request, finished-product, material-issue-note, inventory, and delivery-order pages.
+- **`vite.config.ts`** — Fixed proxy target from hardcoded Docker IP (`172.18.0.3`) to `localhost:8080`.
+
+---
+
 ## [1.0.0-rc9] - 2026-02-12
 
 ### Added

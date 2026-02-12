@@ -1,12 +1,9 @@
 import { ArrowLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { useWarehouse } from '../../hooks/useWarehouses';
 import WarehouseForm from '../../components/warehouses/WarehouseForm';
 
 export default function WarehouseEditPage() {
-    const { t } = useTranslation('warehouses');
-    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const warehouseId = parseInt(id || '0', 10);
 

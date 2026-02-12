@@ -1,11 +1,8 @@
 import { ArrowLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import SupplierForm from '../../components/suppliers/SupplierForm';
 
 export default function SupplierCreatePage() {
-    const { t } = useTranslation('suppliers');
-    const { t: tc } = useTranslation('common');
     return (
         <div className="animate-fade-in">
             <div>

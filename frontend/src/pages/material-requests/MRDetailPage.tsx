@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -25,8 +24,6 @@ import {
 import type { MaterialRequestItem } from '../../types/materialRequest';
 
 export default function MRDetailPage() {
-    const { t } = useTranslation('materialRequests');
-    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const mrId = parseInt(id || '0', 10);
     const navigate = useNavigate();

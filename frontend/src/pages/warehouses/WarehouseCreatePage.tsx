@@ -1,11 +1,8 @@
 import { ArrowLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import WarehouseForm from '../../components/warehouses/WarehouseForm';
 
 export default function WarehouseCreatePage() {
-    const { t } = useTranslation('warehouses');
-    const { t: tc } = useTranslation('common');
     return (
         <div className="animate-fade-in">
             <div>

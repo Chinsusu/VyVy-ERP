@@ -1,11 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Package } from 'lucide-react';
 import MaterialForm from '../../components/materials/MaterialForm';
 
 export default function MaterialCreatePage() {
-    const { t } = useTranslation('materials');
-    const { t: tc } = useTranslation('common');
     const navigate = useNavigate();
 
     return (

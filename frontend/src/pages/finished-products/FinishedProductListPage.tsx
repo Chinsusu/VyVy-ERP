@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFinishedProducts } from '../../hooks/useFinishedProducts';
 import type { FinishedProductFilters } from '../../types/finishedProduct';
 
 export default function FinishedProductListPage() {
-    const { t } = useTranslation('finishedProducts');
-    const { t: tc } = useTranslation('common');
     const [filters, setFilters] = useState<FinishedProductFilters>({
         page: 1,
         page_size: 20,

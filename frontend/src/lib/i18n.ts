@@ -18,6 +18,7 @@ import deliveryOrdersEn from '../locales/en/deliveryOrders.json';
 import inventoryEn from '../locales/en/inventory.json';
 import reportsEn from '../locales/en/reports.json';
 import finishedProductsEn from '../locales/en/finishedProducts.json';
+import salesChannelsEn from '../locales/en/salesChannels.json';
 
 // Vietnamese
 import commonVi from '../locales/vi/common.json';
@@ -35,6 +36,7 @@ import deliveryOrdersVi from '../locales/vi/deliveryOrders.json';
 import inventoryVi from '../locales/vi/inventory.json';
 import reportsVi from '../locales/vi/reports.json';
 import finishedProductsVi from '../locales/vi/finishedProducts.json';
+import salesChannelsVi from '../locales/vi/salesChannels.json';
 
 export const LANGUAGES = [
     { code: 'en', label: 'English', flag: '🇺🇸' },
@@ -62,6 +64,7 @@ i18n
                 inventory: inventoryEn,
                 reports: reportsEn,
                 finishedProducts: finishedProductsEn,
+                salesChannels: salesChannelsEn,
             },
             vi: {
                 common: commonVi,
@@ -79,6 +82,7 @@ i18n
                 inventory: inventoryVi,
                 reports: reportsVi,
                 finishedProducts: finishedProductsVi,
+                salesChannels: salesChannelsVi,
             },
         },
         fallbackLng: 'en',
@@ -87,7 +91,7 @@ i18n
             'common', 'sidebar', 'login', 'dashboard',
             'materials', 'suppliers', 'warehouses', 'purchaseOrders',
             'grns', 'materialRequests', 'mins', 'deliveryOrders',
-            'inventory', 'reports', 'finishedProducts',
+            'inventory', 'reports', 'finishedProducts', 'salesChannels',
         ],
         detection: {
             order: ['localStorage', 'navigator'],

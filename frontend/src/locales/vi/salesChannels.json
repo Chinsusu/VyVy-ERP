@@ -1,0 +1,46 @@
+{
+    "title": "Kênh bán hàng",
+    "subtitle": "{{count}} kênh",
+    "search": "Tìm theo tên hoặc mã...",
+    "loading": "Đang tải...",
+    "empty": "Không có kênh bán hàng nào",
+    "notFound": "Không tìm thấy kênh bán hàng",
+    "active": "Đang hoạt động",
+    "inactive": "Ngừng hoạt động",
+    "saving": "Đang lưu...",
+    "createTitle": "Kênh bán hàng mới",
+    "createSubtitle": "Thêm kênh bán hàng mới",
+    "editTitle": "Chỉnh sửa kênh bán hàng",
+    "createError": "Không thể tạo kênh bán hàng",
+    "updateError": "Không thể cập nhật kênh bán hàng",
+    "confirmDelete": "Bạn có chắc muốn xóa kênh bán hàng này?",
+    "pagination": "Hiển thị {{from}}–{{to}} trên {{total}}",
+    "table": {
+        "code": "Mã",
+        "name": "Tên",
+        "platform": "Nền tảng",
+        "status": "Trạng thái",
+        "description": "Mô tả"
+    },
+    "form": {
+        "code": "Mã",
+        "name": "Tên",
+        "platformType": "Loại nền tảng",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Mô tả tùy chọn...",
+        "isActive": "Hoạt động"
+    },
+    "platformTypes": {
+        "marketplace": "Sàn TMĐT",
+        "social": "Mạng xã hội",
+        "branch": "Chi nhánh",
+        "other": "Khác"
+    },
+    "actions": {
+        "create": "Tạo kênh",
+        "edit": "Sửa",
+        "delete": "Xóa",
+        "save": "Lưu thay đổi",
+        "cancel": "Hủy"
+    }
+}

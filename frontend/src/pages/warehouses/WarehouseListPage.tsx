@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Warehouse as WarehouseIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import type { WarehouseFilters } from '../../types/warehouse';
 
 export default function WarehouseListPage() {
-    const { t } = useTranslation('warehouses');
-    const { t: tc } = useTranslation('common');
     const [filters, setFilters] = useState<WarehouseFilters>({
         page: 1,
         page_size: 20,

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -19,8 +18,6 @@ import { useGrn, useUpdateGRNQC, usePostGRN } from '../../hooks/useGrns';
 import type { UpdateGRNQCInput, UpdateGRNQCItemInput } from '../../types/grn';
 
 export default function GrnDetailPage() {
-    const { t } = useTranslation('grns');
-    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const grnId = parseInt(id || '0', 10);
 

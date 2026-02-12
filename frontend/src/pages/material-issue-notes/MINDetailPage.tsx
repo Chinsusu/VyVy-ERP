@@ -1,5 +1,4 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import {
     ArrowLeft,
     CheckCircle,
@@ -21,8 +20,6 @@ import {
 import type { MaterialIssueNoteItem } from '../../types/materialIssueNote';
 
 export default function MINDetailPage() {
-    const { t } = useTranslation('mins');
-    const { t: tc } = useTranslation('common');
     const { id } = useParams<{ id: string }>();
     const minId = parseInt(id || '0', 10);
     const navigate = useNavigate();

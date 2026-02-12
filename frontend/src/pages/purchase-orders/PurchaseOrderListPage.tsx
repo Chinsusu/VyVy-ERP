@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Plus, Search } from 'lucide-react';
 import { usePurchaseOrders } from '../../hooks/usePurchaseOrders';
 import type { PurchaseOrder, PurchaseOrderFilters } from '../../types/purchaseOrder';
 
 export default function PurchaseOrderListPage() {
-    const { t } = useTranslation('purchaseOrders');
-    const { t: tc } = useTranslation('common');
     const [filters, setFilters] = useState<PurchaseOrderFilters>({
         page: 1,
         page_size: 10,

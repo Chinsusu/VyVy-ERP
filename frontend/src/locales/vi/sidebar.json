@@ -19,6 +19,7 @@
         "materialRequests": "Yêu cầu vật tư",
         "issueNotes": "Phiếu xuất kho",
         "deliveryOrders": "Đơn giao hàng",
+        "salesChannels": "Kênh bán hàng",
         "adjustments": "Điều chỉnh",
         "transfers": "Chuyển kho",
         "stockMovement": "Biến động kho",

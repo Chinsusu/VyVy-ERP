@@ -1,5 +1,4 @@
 import { useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useCreateAdjustment } from '../../hooks/useInventory';
 import { useWarehouses } from '../../hooks/useWarehouses';
@@ -38,8 +37,6 @@ interface AdjustmentForm {
 }
 
 export default function AdjustmentCreatePage() {
-    const { t } = useTranslation('inventory');
-    const { t: tc } = useTranslation('common');
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
     const createMutation = useCreateAdjustment();

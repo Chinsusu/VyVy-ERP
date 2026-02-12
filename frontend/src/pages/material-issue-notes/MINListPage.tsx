@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Search, ClipboardList } from 'lucide-react';
 import { useMaterialIssueNotes } from '../../hooks/useMaterialIssueNotes';
 import type { MaterialIssueNote, MaterialIssueNoteFilters } from '../../types/materialIssueNote';
 
 export default function MINListPage() {
-    const { t } = useTranslation('mins');
-    const { t: tc } = useTranslation('common');
     const [filters, setFilters] = useState<MaterialIssueNoteFilters>({
         page: 1,
         limit: 10,

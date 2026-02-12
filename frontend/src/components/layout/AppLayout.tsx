@@ -6,7 +6,7 @@ import { useAlertSummary } from '../../hooks/useAlerts';
 import { LANGUAGES } from '../../lib/i18n';
 import {
     LayoutDashboard, Package, Users, Warehouse, ShoppingBag,
-    ShoppingCart, ClipboardCheck, FileText, Send, Truck,
+    ShoppingCart, ClipboardCheck, FileText, Send, Truck, Store,
     ArrowLeftRight, BarChart3, TrendingDown, Clock,
     Bell, LogOut, ChevronLeft, Menu, User,
     AlertTriangle, Calendar, BoxesIcon, Activity, Globe
@@ -57,6 +57,7 @@ const navGroups: NavGroup[] = [
         titleKey: 'groups.sales',
         items: [
             { labelKey: 'nav.deliveryOrders', path: '/delivery-orders', icon: <Truck className="w-5 h-5" /> },
+            { labelKey: 'nav.salesChannels', path: '/sales-channels', icon: <Store className="w-5 h-5" /> },
         ],
     },
     {

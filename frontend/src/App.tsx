@@ -36,6 +36,10 @@ import DOListPage from './pages/delivery-orders/DOListPage';
 import DOCreatePage from './pages/delivery-orders/DOCreatePage';
 import DOEditPage from './pages/delivery-orders/DOEditPage';
 import DODetailPage from './pages/delivery-orders/DODetailPage';
+import SalesChannelListPage from './pages/sales-channels/SalesChannelListPage';
+import SalesChannelCreatePage from './pages/sales-channels/SalesChannelCreatePage';
+import SalesChannelDetailPage from './pages/sales-channels/SalesChannelDetailPage';
+import SalesChannelEditPage from './pages/sales-channels/SalesChannelEditPage';
 import AdjustmentListPage from './pages/inventory/AdjustmentListPage';
 import AdjustmentDetailPage from './pages/inventory/AdjustmentDetailPage';
 import AdjustmentCreatePage from './pages/inventory/AdjustmentCreatePage';
@@ -119,6 +123,12 @@ function App() {
             <Route path="/delivery-orders/create" element={<DOCreatePage />} />
             <Route path="/delivery-orders/:id" element={<DODetailPage />} />
             <Route path="/delivery-orders/:id/edit" element={<DOEditPage />} />
+
+            {/* Sales Channels Routes */}
+            <Route path="/sales-channels" element={<SalesChannelListPage />} />
+            <Route path="/sales-channels/new" element={<SalesChannelCreatePage />} />
+            <Route path="/sales-channels/:id" element={<SalesChannelDetailPage />} />
+            <Route path="/sales-channels/:id/edit" element={<SalesChannelEditPage />} />
 
             {/* Inventory Routes */}
             <Route path="/inventory/adjustments" element={<AdjustmentListPage />} />

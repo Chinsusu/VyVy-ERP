@@ -1,11 +1,8 @@
 import { ArrowLeft } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import MRForm from '../../components/material-requests/MRForm';
 
 export default function MRCreatePage() {
-    const { t } = useTranslation('materialRequests');
-    const { t: tc } = useTranslation('common');
     return (
         <div className="animate-fade-in">
             <div>
