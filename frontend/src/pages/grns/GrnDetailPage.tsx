@@ -57,7 +57,7 @@ export default function GrnDetailPage() {
 
     const startQCEdit = () => {
         const initialItems: Record<number, UpdateGRNQCItemInput> = {};
-        grn.items.forEach(item => {
+        (grn.items || []).forEach(item => {
             initialItems[item.id] = {
                 accepted_quantity: item.accepted_quantity || item.quantity,
                 rejected_quantity: item.rejected_quantity || 0,
@@ -201,10 +201,10 @@ export default function GrnDetailPage() {
                         <div className="card p-0 overflow-hidden">
                             <div className="p-4 bg-gray-50 border-b flex justify-between items-center">
                                 <h3 className="font-bold text-sm">Receipt Items</h3>
-                                <span className="text-xs text-gray-500">{grn.items.length} materials</span>
+                                <span className="text-xs text-gray-500">{(grn.items || []).length} materials</span>
                             </div>
-                            <div className="overflow-x-auto">
-                                <table className="table w-full">
+                            <div className="table-container">
+                                <table className="w-full">
                                     <thead>
                                         <tr className="bg-white border-b text-[11px] uppercase text-gray-500 font-bold">
                                             <th className="px-4 py-3 text-left">Material</th>
@@ -216,70 +216,78 @@ export default function GrnDetailPage() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
-                                        {grn.items.map((item) => (
-                                            <tr key={item.id} className="hover:bg-gray-50">
-                                                <td className="px-4 py-4">
-                                                    <div className="font-bold text-sm">{item.material?.trading_name}</div>
-                                                    <div className="text-[10px] text-gray-400 font-mono uppercase">{item.material?.code}</div>
-                                                </td>
-                                                <td className="px-4 py-4 text-right font-medium">{item.quantity}</td>
-                                                <td className="px-4 py-4 text-right">
-                                                    {isQCEditMode ? (
-                                                        <input
-                                                            type="number"
-                                                            className="input input-sm w-20 text-right h-8"
-                                                            value={qcFormData.items[item.id]?.accepted_quantity}
-                                                            onChange={(e) => handleQCInputChange(item.id, 'accepted_quantity', Number(e.target.value))}
-                                                            max={item.quantity}
-                                                            min={0}
-                                                        />
-                                                    ) : (
-                                                        <span className="text-green-600 font-bold">{item.accepted_quantity}</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-4 text-right">
-                                                    {isQCEditMode ? (
-                                                        <input
-                                                            type="number"
-                                                            className="input input-sm w-20 text-right h-8"
-                                                            value={qcFormData.items[item.id]?.rejected_quantity}
-                                                            onChange={(e) => handleQCInputChange(item.id, 'rejected_quantity', Number(e.target.value))}
-                                                            max={item.quantity}
-                                                            min={0}
-                                                        />
-                                                    ) : (
-                                                        <span className="text-red-500">{item.rejected_quantity}</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-4 text-center">
-                                                    {isQCEditMode ? (
-                                                        <select
-                                                            className="select select-sm h-8 py-0"
-                                                            value={qcFormData.items[item.id]?.qc_status}
-                                                            onChange={(e) => handleQCInputChange(item.id, 'qc_status', e.target.value)}
-                                                        >
-                                                            <option value="pass">Pass</option>
-                                                            <option value="fail">Fail</option>
-                                                            <option value="partial">Partial</option>
-                                                        </select>
-                                                    ) : (
-                                                        <span className={`text-[10px] font-bold uppercase ${item.qc_status === 'pass' ? 'text-green-600' :
-                                                            item.qc_status === 'fail' ? 'text-red-600' :
-                                                                item.qc_status === 'partial' ? 'text-blue-600' : 'text-gray-400'
-                                                            }`}>
-                                                            {item.qc_status}
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-4 text-xs">
-                                                    <div className="text-gray-600 font-medium">{item.warehouse_location?.full_path || 'No Location'}</div>
-                                                    <div className="text-[10px] text-gray-400">
-                                                        {item.batch_number ? `Batch: ${item.batch_number}` : ''}
-                                                        {item.lot_number ? ` | Lot: ${item.lot_number}` : ''}
-                                                    </div>
+                                        {(grn.items || []).length === 0 ? (
+                                            <tr>
+                                                <td colSpan={6} className="text-center py-8 text-gray-500 italic">
+                                                    No items received in this note.
                                                 </td>
                                             </tr>
-                                        ))}
+                                        ) : (
+                                            grn.items.map((item) => (
+                                                <tr key={item.id} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-4">
+                                                        <div className="font-bold text-sm">{item.material?.trading_name}</div>
+                                                        <div className="text-[10px] text-gray-400 font-mono uppercase">{item.material?.code}</div>
+                                                    </td>
+                                                    <td className="px-4 py-4 text-right font-medium">{item.quantity}</td>
+                                                    <td className="px-4 py-4 text-right">
+                                                        {isQCEditMode ? (
+                                                            <input
+                                                                type="number"
+                                                                className="input input-sm w-20 text-right h-8"
+                                                                value={qcFormData.items[item.id]?.accepted_quantity}
+                                                                onChange={(e) => handleQCInputChange(item.id, 'accepted_quantity', Number(e.target.value))}
+                                                                max={item.quantity}
+                                                                min={0}
+                                                            />
+                                                        ) : (
+                                                            <span className="text-green-600 font-bold">{item.accepted_quantity}</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-right">
+                                                        {isQCEditMode ? (
+                                                            <input
+                                                                type="number"
+                                                                className="input input-sm w-20 text-right h-8"
+                                                                value={qcFormData.items[item.id]?.rejected_quantity}
+                                                                onChange={(e) => handleQCInputChange(item.id, 'rejected_quantity', Number(e.target.value))}
+                                                                max={item.quantity}
+                                                                min={0}
+                                                            />
+                                                        ) : (
+                                                            <span className="text-red-500">{item.rejected_quantity}</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-center">
+                                                        {isQCEditMode ? (
+                                                            <select
+                                                                className="select select-sm h-8 py-0"
+                                                                value={qcFormData.items[item.id]?.qc_status}
+                                                                onChange={(e) => handleQCInputChange(item.id, 'qc_status', e.target.value)}
+                                                            >
+                                                                <option value="pass">Pass</option>
+                                                                <option value="fail">Fail</option>
+                                                                <option value="partial">Partial</option>
+                                                            </select>
+                                                        ) : (
+                                                            <span className={`text-[10px] font-bold uppercase ${item.qc_status === 'pass' ? 'text-green-600' :
+                                                                item.qc_status === 'fail' ? 'text-red-600' :
+                                                                    item.qc_status === 'partial' ? 'text-blue-600' : 'text-gray-400'
+                                                                }`}>
+                                                                {item.qc_status}
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-xs">
+                                                        <div className="text-gray-600 font-medium">{item.warehouse_location?.full_path || <span className="text-gray-400 italic">No Location</span>}</div>
+                                                        <div className="text-[10px] text-gray-400">
+                                                            {item.batch_number ? `Batch: ${item.batch_number}` : ''}
+                                                            {item.lot_number ? ` | Lot: ${item.lot_number}` : ''}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
