@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { reconciliationsAPI } from '../api/reconciliations';
-import { ReconciliationFilter, CreateReconciliationRequest, AddReconciliationItemInput } from '../types/reconciliation';
+import type { ReconciliationFilter, CreateReconciliationRequest, AddReconciliationItemInput } from '../types/reconciliation';
 
 export function useReconciliations(filter?: ReconciliationFilter) {
     return useQuery({

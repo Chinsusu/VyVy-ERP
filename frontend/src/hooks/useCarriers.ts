@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { carriersAPI } from '../api/carriers';
-import { CarrierFilter, CreateCarrierRequest, UpdateCarrierRequest } from '../types/carrier';
+import type { CarrierFilter, CreateCarrierRequest, UpdateCarrierRequest } from '../types/carrier';
 
 export function useCarriers(filter?: CarrierFilter) {
     return useQuery({

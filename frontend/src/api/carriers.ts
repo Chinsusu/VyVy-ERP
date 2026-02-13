@@ -1,7 +1,5 @@
-import axios from 'axios';
-import { Carrier, CreateCarrierRequest, UpdateCarrierRequest, CarrierFilter } from '../types/carrier';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+import axios from '../lib/axios';
+import type { CreateCarrierRequest, UpdateCarrierRequest, CarrierFilter } from '../types/carrier';
 
 export const carriersAPI = {
     list: async (filter?: CarrierFilter) => {
@@ -12,27 +10,27 @@ export const carriersAPI = {
         if (filter?.offset) params.append('offset', filter.offset.toString());
         if (filter?.limit) params.append('limit', filter.limit.toString());
 
-        const response = await axios.get(`${API_URL}/carriers?${params.toString()}`);
-        return response.data;
+        const { data } = await axios.get(`/carriers?${params.toString()}`);
+        return data;
     },
 
     getById: async (id: number) => {
-        const response = await axios.get(`${API_URL}/carriers/${id}`);
-        return response.data;
+        const { data } = await axios.get(`/carriers/${id}`);
+        return data;
     },
 
-    create: async (data: CreateCarrierRequest) => {
-        const response = await axios.post(`${API_URL}/carriers`, data);
-        return response.data;
+    create: async (payload: CreateCarrierRequest) => {
+        const { data } = await axios.post('/carriers', payload);
+        return data;
     },
 
-    update: async (id: number, data: UpdateCarrierRequest) => {
-        const response = await axios.put(`${API_URL}/carriers/${id}`, data);
-        return response.data;
+    update: async (id: number, payload: UpdateCarrierRequest) => {
+        const { data } = await axios.put(`/carriers/${id}`, payload);
+        return data;
     },
 
     delete: async (id: number) => {
-        const response = await axios.delete(`${API_URL}/carriers/${id}`);
-        return response.data;
+        const { data } = await axios.delete(`/carriers/${id}`);
+        return data;
     },
 };

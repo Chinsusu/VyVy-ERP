@@ -7,6 +7,19 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc12] - 2026-02-13
+
+### Fixed
+- **Carriers & Reconciliations CORS Error**: `carriers.ts` and `reconciliations.ts` used raw `import axios from 'axios'` with hardcoded `API_URL`, bypassing Vite proxy → CORS block. Switched to shared `import axios from '../lib/axios'` with relative paths.
+- **Delivery Orders 404 (Double API Path)**: `deliveryOrders.ts` paths included redundant `/api/v1/` prefix (e.g., `/api/v1/delivery-orders`) while shared axios `baseURL` was already `/api/v1` → requests became `/api/v1/api/v1/delivery-orders`. Removed prefix from all 6 endpoints.
+- **Shared Axios BaseURL**: Changed `lib/axios.ts` default `baseURL` from absolute `http://localhost:8080/api/v1` to relative `/api/v1` so all requests route through Vite dev proxy, avoiding CORS.
+- **TypeScript `import type` Errors**: Fixed `import` → `import type` in `useCarriers.ts`, `useReconciliations.ts` to prevent Vite/esbuild transpilation errors with type-only imports.
+
+### Verified
+- UAT browser tests: Login ✅, Sales Channels (5) ✅, Carriers (6) ✅, Delivery Orders ✅, Return Orders ✅, Reconciliations ✅.
+
+---
+
 ## [1.0.0-rc11] - 2026-02-12
 
 ### Added

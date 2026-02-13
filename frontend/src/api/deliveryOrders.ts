@@ -19,32 +19,32 @@ export const deliveryOrdersAPI = {
         if (filter.offset !== undefined) params.append('offset', filter.offset.toString());
         if (filter.limit !== undefined) params.append('limit', filter.limit.toString());
 
-        const response = await api.get<{ data: { items: DeliveryOrder[], total: number } }>(`/api/v1/delivery-orders?${params.toString()}`);
+        const response = await api.get<{ data: { items: DeliveryOrder[], total: number } }>(`/delivery-orders?${params.toString()}`);
         return response.data.data;
     },
 
     get: async (id: number) => {
-        const response = await api.get<{ data: DeliveryOrder }>(`/api/v1/delivery-orders/${id}`);
+        const response = await api.get<{ data: DeliveryOrder }>(`/delivery-orders/${id}`);
         return response.data.data;
     },
 
     create: async (data: CreateDeliveryOrderRequest) => {
-        const response = await api.post<{ data: DeliveryOrder }>(`/api/v1/delivery-orders`, data);
+        const response = await api.post<{ data: DeliveryOrder }>(`/delivery-orders`, data);
         return response.data.data;
     },
 
     update: async (id: number, data: UpdateDeliveryOrderRequest) => {
-        const response = await api.put<{ data: DeliveryOrder }>(`/api/v1/delivery-orders/${id}`, data);
+        const response = await api.put<{ data: DeliveryOrder }>(`/delivery-orders/${id}`, data);
         return response.data.data;
     },
 
     ship: async (id: number, data: ShipDeliveryOrderRequest) => {
-        const response = await api.post<{ data: DeliveryOrder }>(`/api/v1/delivery-orders/${id}/ship`, data);
+        const response = await api.post<{ data: DeliveryOrder }>(`/delivery-orders/${id}/ship`, data);
         return response.data.data;
     },
 
     cancel: async (id: number) => {
-        const response = await api.post<{ data: DeliveryOrder }>(`/api/v1/delivery-orders/${id}/cancel`);
+        const response = await api.post<{ data: DeliveryOrder }>(`/delivery-orders/${id}/cancel`);
         return response.data.data;
     }
 };

@@ -1,7 +1,5 @@
-import axios from 'axios';
-import { CreateReconciliationRequest, AddReconciliationItemInput, ReconciliationFilter } from '../types/reconciliation';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+import axios from '../lib/axios';
+import type { CreateReconciliationRequest, AddReconciliationItemInput, ReconciliationFilter } from '../types/reconciliation';
 
 export const reconciliationsAPI = {
     list: async (filter?: ReconciliationFilter) => {
@@ -11,32 +9,32 @@ export const reconciliationsAPI = {
         if (filter?.offset) params.append('offset', filter.offset.toString());
         if (filter?.limit) params.append('limit', filter.limit.toString());
 
-        const response = await axios.get(`${API_URL}/reconciliations?${params.toString()}`);
-        return response.data;
+        const { data } = await axios.get(`/reconciliations?${params.toString()}`);
+        return data;
     },
 
     getById: async (id: number) => {
-        const response = await axios.get(`${API_URL}/reconciliations/${id}`);
-        return response.data;
+        const { data } = await axios.get(`/reconciliations/${id}`);
+        return data;
     },
 
-    create: async (data: CreateReconciliationRequest) => {
-        const response = await axios.post(`${API_URL}/reconciliations`, data);
-        return response.data;
+    create: async (payload: CreateReconciliationRequest) => {
+        const { data } = await axios.post('/reconciliations', payload);
+        return data;
     },
 
     addItems: async (id: number, items: AddReconciliationItemInput[]) => {
-        const response = await axios.post(`${API_URL}/reconciliations/${id}/items`, { items });
-        return response.data;
+        const { data } = await axios.post(`/reconciliations/${id}/items`, { items });
+        return data;
     },
 
     confirm: async (id: number) => {
-        const response = await axios.put(`${API_URL}/reconciliations/${id}/confirm`);
-        return response.data;
+        const { data } = await axios.put(`/reconciliations/${id}/confirm`);
+        return data;
     },
 
     delete: async (id: number) => {
-        const response = await axios.delete(`${API_URL}/reconciliations/${id}`);
-        return response.data;
+        const { data } = await axios.delete(`/reconciliations/${id}`);
+        return data;
     },
 };
