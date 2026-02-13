@@ -267,7 +267,7 @@ export default function PurchaseOrderDetailPage() {
                                             <p className="text-2xl font-black text-primary leading-tight">
                                                 {po.total_amount.toLocaleString('vi-VN')}
                                             </p>
-                                            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">VND</p>
+                                            <p className="text-[length:var(--font-size-3xs)] text-gray-500 uppercase font-bold tracking-widest mt-1">VND</p>
                                         </div>
                                     </div>
                                 </div>
@@ -276,7 +276,7 @@ export default function PurchaseOrderDetailPage() {
 
                         <div className="card space-y-6 bg-white">
                             <div className="space-y-4">
-                                <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
+                                <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
                                     <User className="w-3 h-3" /> System Audit
                                 </h4>
                                 <div className="text-xs space-y-3">
@@ -299,13 +299,13 @@ export default function PurchaseOrderDetailPage() {
 
                             {po.payment_terms && (
                                 <div className="space-y-2 pt-2 border-t">
-                                    <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Payment Terms</h4>
+                                    <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest">Payment Terms</h4>
                                     <p className="text-sm font-medium text-gray-700">{po.payment_terms}</p>
                                 </div>
                             )}
                             {po.shipping_method && (
                                 <div className="space-y-2 pt-2 border-t">
-                                    <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Shipping Method</h4>
+                                    <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest">Shipping Method</h4>
                                     <p className="text-sm font-medium text-gray-700">{po.shipping_method}</p>
                                 </div>
                             )}

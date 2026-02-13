@@ -175,7 +175,7 @@ export default function GrnDetailPage() {
                         {/* Primary Info */}
                         <div className="card grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-4">
-                                <h3 className="font-bold text-gray-400 uppercase text-[10px] tracking-widest flex items-center gap-2 border-b pb-2">
+                                <h3 className="font-bold text-gray-400 uppercase text-[length:var(--font-size-3xs)] tracking-widest flex items-center gap-2 border-b pb-2">
                                     <Truck className="w-3 h-3" /> Purchase Order & Supplier
                                 </h3>
                                 <div>
@@ -187,7 +187,7 @@ export default function GrnDetailPage() {
                                 </div>
                             </div>
                             <div className="space-y-4">
-                                <h3 className="font-bold text-gray-400 uppercase text-[10px] tracking-widest flex items-center gap-2 border-b pb-2">
+                                <h3 className="font-bold text-gray-400 uppercase text-[length:var(--font-size-3xs)] tracking-widest flex items-center gap-2 border-b pb-2">
                                     <Building2 className="w-3 h-3" /> Warehouse Information
                                 </h3>
                                 <div>
@@ -227,7 +227,7 @@ export default function GrnDetailPage() {
                                                 <tr key={item.id} className="hover:bg-gray-50">
                                                     <td className="px-4 py-4">
                                                         <div className="font-bold text-sm">{item.material?.trading_name}</div>
-                                                        <div className="text-[10px] text-gray-400 font-mono uppercase">{item.material?.code}</div>
+                                                        <div className="text-[length:var(--font-size-3xs)] text-gray-400 font-mono uppercase">{item.material?.code}</div>
                                                     </td>
                                                     <td className="px-4 py-4 text-right font-medium">{item.quantity}</td>
                                                     <td className="px-4 py-4 text-right">
@@ -270,7 +270,7 @@ export default function GrnDetailPage() {
                                                                 <option value="partial">Partial</option>
                                                             </select>
                                                         ) : (
-                                                            <span className={`text-[10px] font-bold uppercase ${item.qc_status === 'pass' ? 'text-green-600' :
+                                                            <span className={`text-[length:var(--font-size-3xs)] font-bold uppercase ${item.qc_status === 'pass' ? 'text-green-600' :
                                                                 item.qc_status === 'fail' ? 'text-red-600' :
                                                                     item.qc_status === 'partial' ? 'text-blue-600' : 'text-gray-400'
                                                                 }`}>
@@ -280,7 +280,7 @@ export default function GrnDetailPage() {
                                                     </td>
                                                     <td className="px-4 py-4 text-xs">
                                                         <div className="text-gray-600 font-medium">{item.warehouse_location?.full_path || <span className="text-gray-400 italic">No Location</span>}</div>
-                                                        <div className="text-[10px] text-gray-400">
+                                                        <div className="text-[length:var(--font-size-3xs)] text-gray-400">
                                                             {item.batch_number ? `Batch: ${item.batch_number}` : ''}
                                                             {item.lot_number ? ` | Lot: ${item.lot_number}` : ''}
                                                         </div>
@@ -295,7 +295,7 @@ export default function GrnDetailPage() {
 
                         {grn.notes && (
                             <div className="card space-y-2">
-                                <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
+                                <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
                                     <FileText className="w-3 h-3" /> Notes
                                 </h4>
                                 <p className="text-sm text-gray-700 whitespace-pre-wrap">{grn.notes}</p>
@@ -306,7 +306,7 @@ export default function GrnDetailPage() {
                     <div className="space-y-8">
                         <div className="card space-y-6">
                             <div>
-                                <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2 mb-4">
+                                <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2 mb-4">
                                     <History className="w-3 h-3" /> Status & Audit
                                 </h4>
                                 <div className="space-y-4">

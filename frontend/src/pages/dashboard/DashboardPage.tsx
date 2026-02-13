@@ -96,7 +96,7 @@ export default function DashboardPage() {
             {/* Modules Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <div className="lg:col-span-2">
-                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <h3 className="text-[length:var(--font-size-xs)] font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <BarChart2 className="w-4 h-4" />
                         {t('reportsAnalytics')}
                     </h3>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <h3 className="text-[length:var(--font-size-xs)] font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <RefreshCcw className="w-4 h-4" />
                         {t('quickAccess')}
                     </h3>
@@ -145,7 +145,7 @@ export default function DashboardPage() {
 
             {/* Master Data */}
             <div>
-                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{t('masterData')}</h3>
+                <h3 className="text-[length:var(--font-size-xs)] font-semibold text-slate-500 uppercase tracking-wider mb-3">{t('masterData')}</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <MasterDataCard to="/materials" icon={<Package className="w-5 h-5 text-violet-500" />} label={t('materials')} />
                     <MasterDataCard to="/suppliers" icon={<Users className="w-5 h-5 text-blue-500" />} label={t('suppliers')} />

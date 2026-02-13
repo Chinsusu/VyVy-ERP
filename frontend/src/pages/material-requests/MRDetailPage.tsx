@@ -314,7 +314,7 @@ export default function MRDetailPage() {
                                         <Package className="w-4 h-4" />
                                         Issue Materials
                                     </Link>
-                                    <p className="text-center text-[10px] text-gray-400 mt-2">
+                                    <p className="text-center text-[length:var(--font-size-3xs)] text-gray-400 mt-2">
                                         Create a Material Issue Note for this approved request
                                     </p>
                                 </div>

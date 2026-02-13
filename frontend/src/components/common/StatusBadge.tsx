@@ -44,7 +44,7 @@ export default function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
     const config = statusConfig[normalized] || { className: 'badge-secondary', label: status };
 
     return (
-        <span className={`badge ${config.className} ${size === 'sm' ? 'text-[10px] px-2 py-0.5' : ''}`}>
+        <span className={`badge ${config.className} ${size === 'sm' ? 'text-[length:var(--font-size-3xs)] px-2 py-0.5' : ''}`}>
             {config.label}
         </span>
     );

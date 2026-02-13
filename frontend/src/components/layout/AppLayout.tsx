@@ -135,7 +135,7 @@ export default function AppLayout() {
                             </div>
                             <div>
                                 <h1 className="text-base font-bold text-slate-900 leading-none">{t('brand.name')}</h1>
-                                <p className="text-[10px] text-slate-400 font-medium tracking-wider uppercase">{t('brand.subtitle')}</p>
+                                <p className="text-[length:var(--font-size-3xs)] text-slate-400 font-medium tracking-wider uppercase">{t('brand.subtitle')}</p>
                             </div>
                         </Link>
                     )}
@@ -153,7 +153,7 @@ export default function AppLayout() {
                     {navGroups.map((group) => (
                         <div key={group.titleKey} className="mb-1">
                             {!collapsed && (
-                                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 px-3 mb-1.5 mt-3 first:mt-0">
+                                <p className="text-[length:var(--font-size-3xs)] font-semibold uppercase tracking-widest text-slate-400 px-3 mb-1.5 mt-3 first:mt-0">
                                     {t(group.titleKey)}
                                 </p>
                             )}
@@ -234,7 +234,7 @@ export default function AppLayout() {
                             >
                                 <Bell className="w-5 h-5" />
                                 {totalAlerts > 0 && (
-                                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-white">
+                                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[length:var(--font-size-3xs)] font-bold text-white ring-2 ring-white">
                                         {totalAlerts > 9 ? '9+' : totalAlerts}
                                     </span>
                                 )}

@@ -354,7 +354,7 @@ function ItemPickingRow({ item, products, warehouseId, onUpdate, onRemove }: any
                             ))}
                         </select>
                         {!item.batch_number && item.finished_product_id > 0 && availableBatches.length === 0 && (
-                            <span className="text-[10px] text-red-500 mt-1 block">No stock available in this warehouse</span>
+                            <span className="text-[length:var(--font-size-3xs)] text-red-500 mt-1 block">No stock available in this warehouse</span>
                         )}
                     </div>
 

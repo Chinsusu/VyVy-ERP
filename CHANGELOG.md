@@ -10,7 +10,8 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [1.0.0-rc12] - 2026-02-13
 
 ### Fixed
-- **Layout Grid Stabilization**: Resolved overlapping table columns and compressed grid layout by standardizing the table structure and adding width constraints for long names/descriptions on Finished Products, Warehouses, Material Requests, Material Issue Notes, Goods Receipt Notes (GRN), and **Inventory Valuation Report** pages.
+- **Layout Grid Stabilization**: Resolved overlapping table columns and compressed grid layout by standardizing the table structure and adding width constraints for long names/descriptions on Finished Products, Warehouses, Material Requests, Material Issue Notes, Goods Receipt Notes (GRN), and Inventory Valuation Report pages.
+- **Global Typography Synchronization**: Unified font family (Inter) and font sizes across the entire application by defining a comprehensive typography system in `index.css` vars and refactoring all system components (Buttons, Inputs, Labels, Badges, Tables, Sidebar) and individual pages to use these standardized variables.
 - **Fixed Page Crashes (Detail & Report Views)**: Resolved `TypeError` regarding `.length` access on `PurchaseOrderDetailPage.tsx`, `GrnDetailPage.tsx`, `MINDetailPage.tsx`, and `LowStockReportPage.tsx` by adding optional chaining and null checks. Updated `reports.ts` API to ensure safe data returns.
 - **Global Auth Fix (401 Unauthorized)**: Identifed 8 remaining API/Hook files (`purchaseOrders`, `grns`, `warehouses`, `warehouseLocations`, `materialRequests`, `finishedProducts`, `materialIssueNotes`, and `useStockBalance`) using raw `axios` without the auth interceptor. Switched all to shared `lib/axios` instance.
 - **Carriers & Reconciliations CORS Error**: Fixed bypassing of Vite proxy by switching to relative paths via shared axios instance.

@@ -335,12 +335,12 @@ export default function DODetailPage() {
                                     </div>
                                     <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
                                         <p className="text-sm font-bold text-gray-900">Order Created</p>
-                                        <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                        <p className="text-[length:var(--font-size-3xs)] text-gray-400 mt-1 flex items-center gap-1">
                                             <Clock className="w-3 h-3" />
                                             {new Date(doData.created_at).toLocaleString('vi-VN')}
                                         </p>
                                         {doData.created_by_name && (
-                                            <p className="text-[10px] text-gray-500 mt-1">by {doData.created_by_name}</p>
+                                            <p className="text-[length:var(--font-size-3xs)] text-gray-500 mt-1">by {doData.created_by_name}</p>
                                         )}
                                     </div>
                                 </div>
@@ -352,12 +352,12 @@ export default function DODetailPage() {
                                         </div>
                                         <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
                                             <p className="text-sm font-bold text-gray-900">Order Shipped</p>
-                                            <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+                                            <p className="text-[length:var(--font-size-3xs)] text-gray-400 mt-1 flex items-center gap-1">
                                                 <Clock className="w-3 h-3" />
                                                 {new Date(doData.posted_at).toLocaleString('vi-VN')}
                                             </p>
                                             {doData.posted_by_name && (
-                                                <p className="text-[10px] text-gray-500 mt-1">by {doData.posted_by_name}</p>
+                                                <p className="text-[length:var(--font-size-3xs)] text-gray-500 mt-1">by {doData.posted_by_name}</p>
                                             )}
                                         </div>
                                     </div>

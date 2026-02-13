@@ -214,7 +214,7 @@ export default function GrnForm() {
                                             <td className="px-4 py-3">
                                                 <div className="font-medium">{poItem?.material?.trading_name}</div>
                                                 <div className="text-xs text-gray-500">{poItem?.material?.code}</div>
-                                                <div className="mt-1 text-[10px] text-primary uppercase font-bold">
+                                                <div className="mt-1 text-[length:var(--font-size-3xs)] text-primary uppercase font-bold">
                                                     Ordered: {poItem?.quantity} | Received: {poItem?.received_quantity}
                                                 </div>
                                             </td>
@@ -260,7 +260,7 @@ export default function GrnForm() {
                                             </td>
                                             <td className="px-4 py-3 space-y-2">
                                                 <div>
-                                                    <label className="text-[10px] uppercase text-gray-500 font-bold block">Mfg Date</label>
+                                                    <label className="text-[length:var(--font-size-3xs)] uppercase text-gray-500 font-bold block">Mfg Date</label>
                                                     <input
                                                         type="date"
                                                         className="input w-full text-xs py-1 px-2 h-auto"
@@ -269,7 +269,7 @@ export default function GrnForm() {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="text-[10px] uppercase text-gray-500 font-bold block">Expiry Date</label>
+                                                    <label className="text-[length:var(--font-size-3xs)] uppercase text-gray-500 font-bold block">Expiry Date</label>
                                                     <input
                                                         type="date"
                                                         className="input w-full text-xs py-1 px-2 h-auto"
