@@ -168,7 +168,7 @@ export default function MINDetailPage() {
                                         <Package className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase font-semibold">Total Items</p>
-                                            <p className="font-medium text-gray-900">{min.items.length} materials</p>
+                                            <p className="font-medium text-gray-900">{(min.items || []).length} materials</p>
                                         </div>
                                     </div>
                                 </div>
@@ -190,45 +190,53 @@ export default function MINDetailPage() {
                                 <Package className="w-5 h-5 text-primary-600" />
                                 Issued Items
                             </h3>
-                            <div className="overflow-x-auto">
-                                <table className="table">
+                            <div className="table-container">
+                                <table>
                                     <thead>
                                         <tr>
-                                            <th>Material</th>
-                                            <th>Batch / Expiry</th>
-                                            <th>Location</th>
+                                            <th className="text-left">Material</th>
+                                            <th className="text-left">Batch / Expiry</th>
+                                            <th className="text-left">Location</th>
                                             <th className="text-right">Quantity</th>
                                             {min.is_posted && <th className="text-right">Unit Cost</th>}
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {min.items.map((item: MaterialIssueNoteItem) => (
-                                            <tr key={item.id}>
-                                                <td>
-                                                    <div className="font-medium text-gray-900">{item.material?.trading_name}</div>
-                                                    <div className="text-xs text-gray-500 font-mono">{item.material?.code}</div>
+                                        {(min.items || []).length === 0 ? (
+                                            <tr>
+                                                <td colSpan={min.is_posted ? 5 : 4} className="text-center py-8 text-gray-500 italic">
+                                                    No materials listed in this note.
                                                 </td>
-                                                <td>
-                                                    <div className="text-sm font-medium">{item.batch_number || '-'}</div>
-                                                    <div className="text-xs text-gray-500">
-                                                        {item.expiry_date ? `Exp: ${new Date(item.expiry_date).toLocaleDateString('vi-VN')}` : ''}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium">
-                                                        {item.warehouse_location?.code || '-'}
-                                                    </span>
-                                                </td>
-                                                <td className="text-right font-semibold">
-                                                    {item.quantity.toLocaleString()} {item.material?.unit}
-                                                </td>
-                                                {min.is_posted && (
-                                                    <td className="text-right text-sm text-gray-600">
-                                                        {item.unit_cost ? item.unit_cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '-'}
-                                                    </td>
-                                                )}
                                             </tr>
-                                        ))}
+                                        ) : (
+                                            min.items.map((item: MaterialIssueNoteItem) => (
+                                                <tr key={item.id}>
+                                                    <td>
+                                                        <div className="font-medium text-gray-900">{item.material?.trading_name}</div>
+                                                        <div className="text-xs text-gray-500 font-mono">{item.material?.code}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="text-sm font-medium">{item.batch_number || '-'}</div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {item.expiry_date ? `Exp: ${new Date(item.expiry_date).toLocaleDateString('vi-VN')}` : ''}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-gray-700 text-xs font-medium">
+                                                            {item.warehouse_location?.code || '-'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="text-right font-semibold">
+                                                        {item.quantity.toLocaleString()} {item.material?.unit}
+                                                    </td>
+                                                    {min.is_posted && (
+                                                        <td className="text-right text-sm text-gray-600">
+                                                            {item.unit_cost ? item.unit_cost.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : '-'}
+                                                        </td>
+                                                    )}
+                                                </tr>
+                                            ))
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
