@@ -58,7 +58,7 @@ export default function LowStockReportPage() {
                 <button
                     onClick={handleExport}
                     className="btn-outline bg-white"
-                    disabled={data.length === 0}
+                    disabled={(data || []).length === 0}
                 >
                     <Download className="w-4 h-4 mr-2" />
                     Export CSV
@@ -88,8 +88,8 @@ export default function LowStockReportPage() {
             </div>
 
             <div className="card overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="table w-full">
+                <div className="table-container">
+                    <table className="w-full">
                         <thead>
                             <tr>
                                 <th>Item Code</th>
@@ -110,7 +110,7 @@ export default function LowStockReportPage() {
                                         <p className="mt-2 text-gray-500">Checking inventory levels...</p>
                                     </td>
                                 </tr>
-                            ) : data.length === 0 ? (
+                            ) : (data || []).length === 0 ? (
                                 <tr>
                                     <td colSpan={8} className="text-center py-10 text-gray-500">
                                         No low stock items found. All inventory levels are healthy!
