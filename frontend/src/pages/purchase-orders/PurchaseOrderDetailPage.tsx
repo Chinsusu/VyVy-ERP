@@ -189,10 +189,10 @@ export default function PurchaseOrderDetailPage() {
                                     <Package className="w-5 h-5" />
                                     Order Items
                                 </h3>
-                                <span className="text-sm text-gray-500">{po.items.length} items</span>
+                                <span className="text-sm text-gray-500">{(po.items || []).length} items</span>
                             </div>
-                            <div className="overflow-x-auto">
-                                <table className="table w-full">
+                            <div className="table-container">
+                                <table className="w-full">
                                     <thead>
                                         <tr className="bg-gray-100 text-gray-600 border-b">
                                             <th className="py-3 px-6 text-left">Material</th>
@@ -203,21 +203,29 @@ export default function PurchaseOrderDetailPage() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {po.items.map((item: PurchaseOrderItem) => (
-                                            <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors">
-                                                <td className="py-4 px-6 text-left">
-                                                    <p className="font-bold">{item.material?.trading_name}</p>
-                                                    <p className="text-xs text-gray-500">{item.material?.code}</p>
-                                                    {item.notes && <p className="text-xs text-gray-400 mt-1">Note: {item.notes}</p>}
-                                                </td>
-                                                <td className="py-4 px-6 text-right font-medium">{item.quantity}</td>
-                                                <td className="py-4 px-6 text-right">{item.unit_price.toLocaleString('vi-VN')}</td>
-                                                <td className="py-4 px-6 text-right text-gray-500">{item.tax_rate}%</td>
-                                                <td className="py-4 px-6 text-right font-bold text-primary">
-                                                    {item.line_total.toLocaleString('vi-VN')}
+                                        {(po.items || []).length === 0 ? (
+                                            <tr>
+                                                <td colSpan={5} className="text-center py-8 text-gray-500 italic">
+                                                    No items found in this order.
                                                 </td>
                                             </tr>
-                                        ))}
+                                        ) : (
+                                            po.items.map((item: PurchaseOrderItem) => (
+                                                <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors">
+                                                    <td className="py-4 px-6 text-left">
+                                                        <p className="font-bold">{item.material?.trading_name}</p>
+                                                        <p className="text-xs text-gray-500">{item.material?.code}</p>
+                                                        {item.notes && <p className="text-xs text-gray-400 mt-1">Note: {item.notes}</p>}
+                                                    </td>
+                                                    <td className="py-4 px-6 text-right font-medium">{item.quantity}</td>
+                                                    <td className="py-4 px-6 text-right">{item.unit_price.toLocaleString('vi-VN')}</td>
+                                                    <td className="py-4 px-6 text-right text-gray-500">{item.tax_rate}%</td>
+                                                    <td className="py-4 px-6 text-right font-bold text-primary">
+                                                        {item.line_total.toLocaleString('vi-VN')}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
                                     </tbody>
                                 </table>
                             </div>

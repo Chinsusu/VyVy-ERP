@@ -11,7 +11,7 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 - **Layout Grid Stabilization**: Resolved overlapping table columns and compressed grid layout by standardizing the table structure and adding width constraints for long names/descriptions on Finished Products, Warehouses, Material Requests, Material Issue Notes, and Goods Receipt Notes (GRN) pages.
-- **Fixed Page Crashes (Detail Views)**: Resolved `TypeError` regarding `.length` access on `GrnDetailPage.tsx` and `MINDetailPage.tsx` by adding optional chaining and null checks. Standardized table layout aesthetics for detail views.
+- **Fixed Page Crashes (Detail Views)**: Resolved `TypeError` regarding `.length` access on **PurchaseOrderDetailPage.tsx**, `GrnDetailPage.tsx`, and `MINDetailPage.tsx` by adding optional chaining and null checks. Standardized table layout aesthetics for detail views.
 - **Global Auth Fix (401 Unauthorized)**: Identifed 8 remaining API/Hook files (`purchaseOrders`, `grns`, `warehouses`, `warehouseLocations`, `materialRequests`, `finishedProducts`, `materialIssueNotes`, and `useStockBalance`) using raw `axios` without the auth interceptor. Switched all to shared `lib/axios` instance.
 - **Carriers & Reconciliations CORS Error**: Fixed bypassing of Vite proxy by switching to relative paths via shared axios instance.
 - **Delivery Orders 404 (Double API Path)**: Removed redundant `/api/v1/` prefix from all 6 endpoints in `deliveryOrders.ts`.
