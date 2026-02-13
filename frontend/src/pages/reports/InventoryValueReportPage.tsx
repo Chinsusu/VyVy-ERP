@@ -50,8 +50,8 @@ export default function InventoryValueReportPage() {
                         <ArrowLeft className="w-5 h-5 text-gray-500" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Inventory Valuation Report</h1>
-                        <p className="text-gray-500">Current financial value of physical inventory</p>
+                        <h1 className="text-slate-900">Inventory Valuation Report</h1>
+                        <p className="text-slate-500 text-premium-sm">Current financial value of physical inventory</p>
                     </div>
                 </div>
                 <div className="flex gap-2">
@@ -107,7 +107,7 @@ export default function InventoryValueReportPage() {
 
                 <div className="card p-5 bg-primary-600 text-white flex flex-col justify-center">
                     <p className="text-primary-100 text-sm font-medium">Total Inventory Value</p>
-                    <p className="text-2xl font-bold mt-1">{currencyFormatter.format(totalValue)}</p>
+                    <p className="text-premium-2xl font-bold mt-1">{currencyFormatter.format(totalValue)}</p>
                 </div>
             </div>
 
@@ -163,7 +163,7 @@ export default function InventoryValueReportPage() {
                             <tfoot>
                                 <tr className="bg-gray-50 font-bold">
                                     <td colSpan={7} className="text-right py-4">Total:</td>
-                                    <td className="text-right py-4 text-primary-700 text-lg">
+                                    <td className="text-right py-4 text-primary-700 text-premium-lg">
                                         {currencyFormatter.format(totalValue)}
                                     </td>
                                 </tr>

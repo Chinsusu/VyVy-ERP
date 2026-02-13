@@ -271,66 +271,68 @@ export default function ReturnOrderCreatePage() {
 
                         {/* Selected items */}
                         {items.length > 0 && (
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="bg-slate-50 border-b">
-                                        <th className="text-left p-2 text-sm font-semibold text-slate-600">Sản phẩm</th>
-                                        <th className="text-right p-2 text-sm font-semibold text-slate-600">SL hoàn</th>
-                                        <th className="text-left p-2 text-sm font-semibold text-slate-600">Lý do</th>
-                                        <th className="text-center p-2"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {items.map((item, idx) => (
-                                        <tr key={idx} className="border-b border-slate-100">
-                                            <td className="p-2">
-                                                <div className="text-sm font-medium">{item.product_name}</div>
-                                                <div className="text-xs text-slate-400 font-mono">{item.product_sku}</div>
-                                            </td>
-                                            <td className="p-2">
-                                                <input
-                                                    type="number"
-                                                    min={1}
-                                                    max={item.max_qty || 999}
-                                                    value={item.quantity_returned}
-                                                    onChange={e => updateItem(idx, 'quantity_returned', parseInt(e.target.value) || 1)}
-                                                    className="input w-20 text-right"
-                                                />
-                                            </td>
-                                            <td className="p-2">
-                                                <input
-                                                    type="text"
-                                                    value={item.reason || ''}
-                                                    onChange={e => updateItem(idx, 'reason', e.target.value)}
-                                                    className="input w-full text-sm"
-                                                    placeholder="Lý do..."
-                                                />
-                                            </td>
-                                            <td className="p-2 text-center">
-                                                <button type="button" onClick={() => removeItem(idx)} className="p-1 text-red-400 hover:text-red-600 transition-colors">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </td>
+                            <div className="table-container">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th className="text-right">SL hoàn</th>
+                                            <th>Lý do</th>
+                                            <th className="text-center"></th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {items.map((item, idx) => (
+                                            <tr key={idx} className="border-b border-slate-100">
+                                                <td className="p-2">
+                                                    <div className="text-sm font-medium">{item.product_name}</div>
+                                                    <div className="text-xs text-slate-400 font-mono">{item.product_sku}</div>
+                                                </td>
+                                                <td className="p-2">
+                                                    <input
+                                                        type="number"
+                                                        min={1}
+                                                        max={item.max_qty || 999}
+                                                        value={item.quantity_returned}
+                                                        onChange={e => updateItem(idx, 'quantity_returned', parseInt(e.target.value) || 1)}
+                                                        className="input w-20 text-right"
+                                                    />
+                                                </td>
+                                                <td className="p-2">
+                                                    <input
+                                                        type="text"
+                                                        value={item.reason || ''}
+                                                        onChange={e => updateItem(idx, 'reason', e.target.value)}
+                                                        className="input w-full text-sm"
+                                                        placeholder="Lý do..."
+                                                    />
+                                                </td>
+                                                <td className="p-2 text-center">
+                                                    <button type="button" onClick={() => removeItem(idx)} className="p-1 text-red-400 hover:text-red-600 transition-colors">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
+
+                        {/* Submit */}
+                        <div className="flex justify-end gap-3">
+                            <button type="button" onClick={() => navigate('/return-orders')} className="btn-secondary">Hủy</button>
+                            <button
+                                type="submit"
+                                disabled={!deliveryOrder || items.length === 0 || createMutation.isPending}
+                                className="btn-primary flex items-center gap-2"
+                            >
+                                <Save className="w-4 h-4" />
+                                {createMutation.isPending ? 'Đang tạo...' : 'Tạo đơn hoàn'}
+                            </button>
+                        </div>
                     </div>
                 )}
-
-                {/* Submit */}
-                <div className="flex justify-end gap-3">
-                    <button type="button" onClick={() => navigate('/return-orders')} className="btn-secondary">Hủy</button>
-                    <button
-                        type="submit"
-                        disabled={!deliveryOrder || items.length === 0 || createMutation.isPending}
-                        className="btn-primary flex items-center gap-2"
-                    >
-                        <Save className="w-4 h-4" />
-                        {createMutation.isPending ? 'Đang tạo...' : 'Tạo đơn hoàn'}
-                    </button>
-                </div>
             </form>
         </div>
     );

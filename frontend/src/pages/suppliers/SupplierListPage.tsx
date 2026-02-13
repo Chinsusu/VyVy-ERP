@@ -93,97 +93,99 @@ export default function SupplierListPage() {
                 </div>
 
                 {/* Table */}
-                <div className="card">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="text-left p-4 font-semibold text-gray-700">Code</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">Name</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">Contact Person</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">Phone</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">Email</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">City</th>
-                                    <th className="text-center p-4 font-semibold text-gray-700">Status</th>
-                                    <th className="text-right p-4 font-semibold text-gray-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {suppliers.length === 0 ? (
+                <div className="card shadow-md">
+                    <div className="table-container">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
                                     <tr>
-                                        <td colSpan={8} className="text-center p-12 text-gray-500">
-                                            No suppliers found. Add your first supplier to get started.
-                                        </td>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Contact Person</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>City</th>
+                                        <th className="text-center">Status</th>
+                                        <th className="text-right">Actions</th>
                                     </tr>
-                                ) : (
-                                    suppliers.map((supplier) => (
-                                        <tr key={supplier.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                            <td className="p-4">
-                                                <Link
-                                                    to={`/suppliers/${supplier.id}`}
-                                                    className="text-primary font-medium hover:underline"
-                                                >
-                                                    {supplier.code}
-                                                </Link>
-                                            </td>
-                                            <td className="p-4">{supplier.name}</td>
-                                            <td className="p-4 text-gray-600">{supplier.contact_person || '-'}</td>
-                                            <td className="p-4 text-gray-600">{supplier.phone || '-'}</td>
-                                            <td className="p-4 text-gray-600">{supplier.email || '-'}</td>
-                                            <td className="p-4">{supplier.city || '-'}</td>
-                                            <td className="p-4 text-center">
-                                                {supplier.is_active ? (
-                                                    <span className="badge badge-success">Active</span>
-                                                ) : (
-                                                    <span className="badge badge-secondary">Inactive</span>
-                                                )}
-                                            </td>
-                                            <td className="p-4 text-right">
-                                                <Link
-                                                    to={`/suppliers/${supplier.id}/edit`}
-                                                    className="text-primary hover:underline text-sm"
-                                                >
-                                                    Edit
-                                                </Link>
+                                </thead>
+                                <tbody>
+                                    {suppliers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={8} className="text-center p-12 text-gray-500">
+                                                No suppliers found. Add your first supplier to get started.
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    {pagination && pagination.total > 0 && (
-                        <div className="flex items-center justify-between p-4 border-t border-gray-200">
-                            <div className="text-sm text-gray-600">
-                                Showing {((pagination.page - 1) * pagination.page_size) + 1} to{' '}
-                                {Math.min(pagination.page * pagination.page_size, pagination.total)} of{' '}
-                                {pagination.total} suppliers
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => handlePageChange(pagination.page - 1)}
-                                    disabled={pagination.page === 1}
-                                    className="btn btn-secondary btn-sm disabled:opacity-50"
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                    Previous
-                                </button>
-                                <span className="text-sm text-gray-600">
-                                    Page {pagination.page} of {pagination.total_pages}
-                                </span>
-                                <button
-                                    onClick={() => handlePageChange(pagination.page + 1)}
-                                    disabled={pagination.page >= pagination.total_pages}
-                                    className="btn btn-secondary btn-sm disabled:opacity-50"
-                                >
-                                    Next
-                                    <ChevronRight className="w-4 h-4" />
-                                </button>
-                            </div>
+                                    ) : (
+                                        suppliers.map((supplier) => (
+                                            <tr key={supplier.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                                <td className="p-4">
+                                                    <Link
+                                                        to={`/suppliers/${supplier.id}`}
+                                                        className="text-primary font-medium hover:underline"
+                                                    >
+                                                        {supplier.code}
+                                                    </Link>
+                                                </td>
+                                                <td className="p-4">{supplier.name}</td>
+                                                <td className="p-4 text-gray-600">{supplier.contact_person || '-'}</td>
+                                                <td className="p-4 text-gray-600">{supplier.phone || '-'}</td>
+                                                <td className="p-4 text-gray-600">{supplier.email || '-'}</td>
+                                                <td className="p-4">{supplier.city || '-'}</td>
+                                                <td className="p-4 text-center">
+                                                    {supplier.is_active ? (
+                                                        <span className="badge badge-success">Active</span>
+                                                    ) : (
+                                                        <span className="badge badge-secondary">Inactive</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-4 text-right">
+                                                    <Link
+                                                        to={`/suppliers/${supplier.id}/edit`}
+                                                        className="text-primary hover:underline text-sm"
+                                                    >
+                                                        Edit
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
+
+                        {/* Pagination */}
+                        {pagination && pagination.total > 0 && (
+                            <div className="flex items-center justify-between p-4 border-t border-gray-200">
+                                <div className="text-sm text-gray-600">
+                                    Showing {((pagination.page - 1) * pagination.page_size) + 1} to{' '}
+                                    {Math.min(pagination.page * pagination.page_size, pagination.total)} of{' '}
+                                    {pagination.total} suppliers
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handlePageChange(pagination.page - 1)}
+                                        disabled={pagination.page === 1}
+                                        className="btn btn-secondary btn-sm disabled:opacity-50"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" />
+                                        Previous
+                                    </button>
+                                    <span className="text-sm text-gray-600">
+                                        Page {pagination.page} of {pagination.total_pages}
+                                    </span>
+                                    <button
+                                        onClick={() => handlePageChange(pagination.page + 1)}
+                                        disabled={pagination.page >= pagination.total_pages}
+                                        className="btn btn-secondary btn-sm disabled:opacity-50"
+                                    >
+                                        Next
+                                        <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

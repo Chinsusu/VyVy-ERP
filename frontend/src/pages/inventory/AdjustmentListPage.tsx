@@ -1,18 +1,14 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAdjustments } from '../../hooks/useInventory';
-import { useAuthStore } from '../../stores/authStore';
 import {
     Plus, Search, Filter, ChevronLeft, ChevronRight,
-    Clock, CheckCircle2, XCircle, MoreVertical,
-    LogOut, User, Home
+    Clock, CheckCircle2, XCircle, MoreVertical
 } from 'lucide-react';
 import { format } from 'date-fns';
 import type { StockAdjustment } from '../../types/inventory';
 
 export default function AdjustmentListPage() {
-    const navigate = useNavigate();
-    const { user, logout } = useAuthStore();
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
 
@@ -21,10 +17,6 @@ export default function AdjustmentListPage() {
         limit: pageSize,
     });
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -43,43 +35,18 @@ export default function AdjustmentListPage() {
 
     return (
         <div className="animate-fade-in text-slate-900">
-            <nav className="bg-white shadow-sm border-b border-gray-200">
-                <div className=" px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center gap-4">
-                            <Link to="/dashboard" className="text-gray-500 hover:text-primary-600 transition-colors">
-                                <Home className="w-5 h-5" />
-                            </Link>
-                            <h1 className="text-xl font-bold text-primary-600">Inventory & Stock</h1>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <User className="w-5 h-5 text-gray-500" />
-                                <div className="text-sm hidden sm:block">
-                                    <p className="font-medium text-gray-900">{user?.full_name}</p>
-                                    <p className="text-gray-500">{user?.role}</p>
-                                </div>
-                            </div>
-                            <button onClick={handleLogout} className="btn-outline py-1.5">
-                                <LogOut className="w-4 h-4" />
-                                <span className="hidden sm:inline">Logout</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
 
             <main className=" px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Stock Adjustments</h2>
-                        <p className="text-gray-600">Manage and track inventory corrections</p>
+                        <h1 className="text-slate-900">Stock Adjustments</h1>
+                        <p className="text-slate-500 text-premium-sm">Manage and track inventory corrections</p>
                     </div>
                     <div className="flex gap-3">
-                        <Link to="/inventory/transfers" className="btn-outline">
+                        <Link to="/inventory/transfers" className="btn btn-outline">
                             Transfers
                         </Link>
-                        <Link to="/inventory/adjustments/new" className="btn-primary">
+                        <Link to="/inventory/adjustments/new" className="btn btn-primary">
                             <Plus className="w-4 h-4" />
                             New Adjustment
                         </Link>
@@ -97,17 +64,17 @@ export default function AdjustmentListPage() {
                             />
                         </div>
                         <div className="flex gap-2">
-                            <button className="btn-outline">
+                            <button className="btn btn-outline">
                                 <Filter className="w-4 h-4" />
                                 Filters
                             </button>
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
-                                <tr>
+                    <div className="table-container">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="bg-gray-50 text-gray-600 text-premium-3xs uppercase font-bold border-b">
                                     <th className="px-6 py-4">Adjustment Number</th>
                                     <th className="px-6 py-4">Date</th>
                                     <th className="px-6 py-4">Warehouse</th>
@@ -165,14 +132,14 @@ export default function AdjustmentListPage() {
                             </p>
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                    onClick={() => setCurrentPage((prev: number) => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
                                     className="p-1.5 border border-gray-200 rounded-md disabled:opacity-50"
                                 >
                                     <ChevronLeft className="w-5 h-5" />
                                 </button>
                                 <button
-                                    onClick={() => setCurrentPage(prev => prev + 1)}
+                                    onClick={() => setCurrentPage((prev: number) => prev + 1)}
                                     disabled={currentPage * pageSize >= data.total}
                                     className="p-1.5 border border-gray-200 rounded-md disabled:opacity-50"
                                 >

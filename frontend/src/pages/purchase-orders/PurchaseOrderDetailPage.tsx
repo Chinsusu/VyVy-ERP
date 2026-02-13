@@ -104,7 +104,7 @@ export default function PurchaseOrderDetailPage() {
                             Back to List
                         </Link>
                         <div className="flex items-center gap-4">
-                            <h1 className="text-3xl font-bold text-gray-900">{po.po_number}</h1>
+                            <h1 className="text-slate-900">{po.po_number}</h1>
                             {getStatusBadge(po.status)}
                         </div>
                     </div>
@@ -154,7 +154,7 @@ export default function PurchaseOrderDetailPage() {
                                     <Truck className="w-4 h-4" /> Supplier
                                 </h3>
                                 <div className="space-y-2">
-                                    <p className="font-bold text-lg text-primary">{po.supplier?.name}</p>
+                                    <p className="font-bold text-premium-lg text-primary">{po.supplier?.name}</p>
                                     <p className="text-sm text-gray-600">Code: {po.supplier?.code}</p>
                                     <p className="text-sm text-gray-600">{po.supplier?.email}</p>
                                     <p className="text-sm text-gray-600">{po.supplier?.phone}</p>
@@ -166,7 +166,7 @@ export default function PurchaseOrderDetailPage() {
                                     <Building2 className="w-4 h-4" /> Warehouse / Delivery
                                 </h3>
                                 <div className="space-y-2">
-                                    <p className="font-bold text-lg">{po.warehouse?.name}</p>
+                                    <p className="font-bold text-premium-lg">{po.warehouse?.name}</p>
                                     <p className="text-sm text-gray-600">Code: {po.warehouse?.code}</p>
                                     <div className="flex items-center gap-2 text-sm text-gray-600 pt-2">
                                         <Calendar className="w-4 h-4" />
@@ -244,7 +244,7 @@ export default function PurchaseOrderDetailPage() {
                     {/* Totals & Metadata Sidebar */}
                     <div className="space-y-8">
                         <div className="card bg-primary/5 border-primary/20">
-                            <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-primary">
+                            <h3 className="font-bold text-premium-lg mb-6 flex items-center gap-2 text-primary">
                                 Order Summary
                             </h3>
                             <div className="space-y-4">
@@ -264,7 +264,7 @@ export default function PurchaseOrderDetailPage() {
                                     <div className="flex justify-between items-end">
                                         <span className="font-bold text-gray-700">Grand Total</span>
                                         <div className="text-right">
-                                            <p className="text-2xl font-black text-primary leading-tight">
+                                            <p className="text-premium-2xl font-black text-primary leading-tight">
                                                 {po.total_amount.toLocaleString('vi-VN')}
                                             </p>
                                             <p className="text-[length:var(--font-size-3xs)] text-gray-500 uppercase font-bold tracking-widest mt-1">VND</p>
@@ -319,7 +319,7 @@ export default function PurchaseOrderDetailPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                     <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 space-y-6">
                         <div className="text-center space-y-2">
-                            <h3 className="text-2xl font-bold text-gray-900 capitalize">
+                            <h3 className="text-premium-2xl font-bold text-gray-900 capitalize">
                                 {showConfirmModal} Order?
                             </h3>
                             <p className="text-gray-500">

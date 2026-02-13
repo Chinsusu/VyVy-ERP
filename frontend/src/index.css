@@ -80,6 +80,47 @@
 
 @layer components {
 
+  /* Typography Utilities */
+  .text-premium-4xl {
+    font-size: var(--font-size-4xl);
+  }
+
+  .text-premium-3xl {
+    font-size: var(--font-size-3xl);
+  }
+
+  .text-premium-2xl {
+    font-size: var(--font-size-2xl);
+  }
+
+  .text-premium-xl {
+    font-size: var(--font-size-xl);
+  }
+
+  .text-premium-lg {
+    font-size: var(--font-size-lg);
+  }
+
+  .text-premium-base {
+    font-size: var(--font-size-base);
+  }
+
+  .text-premium-sm {
+    font-size: var(--font-size-sm);
+  }
+
+  .text-premium-xs {
+    font-size: var(--font-size-xs);
+  }
+
+  .text-premium-2xs {
+    font-size: var(--font-size-2xs);
+  }
+
+  .text-premium-3xs {
+    font-size: var(--font-size-3xs);
+  }
+
   /* ═══ Card ═══ */
   .card {
     background-color: white;

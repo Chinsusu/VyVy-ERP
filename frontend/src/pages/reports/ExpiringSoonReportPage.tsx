@@ -55,8 +55,8 @@ export default function ExpiringSoonReportPage() {
                         <ArrowLeft className="w-5 h-5 text-gray-500" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Expiring Items Report</h1>
-                        <p className="text-gray-500">Track batches that are nearing their expiration date</p>
+                        <h1 className="text-slate-900">Expiring Items Report</h1>
+                        <p className="text-slate-500 text-premium-sm">Track batches that are nearing their expiration date</p>
                     </div>
                 </div>
                 <button
@@ -103,7 +103,7 @@ export default function ExpiringSoonReportPage() {
                 </form>
             </div>
 
-            <div className="card overflow-hidden">
+            <div className="table-container">
                 <div className="overflow-x-auto">
                     <table className="table w-full">
                         <thead>

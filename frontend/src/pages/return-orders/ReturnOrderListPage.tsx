@@ -81,18 +81,18 @@ export default function ReturnOrderListPage() {
             </div>
 
             {/* Table */}
-            <div className="card overflow-hidden">
+            <div className="table-container">
                 <table className="w-full">
                     <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200">
-                            <th className="text-left p-3 font-semibold text-slate-600">Mã hoàn</th>
-                            <th className="text-left p-3 font-semibold text-slate-600">Đơn giao</th>
-                            <th className="text-left p-3 font-semibold text-slate-600">Khách hàng</th>
-                            <th className="text-left p-3 font-semibold text-slate-600">Loại</th>
-                            <th className="text-left p-3 font-semibold text-slate-600">Trạng thái</th>
-                            <th className="text-right p-3 font-semibold text-slate-600">SL hoàn</th>
-                            <th className="text-left p-3 font-semibold text-slate-600">Ngày</th>
-                            <th className="text-center p-3 font-semibold text-slate-600"></th>
+                        <tr>
+                            <th>Mã hoàn</th>
+                            <th>Đơn giao</th>
+                            <th>Khách hàng</th>
+                            <th>Loại</th>
+                            <th>Trạng thái</th>
+                            <th className="text-right">SL hoàn</th>
+                            <th>Ngày</th>
+                            <th className="text-center"></th>
                         </tr>
                     </thead>
                     <tbody>

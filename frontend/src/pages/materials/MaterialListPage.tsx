@@ -93,113 +93,115 @@ export default function MaterialListPage() {
                 </div>
 
                 {/* Table */}
-                <div className="card">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="text-left p-4 font-semibold text-gray-700">Code</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">Trading Name</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">Type</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">Category</th>
-                                    <th className="text-left p-4 font-semibold text-gray-700">Unit</th>
-                                    <th className="text-center p-4 font-semibold text-gray-700">QC</th>
-                                    <th className="text-center p-4 font-semibold text-gray-700">Hazardous</th>
-                                    <th className="text-center p-4 font-semibold text-gray-700">Status</th>
-                                    <th className="text-right p-4 font-semibold text-gray-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {materials.length === 0 ? (
+                <div className="card shadow-md">
+                    <div className="table-container">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
                                     <tr>
-                                        <td colSpan={9} className="text-center p-12 text-gray-500">
-                                            No materials found. Add your first material to get started.
-                                        </td>
+                                        <th>Code</th>
+                                        <th>Trading Name</th>
+                                        <th>Type</th>
+                                        <th>Category</th>
+                                        <th>Unit</th>
+                                        <th className="text-center">QC</th>
+                                        <th className="text-center">Hazardous</th>
+                                        <th className="text-center">Status</th>
+                                        <th className="text-right">Actions</th>
                                     </tr>
-                                ) : (
-                                    materials.map((material) => (
-                                        <tr key={material.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                            <td className="p-4">
-                                                <Link
-                                                    to={`/materials/${material.id}`}
-                                                    className="text-primary font-medium hover:underline"
-                                                >
-                                                    {material.code}
-                                                </Link>
-                                            </td>
-                                            <td className="p-4">{material.trading_name}</td>
-                                            <td className="p-4">
-                                                <span className="badge badge-secondary">{material.material_type}</span>
-                                            </td>
-                                            <td className="p-4 text-gray-600">{material.category || '-'}</td>
-                                            <td className="p-4">{material.unit}</td>
-                                            <td className="p-4 text-center">
-                                                {material.requires_qc ? (
-                                                    <span className="badge badge-warning">Yes</span>
-                                                ) : (
-                                                    <span className="text-gray-400">No</span>
-                                                )}
-                                            </td>
-                                            <td className="p-4 text-center">
-                                                {material.hazardous ? (
-                                                    <span className="badge badge-danger">Yes</span>
-                                                ) : (
-                                                    <span className="text-gray-400">No</span>
-                                                )}
-                                            </td>
-                                            <td className="p-4 text-center">
-                                                {material.is_active ? (
-                                                    <span className="badge badge-success">Active</span>
-                                                ) : (
-                                                    <span className="badge badge-secondary">Inactive</span>
-                                                )}
-                                            </td>
-                                            <td className="p-4 text-right">
-                                                <Link
-                                                    to={`/materials/${material.id}/edit`}
-                                                    className="text-primary hover:underline text-sm"
-                                                >
-                                                    Edit
-                                                </Link>
+                                </thead>
+                                <tbody>
+                                    {materials.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={9} className="text-center p-12 text-gray-500">
+                                                No materials found. Add your first material to get started.
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    {pagination && pagination.total > 0 && (
-                        <div className="flex items-center justify-between p-4 border-t border-gray-200">
-                            <div className="text-sm text-gray-600">
-                                Showing {((pagination.page - 1) * pagination.page_size) + 1} to{' '}
-                                {Math.min(pagination.page * pagination.page_size, pagination.total)} of{' '}
-                                {pagination.total} materials
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => handlePageChange(pagination.page - 1)}
-                                    disabled={pagination.page === 1}
-                                    className="btn btn-secondary btn-sm disabled:opacity-50"
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                    Previous
-                                </button>
-                                <span className="text-sm text-gray-600">
-                                    Page {pagination.page} of {pagination.total_pages}
-                                </span>
-                                <button
-                                    onClick={() => handlePageChange(pagination.page + 1)}
-                                    disabled={pagination.page >= pagination.total_pages}
-                                    className="btn btn-secondary btn-sm disabled:opacity-50"
-                                >
-                                    Next
-                                    <ChevronRight className="w-4 h-4" />
-                                </button>
-                            </div>
+                                    ) : (
+                                        materials.map((material) => (
+                                            <tr key={material.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                                <td className="p-4">
+                                                    <Link
+                                                        to={`/materials/${material.id}`}
+                                                        className="text-primary font-medium hover:underline"
+                                                    >
+                                                        {material.code}
+                                                    </Link>
+                                                </td>
+                                                <td className="p-4">{material.trading_name}</td>
+                                                <td className="p-4">
+                                                    <span className="badge badge-secondary">{material.material_type}</span>
+                                                </td>
+                                                <td className="p-4 text-gray-600">{material.category || '-'}</td>
+                                                <td className="p-4">{material.unit}</td>
+                                                <td className="p-4 text-center">
+                                                    {material.requires_qc ? (
+                                                        <span className="badge badge-warning">Yes</span>
+                                                    ) : (
+                                                        <span className="text-gray-400">No</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-4 text-center">
+                                                    {material.hazardous ? (
+                                                        <span className="badge badge-danger">Yes</span>
+                                                    ) : (
+                                                        <span className="text-gray-400">No</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-4 text-center">
+                                                    {material.is_active ? (
+                                                        <span className="badge badge-success">Active</span>
+                                                    ) : (
+                                                        <span className="badge badge-secondary">Inactive</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-4 text-right">
+                                                    <Link
+                                                        to={`/materials/${material.id}/edit`}
+                                                        className="text-primary hover:underline text-sm"
+                                                    >
+                                                        Edit
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
-                    )}
+
+                        {/* Pagination */}
+                        {pagination && pagination.total > 0 && (
+                            <div className="flex items-center justify-between p-4 border-t border-gray-200">
+                                <div className="text-sm text-gray-600">
+                                    Showing {((pagination.page - 1) * pagination.page_size) + 1} to{' '}
+                                    {Math.min(pagination.page * pagination.page_size, pagination.total)} of{' '}
+                                    {pagination.total} materials
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handlePageChange(pagination.page - 1)}
+                                        disabled={pagination.page === 1}
+                                        className="btn btn-secondary btn-sm disabled:opacity-50"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" />
+                                        Previous
+                                    </button>
+                                    <span className="text-sm text-gray-600">
+                                        Page {pagination.page} of {pagination.total_pages}
+                                    </span>
+                                    <button
+                                        onClick={() => handlePageChange(pagination.page + 1)}
+                                        disabled={pagination.page >= pagination.total_pages}
+                                        className="btn btn-secondary btn-sm disabled:opacity-50"
+                                    >
+                                        Next
+                                        <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

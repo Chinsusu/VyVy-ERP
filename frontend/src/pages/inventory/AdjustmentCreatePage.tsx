@@ -1,12 +1,11 @@
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useCreateAdjustment } from '../../hooks/useInventory';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import { useMaterials } from '../../hooks/useMaterials';
 import { useFinishedProducts } from '../../hooks/useFinishedProducts';
-import { useAuthStore } from '../../stores/authStore';
 import {
-    ArrowLeft, Save, Plus, Trash2, Home, User, LogOut,
+    ArrowLeft, Save, Plus, Trash2,
     Package, Warehouse as WarehouseIcon, FileText, AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -38,7 +37,6 @@ interface AdjustmentForm {
 
 export default function AdjustmentCreatePage() {
     const navigate = useNavigate();
-    const { user, logout } = useAuthStore();
     const createMutation = useCreateAdjustment();
     const { data: warehouses } = useWarehouses();
     const { data: materials } = useMaterials();
@@ -60,10 +58,6 @@ export default function AdjustmentCreatePage() {
     const selectedWarehouseId = watch('warehouse_id');
     const watchedItems = watch('items');
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
 
     const onSubmit = async (data: AdjustmentForm) => {
         if (data.items.length === 0) {
@@ -126,30 +120,6 @@ export default function AdjustmentCreatePage() {
 
     return (
         <div className="animate-fade-in text-slate-900">
-            <nav className="bg-white shadow-sm border-b border-gray-200">
-                <div className=" px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center gap-4">
-                            <Link to="/dashboard" className="text-gray-500 hover:text-primary-600 transition-colors">
-                                <Home className="w-5 h-5" />
-                            </Link>
-                            <h1 className="text-xl font-bold text-primary-600">Inventory & Stock</h1>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <User className="w-5 h-5 text-gray-500" />
-                                <div className="text-sm hidden sm:block">
-                                    <p className="font-medium text-gray-900">{user?.full_name}</p>
-                                </div>
-                            </div>
-                            <button onClick={handleLogout} className="btn-outline py-1.5">
-                                <LogOut className="w-4 h-4" />
-                                <span className="hidden sm:inline">Logout</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
 
             <main className=" px-4 sm:px-6 lg:px-8 py-8">
                 <form onSubmit={handleSubmit(onSubmit)}>

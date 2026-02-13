@@ -1,10 +1,9 @@
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAdjustment, usePostAdjustment, useCancelAdjustment } from '../../hooks/useInventory';
-import { useAuthStore } from '../../stores/authStore';
 import {
     ArrowLeft, Clock, CheckCircle2, XCircle,
     Printer, Send, Ban, Package, Warehouse,
-    FileText, Calendar, User, Home, LogOut
+    FileText, Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -13,17 +12,12 @@ import type { StockAdjustmentItem } from '../../types/inventory';
 export default function AdjustmentDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { user, logout } = useAuthStore();
     const adjustmentId = parseInt(id || '0');
 
     const { data: sa, isLoading, error } = useAdjustment(adjustmentId);
     const postMutation = usePostAdjustment();
     const cancelMutation = useCancelAdjustment();
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
 
     const handlePost = async () => {
         if (!window.confirm('Are you sure you want to post this adjustment? This will update stock levels.')) return;
@@ -65,31 +59,6 @@ export default function AdjustmentDetailPage() {
 
     return (
         <div className="animate-fade-in text-slate-900">
-            <nav className="bg-white shadow-sm border-b border-gray-200">
-                <div className=" px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center gap-4">
-                            <Link to="/dashboard" className="text-gray-500 hover:text-primary-600 transition-colors">
-                                <Home className="w-5 h-5" />
-                            </Link>
-                            <h1 className="text-xl font-bold text-primary-600">Inventory & Stock</h1>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <User className="w-5 h-5 text-gray-500" />
-                                <div className="text-sm hidden sm:block">
-                                    <p className="font-medium text-gray-900">{user?.full_name}</p>
-                                    <p className="text-gray-500">{user?.role}</p>
-                                </div>
-                            </div>
-                            <button onClick={handleLogout} className="btn-outline py-1.5">
-                                <LogOut className="w-4 h-4" />
-                                <span className="hidden sm:inline">Logout</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
 
             <main className=" px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header Actions */}
@@ -100,14 +69,14 @@ export default function AdjustmentDetailPage() {
                         </button>
                         <div>
                             <div className="flex items-center gap-3">
-                                <h2 className="text-2xl font-bold text-gray-900">{sa.adjustment_number}</h2>
+                                <h1 className="text-slate-900">{sa.adjustment_number}</h1>
                                 {getStatusBadge(sa.status)}
                             </div>
-                            <p className="text-sm text-gray-500">Created on {format(new Date(sa.created_at), 'MMMM dd, yyyy HH:mm')}</p>
+                            <p className="text-premium-sm text-gray-500">Created on {format(new Date(sa.created_at), 'MMMM dd, yyyy HH:mm')}</p>
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <button className="btn-outline">
+                        <button className="btn btn-outline">
                             <Printer className="w-4 h-4" />
                             Print
                         </button>
@@ -116,7 +85,7 @@ export default function AdjustmentDetailPage() {
                                 <button
                                     onClick={handlePost}
                                     disabled={postMutation.isPending}
-                                    className="btn-primary"
+                                    className="btn btn-primary"
                                 >
                                     <Send className="w-4 h-4" />
                                     Post Adjustment
@@ -124,7 +93,7 @@ export default function AdjustmentDetailPage() {
                                 <button
                                     onClick={handleCancel}
                                     disabled={cancelMutation.isPending}
-                                    className="btn-outline text-red-600 hover:bg-red-50"
+                                    className="btn btn-outline text-red-600 hover:bg-red-50"
                                 >
                                     <Ban className="w-4 h-4" />
                                     Cancel
@@ -138,16 +107,15 @@ export default function AdjustmentDetailPage() {
                     {/* Main Info */}
                     <div className="lg:col-span-2 space-y-6">
                         <div className="card p-6">
-                            <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-primary-600" />
-                                General Information
+                            <h3 className="font-bold text-gray-400 uppercase text-premium-3xs tracking-widest flex items-center gap-2 border-b pb-2 mb-6">
+                                <FileText className="w-3 h-3" /> General Information
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <div>
-                                    <p className="text-sm text-gray-500 mb-1 flex items-center gap-1.5">
-                                        <Warehouse className="w-4 h-4" /> Warehouse
+                                    <p className="text-premium-3xs text-gray-500 mb-1 flex items-center gap-1.5 uppercase font-bold tracking-wider">
+                                        <Warehouse className="w-3 h-3" /> Warehouse
                                     </p>
-                                    <p className="font-medium">{sa.warehouse_name}</p>
+                                    <p className="font-medium text-sm">{sa.warehouse_name}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500 mb-1 flex items-center gap-1.5">
@@ -172,20 +140,20 @@ export default function AdjustmentDetailPage() {
                             </div>
                         </div>
 
-                        <div className="card overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-                                <Package className="w-5 h-5 text-primary-600" />
-                                <h3 className="text-lg font-semibold">Adjustment Items</h3>
+                        <div className="card p-0 overflow-hidden">
+                            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2 bg-gray-50">
+                                <Package className="w-4 h-4 text-gray-400" />
+                                <h3 className="text-sm font-bold">Adjustment Items</h3>
                             </div>
-                            <div className="overflow-x-auto">
+                            <div className="table-container">
                                 <table className="w-full text-left">
-                                    <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
-                                        <tr>
+                                    <thead>
+                                        <tr className="bg-white text-gray-500 text-premium-3xs uppercase font-bold border-b">
                                             <th className="px-6 py-4">Item</th>
                                             <th className="px-6 py-4">Location</th>
                                             <th className="px-6 py-4 text-center">Prev Qty</th>
                                             <th className="px-6 py-4 text-center">Adj Qty</th>
-                                            <th className="px-6 py-4 text-center font-bold">New Qty</th>
+                                            <th className="px-6 py-4 text-center">New Qty</th>
                                             <th className="px-6 py-4 text-right">Unit Cost</th>
                                         </tr>
                                     </thead>

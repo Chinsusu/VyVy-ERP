@@ -205,7 +205,7 @@ export default function ReconciliationDetailPage() {
             )}
 
             {/* Items Table */}
-            <div className="card overflow-hidden">
+            <div className="table-container">
                 <div className="p-4 border-b bg-gray-50">
                     <h3 className="font-semibold">Reconciliation Items ({items.length})</h3>
                 </div>
@@ -213,17 +213,17 @@ export default function ReconciliationDetailPage() {
                     <div className="p-8 text-center text-gray-500">No items yet. Click "Add Items" to start.</div>
                 ) : (
                     <table className="w-full">
-                        <thead className="bg-gray-50 border-b">
+                        <thead>
                             <tr>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tracking</th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">DO Number</th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Customer</th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Match</th>
-                                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">COD</th>
-                                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Ship Fee</th>
-                                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Received</th>
-                                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Diff</th>
+                                <th>Tracking</th>
+                                <th>DO Number</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Match</th>
+                                <th className="text-right">COD</th>
+                                <th className="text-right">Ship Fee</th>
+                                <th className="text-right">Received</th>
+                                <th className="text-right">Diff</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y">

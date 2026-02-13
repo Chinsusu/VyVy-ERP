@@ -229,7 +229,7 @@ export default function MRDetailPage() {
                                 <Package className="w-5 h-5 text-primary-600" />
                                 Requested Materials
                             </h3>
-                            <div className="overflow-x-auto">
+                            <div className="table-container">
                                 <table className="table">
                                     <thead>
                                         <tr>

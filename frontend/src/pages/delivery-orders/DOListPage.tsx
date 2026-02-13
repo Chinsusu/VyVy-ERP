@@ -54,8 +54,8 @@ export default function DOListPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Delivery Orders</h1>
-                        <p className="text-gray-600 mt-1">Manage finished product shipments to customers</p>
+                        <h1 className="text-slate-900">Delivery Orders</h1>
+                        <p className="text-slate-500 mt-1 text-premium-sm">Manage finished product shipments to customers</p>
                     </div>
                     <Link to="/delivery-orders/create" className="btn btn-primary flex items-center gap-2">
                         <Plus className="w-5 h-5" />
@@ -144,7 +144,7 @@ export default function DOListPage() {
                 </div>
 
                 {/* Table */}
-                <div className="card overflow-hidden">
+                <div className="table-container">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-64">
                             <div className="text-gray-500">Loading delivery orders...</div>

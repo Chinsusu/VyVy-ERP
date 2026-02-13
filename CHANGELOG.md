@@ -7,6 +7,14 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc13] - 2026-02-13
+
+### Fixed
+- **Table Card Background Consistency**: Wrapped bare `table-container` divs in `card shadow-md` wrappers on 7 pages (Materials, Suppliers, Purchase Orders, Sales Channels, Carriers, Inventory Transfers, Stock Movement Report) to match the standard white-card-with-shadow layout used by Finished Products and other correctly styled pages.
+- **Page Wrapper Normalization**: Changed root wrapper from `space-y-6` to `animate-fade-in` on CarrierListPage, and from `p-6` to `animate-fade-in` on StockMovementReportPage to eliminate double padding and ensure consistent page animations.
+
+---
+
 ## [1.0.0-rc12] - 2026-02-13
 
 ### Fixed

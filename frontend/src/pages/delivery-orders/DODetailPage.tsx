@@ -104,7 +104,7 @@ export default function DODetailPage() {
                         </Link>
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <h1 className="text-3xl font-bold text-gray-900">{doData.do_number}</h1>
+                                <h1 className="text-slate-900">{doData.do_number}</h1>
                                 {getStatusBadge(doData.status)}
                             </div>
                             <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -243,7 +243,7 @@ export default function DODetailPage() {
                                 <Package className="w-5 h-5 text-primary-600" />
                                 Order Items
                             </h3>
-                            <div className="overflow-x-auto">
+                            <div className="table-container">
                                 <table className="table">
                                     <thead>
                                         <tr>
@@ -300,7 +300,7 @@ export default function DODetailPage() {
                                             <Truck className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-green-800 text-lg">Shipped</p>
+                                            <p className="font-bold text-green-800 text-premium-lg">Shipped</p>
                                             <p className="text-xs text-green-600 mt-1 leading-relaxed">
                                                 Order has been picked and dispatched. Stock balance has been updated.
                                             </p>
@@ -312,7 +312,7 @@ export default function DODetailPage() {
                                             <Clock className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-orange-800 text-lg">Pending Shipment</p>
+                                            <p className="font-bold text-orange-800 text-premium-lg">Pending Shipment</p>
                                             <p className="text-xs text-orange-600 mt-1 leading-relaxed">
                                                 Items are currently being picked. Ship order to finalize transaction.
                                             </p>

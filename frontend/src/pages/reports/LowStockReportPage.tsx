@@ -51,8 +51,8 @@ export default function LowStockReportPage() {
                         <ArrowLeft className="w-5 h-5 text-gray-500" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Low Stock Report</h1>
-                        <p className="text-gray-500">Items currently below their defined reorder point</p>
+                        <h1 className="text-slate-900">Low Stock Report</h1>
+                        <p className="text-slate-500 text-premium-sm">Items currently below their defined reorder point</p>
                     </div>
                 </div>
                 <button

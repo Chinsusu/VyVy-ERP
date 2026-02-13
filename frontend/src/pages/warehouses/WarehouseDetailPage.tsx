@@ -315,7 +315,7 @@ export default function WarehouseDetailPage() {
 
                     {/* Locations Table */}
                     {locations && locations.length > 0 ? (
-                        <div className="overflow-x-auto">
+                        <div className="table-container">
                             <table className="table">
                                 <thead>
                                     <tr>

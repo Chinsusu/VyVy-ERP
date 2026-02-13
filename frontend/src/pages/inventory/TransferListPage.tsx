@@ -1,18 +1,14 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTransfers } from '../../hooks/useInventory';
-import { useAuthStore } from '../../stores/authStore';
 import {
     Plus, Search, Filter, ChevronLeft, ChevronRight,
-    ArrowRightLeft, Clock, CheckCircle2, XCircle, MoreVertical,
-    LogOut, User, Home
+    ArrowRightLeft, Clock, CheckCircle2, XCircle, MoreVertical
 } from 'lucide-react';
 import { format } from 'date-fns';
 import type { StockTransfer } from '../../types/inventory';
 
 export default function TransferListPage() {
-    const navigate = useNavigate();
-    const { user, logout } = useAuthStore();
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
 
@@ -21,10 +17,7 @@ export default function TransferListPage() {
         limit: pageSize,
     });
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -43,145 +36,120 @@ export default function TransferListPage() {
 
     return (
         <div className="animate-fade-in text-slate-900">
-            <nav className="bg-white shadow-sm border-b border-gray-200">
-                <div className=" px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center gap-4">
-                            <Link to="/dashboard" className="text-gray-500 hover:text-primary-600 transition-colors">
-                                <Home className="w-5 h-5" />
-                            </Link>
-                            <h1 className="text-xl font-bold text-primary-600">Inventory & Stock</h1>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <User className="w-5 h-5 text-gray-500" />
-                                <div className="text-sm hidden sm:block">
-                                    <p className="font-medium text-gray-900">{user?.full_name}</p>
-                                </div>
-                            </div>
-                            <button onClick={handleLogout} className="btn-outline py-1.5">
-                                <LogOut className="w-4 h-4" />
-                                <span className="hidden sm:inline">Logout</span>
-                            </button>
-                        </div>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Stock Transfers</h2>
+                    <p className="text-gray-600">Move inventory between warehouses</p>
+                </div>
+                <div className="flex gap-3">
+                    <Link to="/inventory/adjustments" className="btn-outline">
+                        Adjustments
+                    </Link>
+                    <Link to="/inventory/transfers/new" className="btn-primary">
+                        <Plus className="w-4 h-4" />
+                        New Transfer
+                    </Link>
+                </div>
+            </div>
+
+            <div className="card mb-6">
+                <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-4 justify-between">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search transfer #..."
+                            className="input pl-10 w-full"
+                        />
+                    </div>
+                    <div className="flex gap-2">
+                        <button className="btn-outline">
+                            <Filter className="w-4 h-4" />
+                            Filters
+                        </button>
                     </div>
                 </div>
-            </nav>
+            </div>
 
-            <main className=" px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Stock Transfers</h2>
-                        <p className="text-gray-600">Move inventory between warehouses</p>
-                    </div>
-                    <div className="flex gap-3">
-                        <Link to="/inventory/adjustments" className="btn-outline">
-                            Adjustments
-                        </Link>
-                        <Link to="/inventory/transfers/new" className="btn-primary">
-                            <Plus className="w-4 h-4" />
-                            New Transfer
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="card mb-6">
-                    <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-4 justify-between">
-                        <div className="relative flex-1 max-w-md">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Search transfer #..."
-                                className="input pl-10 w-full"
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <button className="btn-outline">
-                                <Filter className="w-4 h-4" />
-                                Filters
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
+            <div className="card shadow-md">
+                <div className="table-container">
+                    <table className="w-full">
+                        <thead>
+                            <tr>
+                                <th>Transfer Number</th>
+                                <th>Date</th>
+                                <th>From → To</th>
+                                <th>Status</th>
+                                <th className="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {isLoading ? (
                                 <tr>
-                                    <th className="px-6 py-4">Transfer Number</th>
-                                    <th className="px-6 py-4">Date</th>
-                                    <th className="px-6 py-4">From → To</th>
-                                    <th className="px-6 py-4">Status</th>
-                                    <th className="px-6 py-4 text-right">Actions</th>
+                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading transfers...</td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {isLoading ? (
-                                    <tr>
-                                        <td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading transfers...</td>
+                            ) : data?.data?.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">No transfers found.</td>
+                                </tr>
+                            ) : (
+                                data?.data.map((st: StockTransfer) => (
+                                    <tr key={st.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <Link to={`/inventory/transfers/${st.id}`} className="font-semibold text-primary-600 hover:underline">
+                                                {st.transfer_number}
+                                            </Link>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm whitespace-nowrap">
+                                            {format(new Date(st.transfer_date), 'MMM dd, yyyy')}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-medium">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-gray-900">{st.from_warehouse_name}</span>
+                                                <ArrowRightLeft className="w-3 h-3 text-gray-400" />
+                                                <span className="text-gray-900">{st.to_warehouse_name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {getStatusBadge(st.status)}
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button className="p-1 hover:bg-gray-200 rounded-full transition-colors">
+                                                <MoreVertical className="w-5 h-5 text-gray-400" />
+                                            </button>
+                                        </td>
                                     </tr>
-                                ) : data?.data?.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={5} className="px-6 py-8 text-center text-gray-500">No transfers found.</td>
-                                    </tr>
-                                ) : (
-                                    data?.data.map((st: StockTransfer) => (
-                                        <tr key={st.id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <Link to={`/inventory/transfers/${st.id}`} className="font-semibold text-primary-600 hover:underline">
-                                                    {st.transfer_number}
-                                                </Link>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm whitespace-nowrap">
-                                                {format(new Date(st.transfer_date), 'MMM dd, yyyy')}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm font-medium">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-gray-900">{st.from_warehouse_name}</span>
-                                                    <ArrowRightLeft className="w-3 h-3 text-gray-400" />
-                                                    <span className="text-gray-900">{st.to_warehouse_name}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                {getStatusBadge(st.status)}
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <button className="p-1 hover:bg-gray-200 rounded-full transition-colors">
-                                                    <MoreVertical className="w-5 h-5 text-gray-400" />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    {data && data.total > pageSize && (
-                        <div className="p-4 border-t border-gray-100 flex items-center justify-between">
-                            <p className="text-sm text-gray-500">
-                                Showing <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> to <span className="font-medium">{Math.min(currentPage * pageSize, data.total)}</span> of <span className="font-medium">{data.total}</span> results
-                            </p>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                    disabled={currentPage === 1}
-                                    className="p-1.5 border border-gray-200 rounded-md disabled:opacity-50"
-                                >
-                                    <ChevronLeft className="w-5 h-5" />
-                                </button>
-                                <button
-                                    onClick={() => setCurrentPage(prev => prev + 1)}
-                                    disabled={currentPage * pageSize >= data.total}
-                                    className="p-1.5 border border-gray-200 rounded-md disabled:opacity-50"
-                                >
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-            </main>
+            </div>
+
+            {/* Pagination */}
+            {data && data.total > pageSize && (
+                <div className="p-4 border-t border-gray-100 flex items-center justify-between">
+                    <p className="text-sm text-gray-500">
+                        Showing <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> to <span className="font-medium">{Math.min(currentPage * pageSize, data.total)}</span> of <span className="font-medium">{data.total}</span> results
+                    </p>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            disabled={currentPage === 1}
+                            className="p-1.5 border border-gray-200 rounded-md disabled:opacity-50"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(prev => prev + 1)}
+                            disabled={currentPage * pageSize >= data.total}
+                            className="p-1.5 border border-gray-200 rounded-md disabled:opacity-50"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

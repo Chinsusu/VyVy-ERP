@@ -128,7 +128,7 @@ export default function GrnDetailPage() {
                             Back to List
                         </Link>
                         <div className="flex items-center gap-4">
-                            <h1 className="text-3xl font-bold text-gray-900">{grn.grn_number}</h1>
+                            <h1 className="text-slate-900">{grn.grn_number}</h1>
                             <div className="flex gap-2">
                                 {getQCStatusBadge(grn.overall_qc_status || 'pending')}
                                 {grn.posted ? (
@@ -206,7 +206,7 @@ export default function GrnDetailPage() {
                             <div className="table-container">
                                 <table className="w-full">
                                     <thead>
-                                        <tr className="bg-white border-b text-[11px] uppercase text-gray-500 font-bold">
+                                        <tr className="bg-white border-b text-premium-3xs uppercase text-gray-500 font-bold">
                                             <th className="px-4 py-3 text-left">Material</th>
                                             <th className="px-4 py-3 text-right">Received</th>
                                             <th className="px-4 py-3 text-right">Accepted</th>

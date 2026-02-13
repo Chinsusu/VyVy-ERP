@@ -200,7 +200,7 @@ export default function ReturnOrderDetailPage() {
             </div>
 
             {/* Items table */}
-            <div className="card overflow-hidden">
+            <div className="table-container">
                 <div className="p-4 border-b border-slate-200">
                     <h3 className="font-semibold text-slate-800 flex items-center gap-2">
                         <Package className="w-5 h-5 text-slate-400" />
@@ -209,15 +209,15 @@ export default function ReturnOrderDetailPage() {
                 </div>
                 <table className="w-full">
                     <thead>
-                        <tr className="bg-slate-50 border-b">
-                            <th className="text-left p-3 text-sm font-semibold text-slate-600">Sản phẩm</th>
-                            <th className="text-right p-3 text-sm font-semibold text-slate-600">SL hoàn</th>
-                            <th className="text-right p-3 text-sm font-semibold text-slate-600">Nhập kho</th>
-                            <th className="text-right p-3 text-sm font-semibold text-slate-600">Thanh lý</th>
-                            <th className="text-left p-3 text-sm font-semibold text-slate-600">Tình trạng</th>
-                            <th className="text-left p-3 text-sm font-semibold text-slate-600">Kho</th>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th className="text-right">SL hoàn</th>
+                            <th className="text-right">Nhập kho</th>
+                            <th className="text-right">Thanh lý</th>
+                            <th>Tình trạng</th>
+                            <th>Kho</th>
                             {(ro.status === 'receiving' || ro.status === 'inspecting') && (
-                                <th className="text-center p-3 text-sm font-semibold text-slate-600">Kiểm tra</th>
+                                <th className="text-center">Kiểm tra</th>
                             )}
                         </tr>
                     </thead>
