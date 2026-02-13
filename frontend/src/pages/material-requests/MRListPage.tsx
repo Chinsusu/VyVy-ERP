@@ -131,43 +131,53 @@ export default function MRListPage() {
                         </div>
                     ) : (
                         <>
-                            <div className="overflow-x-auto">
-                                <table className="table">
+                            <div className="table-container">
+                                <table>
                                     <thead>
                                         <tr>
-                                            <th>MR Number</th>
+                                            <th className="w-32">MR Number</th>
                                             <th>Department</th>
                                             <th>Warehouse</th>
-                                            <th>Request Date</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
+                                            <th className="w-32">Request Date</th>
+                                            <th className="w-24">Status</th>
+                                            <th className="text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {materialRequests.map((mr: MaterialRequest) => (
                                             <tr key={mr.id}>
-                                                <td className="font-medium">
+                                                <td className="font-mono font-semibold text-primary">
                                                     <div className="flex items-center gap-2">
-                                                        <FileText className="w-4 h-4 text-gray-400" />
+                                                        <FileText className="w-4 h-4 opacity-50" />
                                                         {mr.mr_number}
                                                     </div>
                                                 </td>
-                                                <td>{mr.department}</td>
-                                                <td>{mr.warehouse?.name || '-'}</td>
-                                                <td>{new Date(mr.request_date).toLocaleDateString('vi-VN')}</td>
+                                                <td>
+                                                    <div className="max-w-[200px] truncate" title={mr.department}>
+                                                        {mr.department}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="max-w-[150px] truncate" title={mr.warehouse?.name}>
+                                                        {mr.warehouse?.name || <span className="text-gray-400">-</span>}
+                                                    </div>
+                                                </td>
+                                                <td className="text-gray-600">
+                                                    {new Date(mr.request_date).toLocaleDateString('vi-VN')}
+                                                </td>
                                                 <td>{getStatusBadge(mr.status)}</td>
                                                 <td>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex justify-end gap-3">
                                                         <Link
                                                             to={`/material-requests/${mr.id}`}
-                                                            className="text-primary-600 hover:underline text-sm font-medium"
+                                                            className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
                                                             View
                                                         </Link>
                                                         {mr.status === 'draft' && (
                                                             <Link
                                                                 to={`/material-requests/${mr.id}/edit`}
-                                                                className="text-primary-600 hover:underline text-sm font-medium"
+                                                                className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                             >
                                                                 Edit
                                                             </Link>

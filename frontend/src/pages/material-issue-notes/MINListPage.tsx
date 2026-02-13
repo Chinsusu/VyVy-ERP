@@ -114,42 +114,55 @@ export default function MINListPage() {
                         </div>
                     ) : (
                         <>
-                            <div className="overflow-x-auto">
-                                <table className="table">
+                            <div className="table-container">
+                                <table>
                                     <thead>
                                         <tr>
-                                            <th>MIN Number</th>
+                                            <th className="w-40">MIN Number</th>
                                             <th>Linked MR</th>
                                             <th>Warehouse</th>
-                                            <th>Issue Date</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
+                                            <th className="w-32">Issue Date</th>
+                                            <th className="w-24">Status</th>
+                                            <th className="text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {issueNotes.map((min: MaterialIssueNote) => (
                                             <tr key={min.id}>
-                                                <td className="font-medium">
+                                                <td className="font-mono font-semibold text-primary">
                                                     <div className="flex items-center gap-2">
-                                                        <ClipboardList className="w-4 h-4 text-gray-400" />
+                                                        <ClipboardList className="w-4 h-4 opacity-50" />
                                                         {min.min_number}
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <Link to={`/material-requests/${min.material_request_id}`} className="text-primary-600 hover:underline">
-                                                        {min.material_request?.mr_number || `#${min.material_request_id}`}
+                                                    <Link
+                                                        to={`/material-requests/${min.material_request_id}`}
+                                                        className="text-primary hover:text-primary-dark font-medium transition-colors"
+                                                    >
+                                                        <div className="max-w-[150px] truncate" title={min.material_request?.mr_number}>
+                                                            {min.material_request?.mr_number || `#${min.material_request_id}`}
+                                                        </div>
                                                     </Link>
                                                 </td>
-                                                <td>{min.warehouse?.name || '-'}</td>
-                                                <td>{new Date(min.issue_date).toLocaleDateString('vi-VN')}</td>
+                                                <td>
+                                                    <div className="max-w-[150px] truncate" title={min.warehouse?.name}>
+                                                        {min.warehouse?.name || <span className="text-gray-400">-</span>}
+                                                    </div>
+                                                </td>
+                                                <td className="text-gray-600">
+                                                    {new Date(min.issue_date).toLocaleDateString('vi-VN')}
+                                                </td>
                                                 <td>{getStatusBadge(min.status)}</td>
                                                 <td>
-                                                    <Link
-                                                        to={`/material-issue-notes/${min.id}`}
-                                                        className="text-primary-600 hover:underline text-sm font-medium"
-                                                    >
-                                                        View Details
-                                                    </Link>
+                                                    <div className="flex justify-end">
+                                                        <Link
+                                                            to={`/material-issue-notes/${min.id}`}
+                                                            className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
+                                                        >
+                                                            View Details
+                                                        </Link>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
