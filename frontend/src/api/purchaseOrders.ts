@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../lib/axios';
 import type {
     PurchaseOrder,
     CreatePurchaseOrderInput,
@@ -7,62 +7,45 @@ import type {
     PurchaseOrderListResponse,
 } from '../types/purchaseOrder';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
-
-const getAuthHeader = () => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
 export const purchaseOrdersAPI = {
     // Get all purchase orders with optional filters
     getPurchaseOrders: async (filters?: PurchaseOrderFilters): Promise<PurchaseOrderListResponse> => {
-        const response = await axios.get(`${API_BASE_URL}/purchase-orders`, { params: filters });
+        const response = await axios.get('/purchase-orders', { params: filters });
         return response.data;
     },
 
     // Get purchase order by ID
     getPurchaseOrderById: async (id: number): Promise<PurchaseOrder> => {
-        const response = await axios.get(`${API_BASE_URL}/purchase-orders/${id}`);
+        const response = await axios.get(`/purchase-orders/${id}`);
         return response.data.data;
     },
 
     // Create new purchase order
     createPurchaseOrder: async (input: CreatePurchaseOrderInput): Promise<PurchaseOrder> => {
-        const response = await axios.post(`${API_BASE_URL}/purchase-orders`, input, {
-            headers: getAuthHeader(),
-        });
+        const response = await axios.post('/purchase-orders', input);
         return response.data.data;
     },
 
     // Update purchase order (only draft)
     updatePurchaseOrder: async (id: number, input: UpdatePurchaseOrderInput): Promise<PurchaseOrder> => {
-        const response = await axios.put(`${API_BASE_URL}/purchase-orders/${id}`, input, {
-            headers: getAuthHeader(),
-        });
+        const response = await axios.put(`/purchase-orders/${id}`, input);
         return response.data.data;
     },
 
     // Delete purchase order (only draft)
     deletePurchaseOrder: async (id: number): Promise<void> => {
-        await axios.delete(`${API_BASE_URL}/purchase-orders/${id}`, {
-            headers: getAuthHeader(),
-        });
+        await axios.delete(`/purchase-orders/${id}`);
     },
 
     // Approve purchase order (draft → approved)
     approvePurchaseOrder: async (id: number): Promise<PurchaseOrder> => {
-        const response = await axios.post(`${API_BASE_URL}/purchase-orders/${id}/approve`, {}, {
-            headers: getAuthHeader(),
-        });
+        const response = await axios.post(`/purchase-orders/${id}/approve`, {});
         return response.data.data;
     },
 
     // Cancel purchase order
     cancelPurchaseOrder: async (id: number): Promise<PurchaseOrder> => {
-        const response = await axios.post(`${API_BASE_URL}/purchase-orders/${id}/cancel`, {}, {
-            headers: getAuthHeader(),
-        });
+        const response = await axios.post(`/purchase-orders/${id}/cancel`, {});
         return response.data.data;
     },
 };
