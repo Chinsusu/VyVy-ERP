@@ -71,10 +71,13 @@ export default function WarehouseListPage() {
                 </div>
 
                 {/* Table */}
-                <div className="card overflow-hidden">
+                <div className="card shadow-md">
                     {isLoading ? (
                         <div className="flex items-center justify-center py-12">
-                            <div className="text-gray-500">Loading warehouses...</div>
+                            <div className="text-gray-500 flex items-center gap-2">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                                Loading warehouses...
+                            </div>
                         </div>
                     ) : warehouses.length === 0 ? (
                         <div className="text-center py-12">
@@ -86,30 +89,34 @@ export default function WarehouseListPage() {
                         </div>
                     ) : (
                         <>
-                            <div className="overflow-x-auto">
-                                <table className="table">
+                            <div className="table-container">
+                                <table>
                                     <thead>
                                         <tr>
-                                            <th>Code</th>
-                                            <th>Name</th>
+                                            <th className="w-32">Code</th>
+                                            <th className="min-w-[180px]">Name</th>
                                             <th>Type</th>
                                             <th>City</th>
                                             <th>Locations</th>
                                             <th>Status</th>
-                                            <th>Actions</th>
+                                            <th className="text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {warehouses.map((warehouse) => (
                                             <tr key={warehouse.id}>
-                                                <td className="font-mono font-semibold">{warehouse.code}</td>
-                                                <td>{warehouse.name}</td>
+                                                <td className="font-mono font-semibold text-primary">{warehouse.code}</td>
+                                                <td>
+                                                    <div className="max-w-[250px] truncate font-medium text-gray-900" title={warehouse.name}>
+                                                        {warehouse.name}
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <span className="badge badge-secondary capitalize">
                                                         {warehouse.warehouse_type}
                                                     </span>
                                                 </td>
-                                                <td>{warehouse.city || '-'}</td>
+                                                <td>{warehouse.city || <span className="text-gray-400">-</span>}</td>
                                                 <td>
                                                     <span className="badge badge-info">
                                                         {warehouse.locations_count || 0} locations
@@ -123,16 +130,16 @@ export default function WarehouseListPage() {
                                                     )}
                                                 </td>
                                                 <td>
-                                                    <div className="flex gap-2">
+                                                    <div className="flex justify-end gap-3">
                                                         <Link
                                                             to={`/warehouses/${warehouse.id}`}
-                                                            className="text-primary hover:underline text-sm"
+                                                            className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
                                                             View
                                                         </Link>
                                                         <Link
                                                             to={`/warehouses/${warehouse.id}/edit`}
-                                                            className="text-primary hover:underline text-sm"
+                                                            className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
                                                             Edit
                                                         </Link>
