@@ -168,37 +168,49 @@ export default function GrnListPage() {
                         </div>
                     ) : (
                         <>
-                            <div className="overflow-x-auto">
-                                <table className="table">
+                            <div className="table-container">
+                                <table>
                                     <thead>
                                         <tr>
-                                            <th>GRN Number</th>
-                                            <th>PO Number</th>
+                                            <th className="w-32">GRN Number</th>
+                                            <th className="w-32">PO Number</th>
                                             <th>Warehouse</th>
-                                            <th>Receipt Date</th>
-                                            <th>QC Status</th>
-                                            <th>Inventory Status</th>
-                                            <th>Actions</th>
+                                            <th className="w-32">Receipt Date</th>
+                                            <th className="w-32">QC Status</th>
+                                            <th className="w-36">Inventory Status</th>
+                                            <th className="text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {grns.map((grn) => (
                                             <tr key={grn.id}>
-                                                <td className="font-medium whitespace-nowrap text-primary">
-                                                    <Link to={`/grns/${grn.id}`}>{grn.grn_number}</Link>
+                                                <td className="font-mono font-semibold text-primary">
+                                                    <Link to={`/grns/${grn.id}`} className="hover:underline">
+                                                        {grn.grn_number}
+                                                    </Link>
                                                 </td>
-                                                <td>{grn.purchase_order?.po_number || '-'}</td>
-                                                <td>{grn.warehouse?.name || '-'}</td>
-                                                <td>{new Date(grn.receipt_date).toLocaleDateString('vi-VN')}</td>
+                                                <td className="font-mono text-gray-600">
+                                                    {grn.purchase_order?.po_number || <span className="text-gray-400">-</span>}
+                                                </td>
+                                                <td>
+                                                    <div className="max-w-[200px] truncate" title={grn.warehouse?.name}>
+                                                        {grn.warehouse?.name || <span className="text-gray-400">-</span>}
+                                                    </div>
+                                                </td>
+                                                <td className="text-gray-600">
+                                                    {new Date(grn.receipt_date).toLocaleDateString('vi-VN')}
+                                                </td>
                                                 <td>{getQCStatusBadge(grn.overall_qc_status)}</td>
                                                 <td>{getPostingStatusBadge(grn.posted)}</td>
                                                 <td>
-                                                    <Link
-                                                        to={`/grns/${grn.id}`}
-                                                        className="btn btn-sm btn-ghost text-primary"
-                                                    >
-                                                        Details
-                                                    </Link>
+                                                    <div className="flex justify-end">
+                                                        <Link
+                                                            to={`/grns/${grn.id}`}
+                                                            className="text-primary hover:bg-primary-50 px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+                                                        >
+                                                            Details
+                                                        </Link>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
