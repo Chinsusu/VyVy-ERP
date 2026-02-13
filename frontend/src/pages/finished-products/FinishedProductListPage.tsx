@@ -71,10 +71,13 @@ export default function FinishedProductListPage() {
                 </div>
 
                 {/* Table */}
-                <div className="card overflow-hidden">
+                <div className="card shadow-md">
                     {isLoading ? (
                         <div className="flex items-center justify-center py-12">
-                            <div className="text-gray-500">Loading finished products...</div>
+                            <div className="text-gray-500 flex items-center gap-2">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                                Loading finished products...
+                            </div>
                         </div>
                     ) : products.length === 0 ? (
                         <div className="text-center py-12">
@@ -86,37 +89,41 @@ export default function FinishedProductListPage() {
                         </div>
                     ) : (
                         <>
-                            <div className="overflow-x-auto">
-                                <table className="table">
+                            <div className="table-container">
+                                <table>
                                     <thead>
                                         <tr>
-                                            <th>Code</th>
-                                            <th>Name</th>
+                                            <th className="w-32">Code</th>
+                                            <th className="min-w-[200px]">Name</th>
                                             <th>Category</th>
                                             <th>Unit</th>
                                             <th>Price</th>
                                             <th>Status</th>
-                                            <th>Actions</th>
+                                            <th className="text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {products.map((product) => (
                                             <tr key={product.id}>
-                                                <td className="font-mono font-semibold">{product.code}</td>
-                                                <td>{product.name}</td>
+                                                <td className="font-mono font-semibold text-primary">{product.code}</td>
+                                                <td>
+                                                    <div className="max-w-[300px] truncate font-medium text-gray-900" title={product.name}>
+                                                        {product.name}
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     {product.category ? (
                                                         <span className="badge badge-secondary">{product.category}</span>
                                                     ) : (
-                                                        '-'
+                                                        <span className="text-gray-400">-</span>
                                                     )}
                                                 </td>
                                                 <td>{product.unit}</td>
-                                                <td>
+                                                <td className="font-medium">
                                                     {product.selling_price ? (
                                                         `${product.selling_price.toLocaleString('vi-VN')} VND`
                                                     ) : (
-                                                        '-'
+                                                        <span className="text-gray-400">-</span>
                                                     )}
                                                 </td>
                                                 <td>
@@ -127,16 +134,16 @@ export default function FinishedProductListPage() {
                                                     )}
                                                 </td>
                                                 <td>
-                                                    <div className="flex gap-2">
+                                                    <div className="flex justify-end gap-3">
                                                         <Link
                                                             to={`/finished-products/${product.id}`}
-                                                            className="text-primary hover:underline text-sm"
+                                                            className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
                                                             View
                                                         </Link>
                                                         <Link
                                                             to={`/finished-products/${product.id}/edit`}
-                                                            className="text-primary hover:underline text-sm"
+                                                            className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
                                                             Edit
                                                         </Link>
