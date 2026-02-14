@@ -7,6 +7,18 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc14] - 2026-02-14
+
+### Added
+- **Cloudflare Tunnel Integration**: Successfully exposed the VyVy-ERP system to the public internet via `https://erp.eaktur.com`.
+- **Host Mode Networking**: Implemented `network_mode: host` for the tunnel connector to ensure high-performance, direct routing to the Nginx origin on port 3000, bypassing Docker bridge network latency and DNS issues.
+
+### Fixed
+- **502 Bad Gateway Resolution**: Resolved persistent Cloudflare Edge connection errors by implementing a direct `localhost:3000` mapping and clearing stale routing state in the Cloudflare Dashboard.
+- **ISP/Firewall Compatibility**: Optimized tunnel transport using the HTTP2 protocol to bypass UDP/QUIC blocking in restrictive network environments.
+
+---
+
 ## [1.0.0-rc13] - 2026-02-13
 
 ### Fixed
