@@ -58,6 +58,10 @@ ON CONFLICT (code) DO UPDATE SET
 -- 2. WAREHOUSES (Kho hàng) - from File 2 & 4 THIẾT LẬP
 -- ============================================================
 INSERT INTO warehouses (code, name, warehouse_type, address, city, is_active) VALUES
+-- 2 placeholder records to offset IDs (server cũ đã có 2 records trước khi seed)
+('_PLACEHOLDER_1', 'Placeholder 1', 'main', NULL, NULL, false),
+('_PLACEHOLDER_2', 'Placeholder 2', 'main', NULL, NULL, false),
+-- Real warehouses: KHO_TONG=3, LAB=4, KHO_MY=5, TAMI=6, CHEMLINK=7, M_HOA=8, LYONA=9, N_TRAC=10
 ('KHO_TONG', 'CÔNG TY TNHH AQUARIUS COSMETICS - VYVY HAIR CARE', 'main', '187 Bành Văn Trân, Phường 7, Tân Bình, Thành Phố Hồ Chí Minh, Việt Nam', 'Hồ Chí Minh', true),
 ('LAB', 'KHO PHÒNG LAB', 'production', '187 Bành Văn Trân, Phường 7, Tân Bình, Thành Phố Hồ Chí Minh, Việt Nam', 'Hồ Chí Minh', true),
 ('KHO_MY', 'KHO THUÊ NGOÀI', 'external', NULL, NULL, true),

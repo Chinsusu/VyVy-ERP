@@ -65,12 +65,12 @@ services:
     networks:
       - vyvy-network
 
-  # Cloudflare Tunnel
+  # Cloudflare Tunnel (dashboard config: localhost:3000 → host port 3000 = frontend nginx)
   tunnel:
     image: cloudflare/cloudflared:latest
     container_name: vyvy_tunnel
     network_mode: host
-    command: tunnel --no-autoupdate run --token eyJhIjoiOWY3MTUwMDA0OTJlYWVjZTEzMzFhMTU5M2IwMTAwNWUiLCJ0IjoiNWU5ZGZlY2ItMzhjMS00YzhhLWEyYjEtMTI3YzQ1Y2UxMDkyIiwicyI6IllXTXdaakUzTVRFdFpUaGhZeTAwWm1OaExXSTRNMk10TkRaa05tWmxObUUxWXpjMSJ9
+    command: tunnel --no-autoupdate run --token eyJhIjoiOWY3MTUwMDA0OTJlYWVjZTEzMzFhMTU5M2IwMTAwNWUiLCJ0IjoiZjllZjBmNjktZDgyOC00OGU3LWJiZjktZDQ4OWQyZDI3YTZkIiwicyI6Ik1ESTROalE1WkRndFlXSXdNUzAwWlRSaUxXRXhZVGN0TXpZMVpUQXlZV0k1T0dJMyJ9
     depends_on:
       - frontend
     restart: always

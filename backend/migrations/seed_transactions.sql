@@ -13,77 +13,92 @@
 
 -- PO-001: Mua Acid Citric + Acid Lactic từ HOA MAI (01/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000001', 5, 3, '2025-01-08', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 3500000, 350000, 3850000, 10, 'Mua Acid Citric 25kg + Acid Lactic 5kg', 1, '2025-01-08', '2025-01-15')
+SELECT 'PO-2025-000001', s.id, w.id,  '2025-01-08', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 3500000, 350000, 3850000, 10, 'Mua Acid Citric 25kg + Acid Lactic 5kg', 1, '2025-01-08', '2025-01-15'
+FROM suppliers s, warehouses w WHERE s.code = 'HOA_MAI' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-002: Mua hương liệu từ BAHH (01/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000002', 6, 3, '2025-01-12', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 8400000, 0, 8400000, 0, 'Mua hương liệu Intense 2kg + Sexy 2kg + Vanbe 1kg', 1, '2025-01-12', '2025-01-20')
+SELECT 'PO-2025-000002', s.id, w.id,  '2025-01-12', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 8400000, 0, 8400000, 0, 'Mua hương liệu Intense 2kg + Sexy 2kg + Vanbe 1kg', 1, '2025-01-12', '2025-01-20'
+FROM suppliers s, warehouses w WHERE s.code = 'BAHH' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-003: Mua NVL từ GREEN (02/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000003', 3, 3, '2025-02-05', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 15200000, 1520000, 16720000, 10, 'Mua Allantoin 5kg + B3 10kg + BTAC 25kg', 1, '2025-02-05', '2025-02-18')
+SELECT 'PO-2025-000003', s.id, w.id,  '2025-02-05', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 15200000, 1520000, 16720000, 10, 'Mua Allantoin 5kg + B3 10kg + BTAC 25kg', 1, '2025-02-05', '2025-02-18'
+FROM suppliers s, warehouses w WHERE s.code = 'GREEN' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-004: Mua Emulsifier từ GREEN (03/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000004', 3, 3, '2025-03-10', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'pending', 22500000, 2250000, 24750000, 10, 'Mua Emulsifier GMS 50kg + Cetyl Alcohol 25kg + Cetearyl Alcohol 25kg', 1, '2025-03-10', '2025-03-25')
+SELECT 'PO-2025-000004', s.id, w.id,  '2025-03-10', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'pending', 22500000, 2250000, 24750000, 10, 'Mua Emulsifier GMS 50kg + Cetyl Alcohol 25kg + Cetearyl Alcohol 25kg', 1, '2025-03-10', '2025-03-25'
+FROM suppliers s, warehouses w WHERE s.code = 'GREEN' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-005: Mua bao bì từ MONGO (04/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000005', 17, 3, '2025-04-01', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 35000000, 3500000, 38500000, 10, 'Mua chai PET nâu 100ml x5000 + chai PET nâu 350ml x3000', 1, '2025-04-01', '2025-04-15')
+SELECT 'PO-2025-000005', s.id, w.id,  '2025-04-01', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 35000000, 3500000, 38500000, 10, 'Mua chai PET nâu 100ml x5000 + chai PET nâu 350ml x3000', 1, '2025-04-01', '2025-04-15'
+FROM suppliers s, warehouses w WHERE s.code = 'MONGO' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-006: Mua NVL từ Organic (05/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000006', 4, 3, '2025-05-15', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 12800000, 0, 12800000, 0, 'Mua dầu Argan 5kg + Coconut Oil 10kg + Shea Butter 5kg', 1, '2025-05-15', '2025-05-28')
+SELECT 'PO-2025-000006', s.id, w.id,  '2025-05-15', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 12800000, 0, 12800000, 0, 'Mua dầu Argan 5kg + Coconut Oil 10kg + Shea Butter 5kg', 1, '2025-05-15', '2025-05-28'
+FROM suppliers s, warehouses w WHERE s.code = 'ORGANIC' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-007: Mua gia công từ TAMI (06/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000007', 34, 6, '2025-06-01', 'completed', 'outsource', 'approved', 'ordered', 'received', 'paid', 'received', 45000000, 4500000, 49500000, 10, 'Gia công Dầu gội Retro Nano 350ml x1500 chai', 1, '2025-06-01', '2025-06-20')
+SELECT 'PO-2025-000007', s.id, w.id,  '2025-06-01', 'completed', 'outsource', 'approved', 'ordered', 'received', 'paid', 'received', 45000000, 4500000, 49500000, 10, 'Gia công Dầu gội Retro Nano 350ml x1500 chai', 1, '2025-06-01', '2025-06-20'
+FROM suppliers s, warehouses w WHERE s.code = 'TAMI' AND w.code = 'TAMI'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-008: Mua gia công từ M_HOA (07/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000008', 36, 8, '2025-07-10', 'completed', 'outsource', 'approved', 'ordered', 'received', 'paid', 'received', 32000000, 3200000, 35200000, 10, 'Gia công Kem body cream PMG 350g x1000 hủ', 1, '2025-07-10', '2025-07-28')
+SELECT 'PO-2025-000008', s.id, w.id,  '2025-07-10', 'completed', 'outsource', 'approved', 'ordered', 'received', 'paid', 'received', 32000000, 3200000, 35200000, 10, 'Gia công Kem body cream PMG 350g x1000 hủ', 1, '2025-07-10', '2025-07-28'
+FROM suppliers s, warehouses w WHERE s.code = 'M_HOA' AND w.code = 'M_HOA'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-009: Mua hương liệu đợt 2 từ BAHH (08/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000009', 6, 3, '2025-08-05', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 6300000, 0, 6300000, 0, 'Mua hương Cafe 1kg + Green Tea 1kg + Pink Grape 2kg', 1, '2025-08-05', '2025-08-15')
+SELECT 'PO-2025-000009', s.id, w.id,  '2025-08-05', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 6300000, 0, 6300000, 0, 'Mua hương Cafe 1kg + Green Tea 1kg + Pink Grape 2kg', 1, '2025-08-05', '2025-08-15'
+FROM suppliers s, warehouses w WHERE s.code = 'BAHH' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-010: Mua bao bì tem nhãn từ INNN (09/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000010', 19, 3, '2025-09-01', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 8500000, 850000, 9350000, 10, 'In tem nhãn các loại x10000 tờ', 1, '2025-09-01', '2025-09-12')
+SELECT 'PO-2025-000010', s.id, w.id,  '2025-09-01', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 8500000, 850000, 9350000, 10, 'In tem nhãn các loại x10000 tờ', 1, '2025-09-01', '2025-09-12'
+FROM suppliers s, warehouses w WHERE s.code = 'INNN' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-011: Mua NVL đợt lớn từ GREEN (10/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000011', 3, 3, '2025-10-01', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 28600000, 2860000, 31460000, 10, 'Mua CTAC 25kg + CX TX 10kg + B5 5kg + Keratin 2kg', 1, '2025-10-01', '2025-10-18')
+SELECT 'PO-2025-000011', s.id, w.id,  '2025-10-01', 'completed', 'material', 'approved', 'ordered', 'received', 'paid', 'received', 28600000, 2860000, 31460000, 10, 'Mua CTAC 25kg + CX TX 10kg + B5 5kg + Keratin 2kg', 1, '2025-10-01', '2025-10-18'
+FROM suppliers s, warehouses w WHERE s.code = 'GREEN' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-012: Mua gia công từ LYONA (11/2025)
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000012', 37, 9, '2025-11-01', 'completed', 'outsource', 'approved', 'ordered', 'received', 'paid', 'received', 38000000, 3800000, 41800000, 10, 'Gia công Sữa tắm Pure Body 500ml x1200 chai', 1, '2025-11-01', '2025-11-22')
+SELECT 'PO-2025-000012', s.id, w.id,  '2025-11-01', 'completed', 'outsource', 'approved', 'ordered', 'received', 'paid', 'received', 38000000, 3800000, 41800000, 10, 'Gia công Sữa tắm Pure Body 500ml x1200 chai', 1, '2025-11-01', '2025-11-22'
+FROM suppliers s, warehouses w WHERE s.code = 'LYONA' AND w.code = 'LYONA'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-013: Mua NVL cuối năm từ HOA MAI (12/2025) - đang xử lý
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000013', 5, 3, '2025-12-01', 'approved', 'material', 'approved', 'ordered', 'partial', 'pending', 'pending', 5200000, 520000, 5720000, 10, 'Mua Acid Citric 25kg + Tranexamic Acid 1kg', 1, '2025-12-01', '2025-12-10')
+SELECT 'PO-2025-000013', s.id, w.id,  '2025-12-01', 'approved', 'material', 'approved', 'ordered', 'partial', 'pending', 'pending', 5200000, 520000, 5720000, 10, 'Mua Acid Citric 25kg + Tranexamic Acid 1kg', 1, '2025-12-01', '2025-12-10'
+FROM suppliers s, warehouses w WHERE s.code = 'HOA_MAI' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-014: Mua bao bì từ WONDERLAND (12/2025) - đang xử lý
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000014', 18, 3, '2025-12-05', 'approved', 'material', 'approved', 'ordered', 'pending', 'pending', 'pending', 18000000, 1800000, 19800000, 10, 'Mua hộp giấy các loại x5000', 1, '2025-12-05', '2025-12-05')
+SELECT 'PO-2025-000014', s.id, w.id,  '2025-12-05', 'approved', 'material', 'approved', 'ordered', 'pending', 'pending', 'pending', 18000000, 1800000, 19800000, 10, 'Mua hộp giấy các loại x5000', 1, '2025-12-05', '2025-12-05'
+FROM suppliers s, warehouses w WHERE s.code = 'WONDERLAND' AND w.code = 'KHO_TONG'
 ON CONFLICT (po_number) DO NOTHING;
 
 -- PO-015: Mua gia công từ N_TRAC (12/2025) - chờ duyệt
 INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, order_date, status, po_type, approval_status, order_status, receipt_status, payment_status, invoice_status, subtotal, tax_amount, total_amount, vat_rate, description, created_by, created_at, updated_at)
-VALUES ('PO-2025-000015', 38, 10, '2025-12-10', 'draft', 'outsource', 'pending', 'pending', 'pending', 'pending', 'pending', 25000000, 2500000, 27500000, 10, 'Gia công Kem ủ tóc Recovery Mask 350g x800', 1, '2025-12-10', '2025-12-10')
+SELECT 'PO-2025-000015', s.id, w.id,  '2025-12-10', 'draft', 'outsource', 'pending', 'pending', 'pending', 'pending', 'pending', 25000000, 2500000, 27500000, 10, 'Gia công Kem ủ tóc Recovery Mask 350g x800', 1, '2025-12-10', '2025-12-10'
+FROM suppliers s, warehouses w WHERE s.code = 'N_TRAC' AND w.code = 'N_TRAC'
 ON CONFLICT (po_number) DO NOTHING;
 
 

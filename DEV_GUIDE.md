@@ -29,11 +29,12 @@ Browser → :3000 (Nginx Prod) ─proxy──→ :8080 (Backend API) → :5432 (
 
 ### Docker Containers
 
-| Container Name   | Image              | Network           | Dependencies    |
-|------------------|--------------------|-------------------|-----------------|
-| `vyvy_postgres`  | postgres:15-alpine | vyvy-erp_vyvy-network | —             |
-| `vyvy_backend`   | vyvy_erp_backend   | vyvy-erp_vyvy-network | postgres      |
-| `vyvy_frontend`  | vyvy_erp_frontend  | vyvy-erp_vyvy-network | backend       |
+| Container Name   | Image                     | Network               | Dependencies    |
+|------------------|---------------------------|----------------------|-----------------|
+| `vyvy_postgres`  | postgres:15-alpine        | vyvy-erp_vyvy-network | —               |
+| `vyvy_backend`   | vyvy_erp_backend          | vyvy-erp_vyvy-network | postgres        |
+| `vyvy_frontend`  | vyvy_erp_frontend         | vyvy-erp_vyvy-network | backend         |
+| `vyvy_tunnel`    | cloudflare/cloudflared    | host                  | frontend        |
 
 ---
 
@@ -63,7 +64,7 @@ cd frontend
 npm run dev
 
 # 3. Mở browser: http://localhost:5173
-# Login: admin / admin123
+# Login: admin@vyvy.com / password123
 ```
 
 ### Mode 2: Production (Docker Compose)
@@ -75,8 +76,11 @@ docker-compose build --no-cache
 # Start tất cả
 docker-compose up -d
 
-# Mở browser: http://localhost:3000
-# Login: admin / admin123
+# Tạo admin user (lần đầu deploy)
+docker exec -i vyvy_postgres psql -U postgres -d erp_warehouse < create_admin.sql
+
+# Mở browser: http://localhost:3000 hoặc https://erp.eaktur.com
+# Login: admin@vyvy.com / password123
 ```
 
 ### Khởi động lại backend (sau khi sửa code Go)

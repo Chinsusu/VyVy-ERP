@@ -7,6 +7,19 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc15] - 2026-02-23
+
+### Fixed
+- **Seed Data FK Violations**: Fixed `seed_transactions.sql` purchase orders — replaced hardcoded `supplier_id` and `warehouse_id` with subquery lookups by `code`. This ensures correct FK references regardless of database ID offsets.
+- **Seed Data ID Offset**: Added 2 placeholder warehouse records in `seed_data.sql` to align warehouse IDs with legacy data referenced by transaction seeds.
+- **Cloudflare Tunnel**: Replaced stale tunnel with new `VyVy-Warehouse` tunnel (`network_mode: host`, service → `http://localhost:3000`). Site accessible at `https://erp.eaktur.com`.
+
+### Changed
+- **Admin User Setup**: Admin user is no longer auto-seeded by SQL migrations. After first deploy, run: `docker exec -i vyvy_postgres psql -U postgres -d erp_warehouse < create_admin.sql` (credentials: `admin@vyvy.com` / `password123`).
+- **Docker Compose**: Updated tunnel service with new Cloudflare tunnel token and `restart: always` policy.
+
+---
+
 ## [1.0.0-rc14] - 2026-02-14
 
 ### Added
