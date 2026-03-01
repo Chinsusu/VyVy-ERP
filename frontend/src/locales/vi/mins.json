@@ -3,7 +3,7 @@
     "subtitle": "Quản lý phiếu xuất vật tư cho sản xuất",
     "addNew": "Tạo phiếu xuất",
     "createTitle": "Tạo phiếu xuất mới",
-    "createSubtitle": "Tạo phiếu xuất từ yêu cầu vật tư đã duyệt",
+    "createSubtitle": "Tạo phiếu xuất từ kế hoạch sản xuất đã duyệt",
     "detail": "Chi tiết phiếu xuất",
     "loadingList": "Đang tải phiếu xuất...",
     "errorLoading": "Lỗi tải phiếu xuất",

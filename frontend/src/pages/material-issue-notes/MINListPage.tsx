@@ -110,7 +110,7 @@ export default function MINListPage() {
                     ) : issueNotes.length === 0 ? (
                         <div className="text-center py-12">
                             <p className="text-gray-500 mb-4">No material issue notes found</p>
-                            <p className="text-sm text-gray-400">Create a MIN from an approved Material Request</p>
+                            <p className="text-sm text-gray-400">Tạo phiếu xuất kho từ kế hoạch sản xuất đã duyệt</p>
                         </div>
                     ) : (
                         <>

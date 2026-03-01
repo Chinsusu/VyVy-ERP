@@ -27,7 +27,7 @@ export default function FinishedProductListPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        Error loading finished products: {(error as Error).message}
+                        Lỗi tải danh sách thành phẩm: {(error as Error).message}
                     </div>
                 </div>
             </div>
@@ -43,13 +43,13 @@ export default function FinishedProductListPage() {
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
                                 <Package className="w-8 h-8 text-primary" />
-                                Finished Products
+                                Thành Phẩm
                             </h1>
-                            <p className="text-gray-600 mt-1">Manage finished products and inventory</p>
+                            <p className="text-gray-600 mt-1">Quản lý danh mục thành phẩm và tồn kho</p>
                         </div>
                         <Link to="/finished-products/new" className="btn btn-primary flex items-center gap-2">
                             <Plus className="w-5 h-5" />
-                            Add Product
+                            Thêm Sản Phẩm
                         </Link>
                     </div>
                 </div>
@@ -61,7 +61,7 @@ export default function FinishedProductListPage() {
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
                                 type="text"
-                                placeholder="Search by code, name, or barcode..."
+                                placeholder="Tìm theo mã, tên sản phẩm hoặc barcode..."
                                 className="input pl-10 w-full"
                                 value={filters.search || ''}
                                 onChange={handleSearch}
@@ -76,15 +76,15 @@ export default function FinishedProductListPage() {
                         <div className="flex items-center justify-center py-12">
                             <div className="text-gray-500 flex items-center gap-2">
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-                                Loading finished products...
+                                Đang tải dữ liệu...
                             </div>
                         </div>
                     ) : products.length === 0 ? (
                         <div className="text-center py-12">
                             <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-500">No finished products found</p>
+                            <p className="text-gray-500">Chưa có thành phẩm nào</p>
                             <Link to="/finished-products/new" className="btn btn-primary mt-4">
-                                Create First Product
+                                Tạo Sản Phẩm Đầu Tiên
                             </Link>
                         </div>
                     ) : (
@@ -93,13 +93,13 @@ export default function FinishedProductListPage() {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th className="w-32">Code</th>
-                                            <th className="min-w-[200px]">Name</th>
-                                            <th>Category</th>
-                                            <th>Unit</th>
-                                            <th>Price</th>
-                                            <th>Status</th>
-                                            <th className="text-right">Actions</th>
+                                            <th className="w-32">Mã SP</th>
+                                            <th className="min-w-[200px]">Tên Sản Phẩm</th>
+                                            <th>Danh Mục</th>
+                                            <th>ĐVT</th>
+                                            <th>Giá Bán</th>
+                                            <th>Trạng Thái</th>
+                                            <th className="text-right">Thao Tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -121,16 +121,16 @@ export default function FinishedProductListPage() {
                                                 <td>{product.unit}</td>
                                                 <td className="font-medium">
                                                     {product.selling_price ? (
-                                                        `${product.selling_price.toLocaleString('vi-VN')} VND`
+                                                        `${product.selling_price.toLocaleString('vi-VN')} VNĐ`
                                                     ) : (
                                                         <span className="text-gray-400">-</span>
                                                     )}
                                                 </td>
                                                 <td>
                                                     {product.is_active ? (
-                                                        <span className="badge badge-success">Active</span>
+                                                        <span className="badge badge-success">Đang dùng</span>
                                                     ) : (
-                                                        <span className="badge badge-secondary">Inactive</span>
+                                                        <span className="badge badge-secondary">Ngưng dùng</span>
                                                     )}
                                                 </td>
                                                 <td>
@@ -139,13 +139,13 @@ export default function FinishedProductListPage() {
                                                             to={`/finished-products/${product.id}`}
                                                             className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
-                                                            View
+                                                            Xem
                                                         </Link>
                                                         <Link
                                                             to={`/finished-products/${product.id}/edit`}
                                                             className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
-                                                            Edit
+                                                            Sửa
                                                         </Link>
                                                     </div>
                                                 </td>
@@ -159,9 +159,9 @@ export default function FinishedProductListPage() {
                             {pagination && pagination.total > 0 && (
                                 <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between">
                                     <div className="text-sm text-gray-700">
-                                        Showing {(pagination.page - 1) * pagination.page_size + 1} to{' '}
-                                        {Math.min(pagination.page * pagination.page_size, pagination.total)} of{' '}
-                                        {pagination.total} results
+                                        Hiển thị {(pagination.page - 1) * pagination.page_size + 1} –{' '}
+                                        {Math.min(pagination.page * pagination.page_size, pagination.total)} trong tổng số{' '}
+                                        {pagination.total} sản phẩm
                                     </div>
                                     <div className="flex gap-2">
                                         <button
@@ -170,14 +170,14 @@ export default function FinishedProductListPage() {
                                             className="btn btn-secondary btn-sm"
                                         >
                                             <ChevronLeft className="w-4 h-4" />
-                                            Previous
+                                            Trước
                                         </button>
                                         <button
                                             onClick={() => handlePageChange(pagination.page + 1)}
                                             disabled={pagination.page >= pagination.total_pages}
                                             className="btn btn-secondary btn-sm"
                                         >
-                                            Next
+                                            Sau
                                             <ChevronRight className="w-4 h-4" />
                                         </button>
                                     </div>

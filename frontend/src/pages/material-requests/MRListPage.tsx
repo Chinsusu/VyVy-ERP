@@ -17,15 +17,15 @@ export default function MRListPage() {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'draft':
-                return <span className="badge badge-secondary">Draft</span>;
+                return <span className="badge badge-secondary">Nháp</span>;
             case 'approved':
-                return <span className="badge badge-primary">Approved</span>;
+                return <span className="badge badge-primary">Đã duyệt</span>;
             case 'issued':
-                return <span className="badge badge-warning">Issued</span>;
+                return <span className="badge badge-warning">Đã xuất</span>;
             case 'closed':
-                return <span className="badge badge-success">Closed</span>;
+                return <span className="badge badge-success">Đã đóng</span>;
             case 'cancelled':
-                return <span className="badge badge-danger">Cancelled</span>;
+                return <span className="badge badge-danger">Đã hủy</span>;
             default:
                 return <span className="badge">{status}</span>;
         }
@@ -47,12 +47,12 @@ export default function MRListPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Material Requests</h1>
-                        <p className="text-gray-600 mt-1">Manage production material requests</p>
+                        <h1 className="text-3xl font-bold text-gray-900">Kế Hoạch Sản Xuất</h1>
+                        <p className="text-gray-600 mt-1">Quản lý kế hoạch sản xuất</p>
                     </div>
                     <Link to="/material-requests/new" className="btn btn-primary flex items-center gap-2">
                         <Plus className="w-4 h-4" />
-                        New Material Request
+                        Tạo Kế Hoạch Mới
                     </Link>
                 </div>
 
@@ -64,35 +64,35 @@ export default function MRListPage() {
                             <input
                                 type="text"
                                 name="search"
-                                placeholder="Search by MR number, department or purpose..."
+                                placeholder="Tìm theo số MR, phòng ban hoặc mục đích..."
                                 className="input pl-10 w-full"
                                 defaultValue={filters.search}
                             />
                         </div>
                         <button type="submit" className="btn btn-secondary">
-                            Search
+                            Tìm kiếm
                         </button>
                     </form>
 
                     {/* Additional Filters */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
                             <select
                                 className="input"
                                 value={filters.status || ''}
                                 onChange={(e) => setFilters({ ...filters, status: e.target.value, page: 1 })}
                             >
-                                <option value="">All Statuses</option>
-                                <option value="draft">Draft</option>
-                                <option value="approved">Approved</option>
-                                <option value="issued">Issued</option>
-                                <option value="closed">Closed</option>
-                                <option value="cancelled">Cancelled</option>
+                                <option value="">Tất cả</option>
+                                <option value="draft">Nháp</option>
+                                <option value="approved">Đã duyệt</option>
+                                <option value="issued">Đã xuất</option>
+                                <option value="closed">Đã đóng</option>
+                                <option value="cancelled">Đã hủy</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Request Date From</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Từ ngày</label>
                             <input
                                 type="date"
                                 className="input"
@@ -101,7 +101,7 @@ export default function MRListPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Request Date To</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Đến ngày</label>
                             <input
                                 type="date"
                                 className="input"
@@ -116,17 +116,17 @@ export default function MRListPage() {
                 <div className="card overflow-hidden">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-64">
-                            <div className="text-gray-500">Loading material requests...</div>
+                            <div className="text-gray-500">Đang tải kế hoạch sản xuất...</div>
                         </div>
                     ) : error ? (
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                            Error loading material requests: {(error as Error).message}
+                            Lỗi tải kế hoạch sản xuất: {(error as Error).message}
                         </div>
                     ) : materialRequests.length === 0 ? (
                         <div className="text-center py-12">
-                            <p className="text-gray-500 mb-4">No material requests found</p>
+                            <p className="text-gray-500 mb-4">Chưa có kế hoạch sản xuất nào</p>
                             <Link to="/material-requests/new" className="btn btn-primary">
-                                Create Your First Material Request
+                                Tạo Kế Hoạch Sản Xuất Đầu Tiên
                             </Link>
                         </div>
                     ) : (
@@ -135,12 +135,12 @@ export default function MRListPage() {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th className="w-32">MR Number</th>
-                                            <th>Department</th>
-                                            <th>Warehouse</th>
-                                            <th className="w-32">Request Date</th>
-                                            <th className="w-24">Status</th>
-                                            <th className="text-right">Actions</th>
+                                            <th className="w-32">Số MR</th>
+                                            <th>Phòng ban</th>
+                                            <th>Kho</th>
+                                            <th className="w-32">Ngày tạo</th>
+                                            <th className="w-24">Trạng thái</th>
+                                            <th className="text-right">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -172,14 +172,14 @@ export default function MRListPage() {
                                                             to={`/material-requests/${mr.id}`}
                                                             className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
-                                                            View
+                                                            Xem
                                                         </Link>
                                                         {mr.status === 'draft' && (
                                                             <Link
                                                                 to={`/material-requests/${mr.id}/edit`}
                                                                 className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                             >
-                                                                Edit
+                                                                Sửa
                                                             </Link>
                                                         )}
                                                     </div>
@@ -194,9 +194,9 @@ export default function MRListPage() {
                             {pagination && pagination.total_pages > 1 && (
                                 <div className="flex items-center justify-between px-6 py-4 border-t">
                                     <div className="text-sm text-gray-600">
-                                        Showing {((pagination.page - 1) * pagination.page_size) + 1} to{' '}
-                                        {Math.min(pagination.page * pagination.page_size, pagination.total)} of{' '}
-                                        {pagination.total} results
+                                        Hiển thị {((pagination.page - 1) * pagination.page_size) + 1} đến{' '}
+                                        {Math.min(pagination.page * pagination.page_size, pagination.total)} trong{' '}
+                                        {pagination.total} kết quả
                                     </div>
                                     <div className="flex gap-2">
                                         <button
@@ -204,14 +204,14 @@ export default function MRListPage() {
                                             disabled={pagination.page === 1}
                                             className="btn btn-secondary"
                                         >
-                                            Previous
+                                            Trước
                                         </button>
                                         <button
                                             onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
                                             disabled={pagination.page >= pagination.total_pages}
                                             className="btn btn-secondary"
                                         >
-                                            Next
+                                            Sau
                                         </button>
                                     </div>
                                 </div>

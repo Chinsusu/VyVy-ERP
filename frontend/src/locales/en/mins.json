@@ -3,7 +3,7 @@
     "subtitle": "Manage material issues for production",
     "addNew": "Create Issue Note",
     "createTitle": "Create New Issue Note",
-    "createSubtitle": "Create a MIN from an approved Material Request",
+    "createSubtitle": "Create a MIN from an approved Production Plan",
     "detail": "Issue Note Detail",
     "loadingList": "Loading issue notes...",
     "errorLoading": "Error loading issue notes",

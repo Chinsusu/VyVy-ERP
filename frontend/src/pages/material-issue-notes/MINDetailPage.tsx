@@ -149,7 +149,7 @@ export default function MINDetailPage() {
                                     <div className="flex items-start gap-3">
                                         <History className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-xs text-gray-500 uppercase font-semibold">Linked Material Request</p>
+                                            <p className="text-xs text-gray-500 uppercase font-semibold">Kế hoạch sản xuất liên kết</p>
                                             <Link to={`/material-requests/${min.material_request_id}`} className="font-medium text-primary-600 hover:underline">
                                                 {min.material_request?.mr_number || `#${min.material_request_id}`}
                                             </Link>

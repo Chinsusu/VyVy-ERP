@@ -12,10 +12,10 @@ export default function MRCreatePage() {
                         className="text-gray-600 hover:text-primary flex items-center gap-2 mb-4 w-fit"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Material Requests
+                        Quay lại danh sách
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">New Material Request</h1>
-                    <p className="text-gray-600 mt-1">Request materials for production or departmental use</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Tạo Kế Hoạch Sản Xuất Mới</h1>
+                    <p className="text-gray-600 mt-1">Yêu cầu nguyên vật liệu cho sản xuất</p>
                 </div>
 
                 <MRForm />

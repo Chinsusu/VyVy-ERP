@@ -16,7 +16,7 @@
         "warehouses": "Warehouses",
         "purchaseOrders": "Purchase Orders",
         "goodsReceipt": "Goods Receipt",
-        "materialRequests": "Material Requests",
+        "materialRequests": "Production Plan",
         "issueNotes": "Issue Notes",
         "deliveryOrders": "Delivery Orders",
         "salesChannels": "Sales Channels",

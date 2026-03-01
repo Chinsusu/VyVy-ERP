@@ -100,3 +100,63 @@ export interface FinishedProductListResponse {
         total_pages: number;
     };
 }
+
+// ===== BOM / Product Formula Types =====
+
+export interface FormulaItemMaterial {
+    id: number;
+    code: string;
+    trading_name: string;
+    unit: string;
+}
+
+export interface ProductFormulaItem {
+    id: number;
+    formula_id: number;
+    material_id: number;
+    quantity: number;
+    unit: string;
+    notes?: string;
+    material?: FormulaItemMaterial;
+}
+
+export interface ProductFormula {
+    id: number;
+    finished_product_id: number;
+    name: string;
+    description?: string;
+    batch_size: number;
+    batch_unit: string;
+    is_active: boolean;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+    items?: ProductFormulaItem[];
+}
+
+export interface FormulaItemInput {
+    material_id: number;
+    quantity: number;
+    unit: string;
+    notes?: string;
+}
+
+export interface CreateFormulaInput {
+    name: string;
+    description?: string;
+    batch_size?: number;
+    batch_unit?: string;
+    is_active: boolean;
+    notes?: string;
+    items: FormulaItemInput[];
+}
+
+export interface UpdateFormulaInput {
+    name?: string;
+    description?: string;
+    batch_size?: number;
+    batch_unit?: string;
+    is_active?: boolean;
+    notes?: string;
+    items?: FormulaItemInput[];
+}

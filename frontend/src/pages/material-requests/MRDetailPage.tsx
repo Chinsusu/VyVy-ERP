@@ -38,7 +38,7 @@ export default function MRDetailPage() {
     if (isLoading) {
         return (
             <div className="animate-fade-in flex items-center justify-center">
-                <div className="text-gray-500">Loading Material Request...</div>
+                <div className="text-gray-500">Đang tải kế hoạch sản xuất...</div>
             </div>
         );
     }
@@ -48,7 +48,7 @@ export default function MRDetailPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        Error loading Material Request: {error?.message || 'Request not found'}
+                        Lỗi tải: {error?.message || 'Không tìm thấy'}
                     </div>
                 </div>
             </div>
@@ -58,48 +58,48 @@ export default function MRDetailPage() {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'draft':
-                return <span className="badge badge-secondary">Draft</span>;
+                return <span className="badge badge-secondary">Nháp</span>;
             case 'approved':
-                return <span className="badge badge-primary">Approved</span>;
+                return <span className="badge badge-primary">Đã duyệt</span>;
             case 'issued':
-                return <span className="badge badge-warning">Issued</span>;
+                return <span className="badge badge-warning">Đã xuất</span>;
             case 'closed':
-                return <span className="badge badge-success">Closed</span>;
+                return <span className="badge badge-success">Đã đóng</span>;
             case 'cancelled':
-                return <span className="badge badge-danger">Cancelled</span>;
+                return <span className="badge badge-danger">Đã hủy</span>;
             default:
                 return <span className="badge">{status}</span>;
         }
     };
 
     const handleApprove = async () => {
-        if (window.confirm('Are you sure you want to approve this Material Request?')) {
+        if (window.confirm('Bạn có chắc muốn duyệt kế hoạch sản xuất này không?')) {
             try {
                 await approveMutation.mutateAsync(mrId);
             } catch (err) {
-                alert('Error approving request: ' + (err as Error).message);
+                alert('Lỗi khi duyệt: ' + (err as Error).message);
             }
         }
     };
 
     const handleCancel = async () => {
-        if (window.confirm('Are you sure you want to cancel this Material Request?')) {
+        if (window.confirm('Bạn có chắc muốn hủy kế hoạch sản xuất này không?')) {
             try {
                 await cancelMutation.mutateAsync(mrId);
             } catch (err) {
-                alert('Error cancelling request: ' + (err as Error).message);
+                alert('Lỗi khi hủy: ' + (err as Error).message);
             }
         }
     };
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this draft? This cannot be undone.')) {
+        if (window.confirm('Bạn có chắc muốn xóa bản nháp này không? Không thể hoàn tác.')) {
             setIsDeleting(true);
             try {
                 await deleteMutation.mutateAsync(mrId);
                 navigate('/material-requests');
             } catch (err) {
-                alert('Error deleting request: ' + (err as Error).message);
+                alert('Lỗi khi xóa: ' + (err as Error).message);
                 setIsDeleting(false);
             }
         }
@@ -125,11 +125,11 @@ export default function MRDetailPage() {
                             <div className="flex items-center gap-4 text-sm text-gray-500">
                                 <span className="flex items-center gap-1">
                                     <Calendar className="w-4 h-4" />
-                                    Requested: {new Date(mr.request_date).toLocaleDateString('vi-VN')}
+                                    Ngày tạo: {new Date(mr.request_date).toLocaleDateString('vi-VN')}
                                 </span>
                                 <span className="flex items-center gap-1">
                                     <User className="w-4 h-4" />
-                                    By: {mr.department}
+                                    Phòng ban: {mr.department}
                                 </span>
                             </div>
                         </div>
@@ -143,13 +143,13 @@ export default function MRDetailPage() {
                                     disabled={isDeleting}
                                     className="btn btn-secondary text-red-600 border-red-100 hover:bg-red-50"
                                 >
-                                    Delete Draft
+                                    Xóa bản nháp
                                 </button>
                                 <Link
                                     to={`/material-requests/${mr.id}/edit`}
                                     className="btn btn-secondary"
                                 >
-                                    Edit Request
+                                    Chỉnh sửa
                                 </Link>
                                 <button
                                     onClick={handleApprove}
@@ -157,7 +157,7 @@ export default function MRDetailPage() {
                                     className="btn btn-primary flex items-center gap-2"
                                 >
                                     <CheckCircle className="w-4 h-4" />
-                                    Approve Request
+                                    Phê duyệt
                                 </button>
                             </>
                         )}
@@ -168,7 +168,7 @@ export default function MRDetailPage() {
                                 className="btn btn-secondary text-red-600 border-red-100 hover:bg-red-50 flex items-center gap-2"
                             >
                                 <XCircle className="w-4 h-4" />
-                                Cancel Request
+                                Hủy kế hoạch
                             </button>
                         )}
                     </div>
@@ -181,23 +181,23 @@ export default function MRDetailPage() {
                         <div className="card">
                             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                                 <FileText className="w-5 h-5 text-primary-600" />
-                                General Information
+                                Thông tin chung
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-3">
                                     <div className="flex items-start gap-3">
                                         <Building2 className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-xs text-gray-500 uppercase font-semibold">Source Warehouse</p>
+                                            <p className="text-xs text-gray-500 uppercase font-semibold">Kho xuất</p>
                                             <p className="font-medium text-gray-900">{mr.warehouse?.name || 'N/A'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-3">
                                         <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-xs text-gray-500 uppercase font-semibold">Required Date</p>
+                                            <p className="text-xs text-gray-500 uppercase font-semibold">Ngày cần</p>
                                             <p className="font-medium text-gray-900">
-                                                {mr.required_date ? new Date(mr.required_date).toLocaleDateString('vi-VN') : 'Not Specified'}
+                                                {mr.required_date ? new Date(mr.required_date).toLocaleDateString('vi-VN') : 'Chưa xác định'}
                                             </p>
                                         </div>
                                     </div>
@@ -206,8 +206,8 @@ export default function MRDetailPage() {
                                     <div className="flex items-start gap-3">
                                         <AlertCircle className="w-5 h-5 text-gray-400 mt-0.5" />
                                         <div>
-                                            <p className="text-xs text-gray-500 uppercase font-semibold">Purpose</p>
-                                            <p className="text-gray-900">{mr.purpose || 'No purpose specified'}</p>
+                                            <p className="text-xs text-gray-500 uppercase font-semibold">Mục đích</p>
+                                            <p className="text-gray-900">{mr.purpose || 'Chưa có mục đích'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -215,7 +215,7 @@ export default function MRDetailPage() {
 
                             {mr.notes && (
                                 <div className="mt-6 pt-6 border-t border-gray-100">
-                                    <p className="text-xs text-gray-500 uppercase font-semibold mb-2">Additional Notes</p>
+                                    <p className="text-xs text-gray-500 uppercase font-semibold mb-2">Ghi chú thêm</p>
                                     <p className="text-gray-700 bg-gray-50 p-4 rounded-lg text-sm border border-gray-100">
                                         {mr.notes}
                                     </p>
@@ -227,17 +227,17 @@ export default function MRDetailPage() {
                         <div className="card scroll-mt-6" id="items">
                             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                                 <Package className="w-5 h-5 text-primary-600" />
-                                Requested Materials
+                                Nguyên vật liệu yêu cầu
                             </h3>
                             <div className="table-container">
                                 <table className="table">
                                     <thead>
                                         <tr>
-                                            <th>Material</th>
-                                            <th className="text-right">Requested</th>
-                                            <th className="text-right">Issued</th>
-                                            <th className="text-right">Remaining</th>
-                                            <th>Notes</th>
+                                            <th>Nguyên liệu</th>
+                                            <th className="text-right">SL yêu cầu</th>
+                                            <th className="text-right">SL xuất</th>
+                                            <th className="text-right">Còn lại</th>
+                                            <th>Ghi chú</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -274,21 +274,21 @@ export default function MRDetailPage() {
                     <div className="space-y-8">
                         {/* Approval Status Card */}
                         <div className="card bg-gray-50 border-gray-200">
-                            <h3 className="text-sm font-bold uppercase text-gray-500 mb-4 tracking-wider">Workflow Info</h3>
+                            <h3 className="text-sm font-bold uppercase text-gray-500 mb-4 tracking-wider">Quy trình</h3>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
                                     <div className="flex items-center gap-3">
                                         <div className={`p-2 rounded-full ${mr.status !== 'draft' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                                             <ClipboardCheck className="w-4 h-4" />
                                         </div>
-                                        <span className="text-sm font-medium">Approved</span>
+                                        <span className="text-sm font-medium">Đã duyệt</span>
                                     </div>
                                     {mr.approved_at ? (
                                         <span className="text-xs text-gray-500">
                                             {new Date(mr.approved_at).toLocaleDateString('vi-VN')}
                                         </span>
                                     ) : (
-                                        <span className="text-xs italic text-gray-400">Pending</span>
+                                        <span className="text-xs italic text-gray-400">Chờ duyệt</span>
                                     )}
                                 </div>
 
@@ -297,10 +297,10 @@ export default function MRDetailPage() {
                                         <div className={`p-2 rounded-full ${mr.status === 'issued' || mr.status === 'closed' ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-400'}`}>
                                             <Package className="w-4 h-4" />
                                         </div>
-                                        <span className="text-sm font-medium">Material Issue</span>
+                                        <span className="text-sm font-medium">Xuất vật tư</span>
                                     </div>
                                     <span className="text-xs italic text-gray-400">
-                                        {mr.status === 'issued' ? 'In Progress' : mr.status === 'closed' ? 'Completed' : 'Pending'}
+                                        {mr.status === 'issued' ? 'Đang xuất' : mr.status === 'closed' ? 'Hoàn thành' : 'Chờ'}
                                     </span>
                                 </div>
                             </div>
@@ -312,10 +312,10 @@ export default function MRDetailPage() {
                                         className="btn btn-primary w-full flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <Package className="w-4 h-4" />
-                                        Issue Materials
+                                        Xuất vật tư
                                     </Link>
                                     <p className="text-center text-[length:var(--font-size-3xs)] text-gray-400 mt-2">
-                                        Create a Material Issue Note for this approved request
+                                        Tạo phiếu xuất kho cho kế hoạch đã duyệt này
                                     </p>
                                 </div>
                             )}
@@ -325,16 +325,16 @@ export default function MRDetailPage() {
                         <div className="card">
                             <h3 className="text-sm font-bold uppercase text-gray-500 mb-4 tracking-wider flex items-center gap-2">
                                 <History className="w-4 h-4" />
-                                Audit Log
+                                Lịch sử
                             </h3>
                             <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-100">
                                 <div className="relative pl-8">
                                     <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-primary-600 rounded-full flex items-center justify-center z-10">
                                         <Plus className="w-3 h-3 text-primary-600" />
                                     </div>
-                                    <p className="text-sm font-bold text-gray-900">Request Created</p>
+                                    <p className="text-sm font-bold text-gray-900">Đã tạo</p>
                                     <p className="text-xs text-gray-500">{new Date(mr.created_at).toLocaleString('vi-VN')}</p>
-                                    <p className="text-xs mt-1 text-gray-600">Requested by {mr.department}</p>
+                                    <p className="text-xs mt-1 text-gray-600">Phòng ban: {mr.department}</p>
                                 </div>
 
                                 {mr.approved_at && (
@@ -342,7 +342,7 @@ export default function MRDetailPage() {
                                         <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-green-500 rounded-full flex items-center justify-center z-10">
                                             <CheckCircle className="w-3 h-3 text-green-500" />
                                         </div>
-                                        <p className="text-sm font-bold text-gray-900">Request Approved</p>
+                                        <p className="text-sm font-bold text-gray-900">Đã duyệt</p>
                                         <p className="text-xs text-gray-500">{new Date(mr.approved_at).toLocaleString('vi-VN')}</p>
                                     </div>
                                 )}
@@ -352,7 +352,7 @@ export default function MRDetailPage() {
                                         <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-red-500 rounded-full flex items-center justify-center z-10">
                                             <XCircle className="w-3 h-3 text-red-500" />
                                         </div>
-                                        <p className="text-sm font-bold text-gray-900">Request Cancelled</p>
+                                        <p className="text-sm font-bold text-gray-900">Đã hủy</p>
                                     </div>
                                 )}
                             </div>

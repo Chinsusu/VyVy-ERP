@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, Save, X, ClipboardList } from 'lucide-react';
-import { useMaterials } from '../../hooks/useMaterials';
+import { useFinishedProducts } from '../../hooks/useFinishedProducts';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import { useCreateMaterialRequest, useUpdateMaterialRequest } from '../../hooks/useMaterialRequests';
-import type { Material } from '../../types/material';
+import type { FinishedProduct } from '../../types/finishedProduct';
 import type { Warehouse } from '../../types/warehouse';
 import type {
     MaterialRequest,
@@ -21,10 +21,10 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
     const navigate = useNavigate();
 
     // API Hooks for dropdowns
-    const { data: materialsData } = useMaterials({ page: 1, page_size: 1000, is_active: true });
+    const { data: productsData } = useFinishedProducts({ page: 1, page_size: 100, is_active: true });
     const { data: warehousesData } = useWarehouses();
 
-    const materials = materialsData?.data || [];
+    const products = productsData?.data || [];
     const warehouses = warehousesData?.data || [];
 
     // Mutations
@@ -97,7 +97,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
 
         // Basic validation
         if (formData.warehouse_id === 0 || !formData.department || items.some(i => i.material_id === 0)) {
-            alert('Please fill in all required fields and select materials for all items.');
+            alert('Vui lòng điền đầy đủ các trường bắt buộc và chọn nguyên vật liệu cho tất cả mục.');
             return;
         }
 
@@ -121,7 +121,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
             }
         } catch (err) {
             console.error('Failed to save MR:', err);
-            alert('Error saving Material Request. Please check the logs.');
+            alert('Lỗi khi lưu. Vui lòng kiểm tra.');
         }
     };
 
@@ -130,7 +130,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
             {/* Header Info */}
             <div className="card grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                    <label className="label">MR Number <span className="text-red-500">*</span></label>
+                    <label className="label">Số KHSX <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         className="input w-full"
@@ -141,32 +141,32 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                     />
                 </div>
                 <div>
-                    <label className="label">Department <span className="text-red-500">*</span></label>
+                    <label className="label">Phòng ban <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         className="input w-full"
                         value={formData.department}
                         onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                        placeholder="e.g. Production Lab, R&D"
+                        placeholder="VD: Xưởng sản xuất, R&D"
                         required
                     />
                 </div>
                 <div>
-                    <label className="label">Warehouse <span className="text-red-500">*</span></label>
+                    <label className="label">Kho hàng <span className="text-red-500">*</span></label>
                     <select
-                        className="select w-full"
+                        className="input w-full"
                         value={formData.warehouse_id}
                         onChange={(e) => setFormData({ ...formData, warehouse_id: Number(e.target.value) })}
                         required
                     >
-                        <option value={0}>Select Warehouse</option>
+                        <option value={0}>Chọn kho hàng</option>
                         {warehouses.map((w: Warehouse) => (
                             <option key={w.id} value={w.id}>{w.name} ({w.code})</option>
                         ))}
                     </select>
                 </div>
                 <div>
-                    <label className="label">Request Date <span className="text-red-500">*</span></label>
+                    <label className="label">Ngày yêu cầu <span className="text-red-500">*</span></label>
                     <input
                         type="date"
                         className="input w-full"
@@ -176,7 +176,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                     />
                 </div>
                 <div>
-                    <label className="label">Required Date</label>
+                    <label className="label">Ngày cần hàng</label>
                     <input
                         type="date"
                         className="input w-full"
@@ -185,13 +185,13 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                     />
                 </div>
                 <div className="md:col-span-3">
-                    <label className="label">Purpose</label>
+                    <label className="label">Mục đích</label>
                     <textarea
                         className="input w-full"
                         rows={2}
                         value={formData.purpose}
                         onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                        placeholder="Why are these materials needed?"
+                        placeholder="Tại sao cần những nguyên vật liệu này?"
                     />
                 </div>
             </div>
@@ -201,7 +201,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold flex items-center gap-2">
                         <ClipboardList className="w-5 h-5 text-primary-600" />
-                        Requested Materials
+                        Sản Phẩm Cần Sản Xuất
                     </h3>
                     <button
                         type="button"
@@ -209,7 +209,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                         className="btn btn-secondary btn-sm flex items-center gap-1"
                     >
                         <Plus className="w-4 h-4" />
-                        Add Material
+                        Thêm sản phẩm
                     </button>
                 </div>
 
@@ -217,9 +217,9 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                     <table className="table w-full border-collapse">
                         <thead>
                             <tr className="bg-gray-50 border-b">
-                                <th className="py-2 px-3 text-left">Material <span className="text-red-500">*</span></th>
-                                <th className="py-2 px-3 text-right w-32">Requested Quantity</th>
-                                <th className="py-2 px-3 text-left">Notes</th>
+                                <th className="py-2 px-3 text-left">Sản phẩm <span className="text-red-500">*</span></th>
+                                <th className="py-2 px-3 text-right w-32">Số lượng sản xuất</th>
+                                <th className="py-2 px-3 text-left">Ghi chú</th>
                                 <th className="py-2 px-3 text-center w-16"></th>
                             </tr>
                         </thead>
@@ -228,14 +228,14 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                                 <tr key={index} className="border-b last:border-0">
                                     <td className="py-3 px-3">
                                         <select
-                                            className="select w-full"
+                                            className="input w-full"
                                             value={item.material_id}
                                             onChange={(e) => updateItem(index, 'material_id', Number(e.target.value))}
                                             required
                                         >
-                                            <option value={0}>Select Material</option>
-                                            {materials.map((m: Material) => (
-                                                <option key={m.id} value={m.id}>{m.trading_name} ({m.code}) - {m.unit}</option>
+                                            <option value={0}>Chọn sản phẩm</option>
+                                            {products.map((p: FinishedProduct) => (
+                                                <option key={p.id} value={p.id}>{p.name} ({p.code}) - {p.unit}</option>
                                             ))}
                                         </select>
                                     </td>
@@ -256,7 +256,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                                             className="input w-full"
                                             value={item.notes}
                                             onChange={(e) => updateItem(index, 'notes', e.target.value)}
-                                            placeholder="Item specific notes..."
+                                            placeholder="Ghi chú cho mục này..."
                                         />
                                     </td>
                                     <td className="py-3 px-3 text-center">
@@ -284,7 +284,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                     className="btn btn-secondary flex-1 flex items-center justify-center gap-2"
                 >
                     <X className="w-4 h-4" />
-                    Cancel
+                    Hủy bỏ
                 </button>
                 <button
                     type="submit"
@@ -292,7 +292,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                     disabled={createMutation.isPending || updateMutation.isPending}
                 >
                     <Save className="w-4 h-4" />
-                    {isEdit ? 'Update Material Request' : 'Create Material Request'}
+                    {isEdit ? 'Cập Nhật Kế Hoạch' : 'Tạo Kế Hoạch Sản Xuất'}
                 </button>
             </div>
         </form>

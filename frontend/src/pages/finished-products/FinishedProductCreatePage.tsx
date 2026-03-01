@@ -13,10 +13,10 @@ export default function FinishedProductCreatePage() {
                         className="text-primary hover:underline flex items-center gap-2 mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Finished Products
+                        Quay lại Danh Sách Thành Phẩm
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Create New Finished Product</h1>
-                    <p className="text-gray-600 mt-1">Add a new finished product to your inventory</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Thêm Thành Phẩm Mới</h1>
+                    <p className="text-gray-600 mt-1">Tạo mới một thành phẩm trong hệ thống</p>
                 </div>
 
                 {/* Form */}

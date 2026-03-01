@@ -17,7 +17,7 @@
     "expiringItemsDesc": "Batches expiring within period",
     "quickAccess": "Quick Access",
     "purchaseOrders": "Purchase Orders",
-    "materialRequests": "Material Requests",
+    "materialRequests": "Production Plan",
     "deliveryOrders": "Delivery Orders",
     "adjustments": "Adjustments",
     "transfers": "Transfers",

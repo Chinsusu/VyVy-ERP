@@ -14,7 +14,7 @@ export default function FinishedProductEditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="flex items-center justify-center h-64">
-                        <div className="text-gray-500">Loading product...</div>
+                        <div className="text-gray-500">Đang tải sản phẩm...</div>
                     </div>
                 </div>
             </div>
@@ -26,14 +26,14 @@ export default function FinishedProductEditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        {error ? `Error: ${(error as Error).message}` : 'Product not found'}
+                        {error ? `Lỗi: ${(error as Error).message}` : 'Không tìm thấy sản phẩm'}
                     </div>
                     <Link
                         to="/finished-products"
                         className="text-primary hover:underline flex items-center gap-2 mt-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Finished Products
+                        Quay lại Danh Sách Thành Phẩm
                     </Link>
                 </div>
             </div>
@@ -50,11 +50,11 @@ export default function FinishedProductEditPage() {
                         className="text-primary hover:underline flex items-center gap-2 mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Product Details
+                        Quay lại Chi Tiết Sản Phẩm
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Edit Finished Product</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Chỉnh Sửa Thành Phẩm</h1>
                     <p className="text-gray-600 mt-1">
-                        Update information for {product.name} ({product.code})
+                        Cập nhật thông tin cho {product.name} ({product.code})
                     </p>
                 </div>
 

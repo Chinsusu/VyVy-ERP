@@ -19,6 +19,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseRepo := repository.NewWarehouseRepository(db)
 	warehouseLocationRepo := repository.NewWarehouseLocationRepository(db)
 	finishedProductRepo := repository.NewFinishedProductRepository(db)
+	productFormulaRepo := repository.NewProductFormulaRepository(db)
 	purchaseOrderRepo := repository.NewPurchaseOrderRepository(db)
 	purchaseOrderItemRepo := repository.NewPurchaseOrderItemRepository(db)
 	grnRepo := repository.NewGoodsReceiptNoteRepository(db)
@@ -44,6 +45,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseService := service.NewWarehouseService(warehouseRepo, warehouseLocationRepo)
 	warehouseLocationService := service.NewWarehouseLocationService(warehouseLocationRepo, warehouseRepo)
 	finishedProductService := service.NewFinishedProductService(finishedProductRepo)
+	productFormulaService := service.NewProductFormulaService(productFormulaRepo, finishedProductRepo, materialRepo)
 	purchaseOrderService := service.NewPurchaseOrderService(purchaseOrderRepo, purchaseOrderItemRepo, supplierRepo, warehouseRepo)
 	grnService := service.NewGRNService(db, grnRepo, grnItemRepo, purchaseOrderRepo, purchaseOrderItemRepo, warehouseRepo, stockLedgerRepo, stockBalanceRepo)
 	mrService := service.NewMaterialRequestService(db, mrRepo, mrItemRepo, warehouseRepo, materialRepo, stockBalanceRepo, stockReservationRepo)
@@ -67,6 +69,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseHandler := handlers.NewWarehouseHandler(warehouseService)
 	warehouseLocationHandler := handlers.NewWarehouseLocationHandler(warehouseLocationService)
 	finishedProductHandler := handlers.NewFinishedProductHandler(finishedProductService)
+	productFormulaHandler := handlers.NewProductFormulaHandler(productFormulaService)
 	purchaseOrderHandler := handlers.NewPurchaseOrderHandler(purchaseOrderService)
 	grnHandler := handlers.NewGRNHandler(grnService)
 	mrHandler := handlers.NewMaterialRequestHandler(mrService)
@@ -151,6 +154,13 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		productGroup.POST("", finishedProductHandler.Create)
 		productGroup.PUT("/:id", finishedProductHandler.Update)
 		productGroup.DELETE("/:id", middleware.RequireRole("admin"), finishedProductHandler.Delete)
+
+		// BOM (Formula) endpoints
+		productGroup.GET("/:id/formulas", productFormulaHandler.ListByProduct)
+		productGroup.GET("/:id/formulas/:fid", productFormulaHandler.GetByID)
+		productGroup.POST("/:id/formulas", productFormulaHandler.Create)
+		productGroup.PUT("/:id/formulas/:fid", productFormulaHandler.Update)
+		productGroup.DELETE("/:id/formulas/:fid", productFormulaHandler.Delete)
 	}
 
 	// Purchase Orders routes - All protected

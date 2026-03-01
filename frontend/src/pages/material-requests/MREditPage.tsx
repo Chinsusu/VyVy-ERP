@@ -12,7 +12,7 @@ export default function MREditPage() {
     if (isLoading) {
         return (
             <div className="animate-fade-in flex items-center justify-center">
-                <div className="text-gray-500">Loading Material Request...</div>
+                <div className="text-gray-500">Đang tải kế hoạch sản xuất...</div>
             </div>
         );
     }
@@ -22,7 +22,7 @@ export default function MREditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        Error loading Material Request: {error?.message || 'Request not found'}
+                        Error loading: {error?.message || 'Không tìm thấy'}
                     </div>
                 </div>
             </div>
@@ -38,10 +38,10 @@ export default function MREditPage() {
                         className="text-gray-600 hover:text-primary flex items-center gap-2 mb-4 w-fit"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Details
+                        Quay lại chi tiết
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Edit Material Request</h1>
-                    <p className="text-gray-600 mt-1">Editing {mr.mr_number}</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Chỉnh Sửa Kế Hoạch Sản Xuất</h1>
+                    <p className="text-gray-600 mt-1">Đang sửa {mr.mr_number}</p>
                 </div>
 
                 <MRForm initialData={mr} isEdit />

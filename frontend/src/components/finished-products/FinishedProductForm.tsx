@@ -42,13 +42,13 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
         const newErrors: Record<string, string> = {};
 
         if (!formData.code.trim()) {
-            newErrors.code = 'Code is required';
+            newErrors.code = 'Mã sản phẩm không được để trống';
         }
         if (!formData.name.trim()) {
-            newErrors.name = 'Name is required';
+            newErrors.name = 'Tên sản phẩm không được để trống';
         }
         if (!formData.unit.trim()) {
-            newErrors.unit = 'Unit is required';
+            newErrors.unit = 'Đơn vị tính không được để trống';
         }
 
         setErrors(newErrors);
@@ -77,7 +77,7 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
             }
         } catch (error) {
             console.error('Error saving finished product:', error);
-            setErrors({ submit: 'Failed to save finished product. Please try again.' });
+            setErrors({ submit: 'Lưu thành phẩm thất bại. Vui lòng thử lại.' });
         }
     };
 
@@ -101,7 +101,7 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
     return (
         <form onSubmit={handleSubmit} className="card">
             <h2 className="text-xl font-semibold mb-6">
-                {product ? 'Edit Finished Product' : 'Create New Finished Product'}
+                {product ? 'Chỉnh Sửa Thành Phẩm' : 'Thêm Thành Phẩm Mới'}
             </h2>
 
             {errors.submit && (
@@ -111,13 +111,13 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
             )}
 
             <div className="space-y-6">
-                {/* 1. Basic Information */}
+                {/* 1. Thông Tin Cơ Bản */}
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Basic Information</h3>
+                    <h3 className="text-lg font-medium mb-4">Thông Tin Cơ Bản</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">
-                                Code <span className="text-red-500">*</span>
+                                Mã Sản Phẩm <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -125,14 +125,14 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                                 value={formData.code}
                                 onChange={(e) => handleChange('code', e.target.value)}
                                 disabled={!!product || isSubmitting}
-                                placeholder="e.g. FP001"
+                                placeholder="VD: TP001"
                             />
                             {errors.code && <p className="text-red-500 text-sm mt-1">{errors.code}</p>}
                         </div>
 
                         <div>
                             <label className="label">
-                                Name (English) <span className="text-red-500">*</span>
+                                Tên Sản Phẩm <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -140,50 +140,50 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                                 value={formData.name}
                                 onChange={(e) => handleChange('name', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. Premium Chocolate Box"
+                                placeholder="VD: Dầu Gội Retro Nano 350ml"
                             />
                             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                         </div>
 
                         <div>
-                            <label className="label">Name (Local/Vietnamese)</label>
+                            <label className="label">Tên Tiếng Anh</label>
                             <input
                                 type="text"
                                 className="input"
                                 value={formData.name_en}
                                 onChange={(e) => handleChange('name_en', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. Hộp Socola Cao Cấp"
+                                placeholder="VD: Retro Nano Shampoo 350ml"
                             />
                         </div>
 
                         <div>
-                            <label className="label">Category</label>
+                            <label className="label">Danh Mục</label>
                             <input
                                 type="text"
                                 className="input"
                                 value={formData.category}
                                 onChange={(e) => handleChange('category', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. Food"
+                                placeholder="VD: tóc"
                             />
                         </div>
 
                         <div>
-                            <label className="label">Sub-category</label>
+                            <label className="label">Danh Mục Con</label>
                             <input
                                 type="text"
                                 className="input"
                                 value={formData.sub_category}
                                 onChange={(e) => handleChange('sub_category', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. Confectionery"
+                                placeholder="VD: Dầu gội"
                             />
                         </div>
 
                         <div>
                             <label className="label">
-                                Unit <span className="text-red-500">*</span>
+                                Đơn Vị Tính <span className="text-red-500">*</span>
                             </label>
                             <select
                                 className={`input ${errors.unit ? 'border-red-500' : ''}`}
@@ -191,12 +191,17 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                                 onChange={(e) => handleChange('unit', e.target.value)}
                                 disabled={isSubmitting}
                             >
-                                <option value="PCS">PCS (Pieces)</option>
-                                <option value="BOX">BOX</option>
-                                <option value="CTN">CTN (Carton)</option>
-                                <option value="KG">KG (Kilogram)</option>
-                                <option value="LTR">LTR (Liter)</option>
-                                <option value="PKT">PKT (Packet)</option>
+                                <option value="Chai">Chai</option>
+                                <option value="Hủ">Hủ</option>
+                                <option value="Tuýp">Tuýp</option>
+                                <option value="Túi">Túi</option>
+                                <option value="Gói">Gói</option>
+                                <option value="Hộp">Hộp</option>
+                                <option value="Cái">Cái</option>
+                                <option value="Bộ">Bộ</option>
+                                <option value="PCS">PCS</option>
+                                <option value="KG">KG</option>
+                                <option value="CTN">CTN (Thùng)</option>
                             </select>
                             {errors.unit && <p className="text-red-500 text-sm mt-1">{errors.unit}</p>}
                         </div>
@@ -209,18 +214,18 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                                 value={formData.barcode}
                                 onChange={(e) => handleChange('barcode', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. 8934561234567"
+                                placeholder="VD: 8934561234567"
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* 2. Specifications */}
+                {/* 2. Thông Số Kỹ Thuật */}
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Specifications</h3>
+                    <h3 className="text-lg font-medium mb-4">Thông Số Kỹ Thuật</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label className="label">Net Weight (kg)</label>
+                            <label className="label">Khối Lượng Tịnh (kg)</label>
                             <input
                                 type="number"
                                 step="0.001"
@@ -233,7 +238,7 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                         </div>
 
                         <div>
-                            <label className="label">Gross Weight (kg)</label>
+                            <label className="label">Khối Lượng Tổng (kg)</label>
                             <input
                                 type="number"
                                 step="0.001"
@@ -246,7 +251,7 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                         </div>
 
                         <div>
-                            <label className="label">Volume (m³)</label>
+                            <label className="label">Thể Tích (m³)</label>
                             <input
                                 type="number"
                                 step="0.001"
@@ -260,12 +265,12 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                     </div>
                 </div>
 
-                {/* 3. Stock Management */}
+                {/* 3. Quản Lý Tồn Kho */}
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Stock Management</h3>
+                    <h3 className="text-lg font-medium mb-4">Quản Lý Tồn Kho</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Min Stock Level</label>
+                            <label className="label">Tồn Kho Tối Thiểu</label>
                             <input
                                 type="number"
                                 step="0.001"
@@ -278,7 +283,7 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                         </div>
 
                         <div>
-                            <label className="label">Max Stock Level</label>
+                            <label className="label">Tồn Kho Tối Đa</label>
                             <input
                                 type="number"
                                 step="0.001"
@@ -291,7 +296,7 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                         </div>
 
                         <div>
-                            <label className="label">Reorder Point</label>
+                            <label className="label">Điểm Đặt Hàng Lại</label>
                             <input
                                 type="number"
                                 step="0.001"
@@ -304,37 +309,37 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                         </div>
 
                         <div>
-                            <label className="label">Shelf Life (days)</label>
+                            <label className="label">Hạn Sử Dụng (ngày)</label>
                             <input
                                 type="number"
                                 className="input"
                                 value={formData.shelf_life_days || ''}
                                 onChange={(e) => handleChange('shelf_life_days', e.target.value ? parseInt(e.target.value) : undefined)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. 365"
+                                placeholder="VD: 365"
                             />
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className="label">Storage Conditions</label>
+                            <label className="label">Điều Kiện Bảo Quản</label>
                             <textarea
                                 className="input"
                                 rows={3}
                                 value={formData.storage_conditions}
                                 onChange={(e) => handleChange('storage_conditions', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. Store in cool, dry place. Keep away from direct sunlight."
+                                placeholder="VD: Bảo quản nơi khô ráo, thoáng mát. Tránh ánh nắng trực tiếp."
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* 4. Pricing */}
+                {/* 4. Định Giá */}
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Pricing</h3>
+                    <h3 className="text-lg font-medium mb-4">Định Giá</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Standard Cost (VND)</label>
+                            <label className="label">Giá Thành Chuẩn (VNĐ)</label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -347,7 +352,7 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                         </div>
 
                         <div>
-                            <label className="label">Selling Price (VND)</label>
+                            <label className="label">Giá Bán (VNĐ)</label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -361,19 +366,19 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                     </div>
                 </div>
 
-                {/* 5. Additional Information */}
+                {/* 5. Thông Tin Bổ Sung */}
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Additional Information</h3>
+                    <h3 className="text-lg font-medium mb-4">Thông Tin Bổ Sung</h3>
                     <div className="space-y-4">
                         <div>
-                            <label className="label">Notes</label>
+                            <label className="label">Ghi Chú</label>
                             <textarea
                                 className="input"
                                 rows={4}
                                 value={formData.notes}
                                 onChange={(e) => handleChange('notes', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="Additional notes about the product..."
+                                placeholder="Ghi chú thêm về sản phẩm..."
                             />
                         </div>
 
@@ -387,14 +392,14 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                                 className="mr-2"
                             />
                             <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
-                                Active
+                                Đang hoạt động
                             </label>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Form Actions */}
+            {/* Nút Hành Động */}
             <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
                 <button
                     type="button"
@@ -402,10 +407,10 @@ export default function FinishedProductForm({ product, onSuccess, onCancel }: Fi
                     className="btn btn-secondary"
                     disabled={isSubmitting}
                 >
-                    Cancel
+                    Huỷ
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                    {isSubmitting ? 'Saving...' : product ? 'Update Product' : 'Create Product'}
+                    {isSubmitting ? 'Đang lưu...' : product ? 'Cập Nhật Sản Phẩm' : 'Tạo Sản Phẩm'}
                 </button>
             </div>
         </form>
