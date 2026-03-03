@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Search, CheckCircle, Clock, AlertTriangle, Package } from 'lucide-react';
 import { useGrns } from '../../hooks/useGrns';
 import type { GRNFilters } from '../../types/grn';
+import PageSizeSelector from '../../components/common/PageSizeSelector';
 
 export default function GrnListPage() {
     const [filters, setFilters] = useState<GRNFilters>({
@@ -74,6 +75,10 @@ export default function GrnListPage() {
             search: formData.get('search') as string,
             page: 1,
         });
+    };
+
+    const handlePageSizeChange = (size: number) => {
+        setFilters({ ...filters, page_size: size, page: 1 });
     };
 
     return (
@@ -219,29 +224,41 @@ export default function GrnListPage() {
                             </div>
 
                             {/* Pagination */}
-                            {pagination && pagination.total_pages > 1 && (
-                                <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50">
-                                    <div className="text-sm text-gray-600">
-                                        Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
-                                        {Math.min(pagination.page * pagination.limit, pagination.total_items)} of{' '}
-                                        {pagination.total_items} results
+                            {pagination && (
+                                <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50 flex-wrap gap-3">
+                                    <div className="flex items-center gap-4">
+                                        <PageSizeSelector
+                                            pageSize={filters.page_size || 10}
+                                            onChange={handlePageSizeChange}
+                                            totalItems={pagination.total_items}
+                                        />
+                                        <span className="text-sm text-gray-500">
+                                            {(filters.page_size || 0) >= 999999
+                                                ? `Tất cả ${pagination.total_items} GRN`
+                                                : `${((pagination.page - 1) * (filters.page_size || 10)) + 1}–${Math.min(pagination.page * (filters.page_size || 10), pagination.total_items)} / ${pagination.total_items} GRN`}
+                                        </span>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => setFilters({ ...filters, page: Math.max(1, (filters.page || 1) - 1) })}
-                                            disabled={pagination.page === 1}
-                                            className="btn btn-sm btn-secondary"
-                                        >
-                                            Previous
-                                        </button>
-                                        <button
-                                            onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
-                                            disabled={pagination.page >= pagination.total_pages}
-                                            className="btn btn-sm btn-secondary"
-                                        >
-                                            Next
-                                        </button>
-                                    </div>
+                                    {(filters.page_size || 0) < 999999 && pagination.total_pages > 1 && (
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setFilters({ ...filters, page: Math.max(1, (filters.page || 1) - 1) })}
+                                                disabled={pagination.page === 1}
+                                                className="btn btn-sm btn-secondary"
+                                            >
+                                                Previous
+                                            </button>
+                                            <span className="text-sm text-gray-600 self-center">
+                                                Trang {pagination.page} / {pagination.total_pages}
+                                            </span>
+                                            <button
+                                                onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+                                                disabled={pagination.page >= pagination.total_pages}
+                                                className="btn btn-sm btn-secondary"
+                                            >
+                                                Next
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </>

@@ -13,7 +13,7 @@ export default function MaterialEditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="flex items-center justify-center h-64">
-                        <div className="text-gray-500">Loading material...</div>
+                        <div className="text-gray-500">Đang tải nguyên vật liệu...</div>
                     </div>
                 </div>
             </div>
@@ -25,7 +25,7 @@ export default function MaterialEditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        Error loading material: {error ? (error as Error).message : 'Material not found'}
+                        Lỗi tải dữ liệu: {error ? (error as Error).message : 'Không tìm thấy nguyên vật liệu'}
                     </div>
                 </div>
             </div>
@@ -42,11 +42,11 @@ export default function MaterialEditPage() {
                         className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
-                        Back to Materials
+                        Quay lại danh sách
                     </button>
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                         <Package className="w-8 h-8 text-primary" />
-                        Edit Material: {material.code}
+                        Chỉnh Sửa NVL: {material.code}
                     </h1>
                 </div>
 

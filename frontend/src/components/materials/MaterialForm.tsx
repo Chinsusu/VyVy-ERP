@@ -52,10 +52,10 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
     const validate = (): boolean => {
         const newErrors: Record<string, string> = {};
 
-        if (!formData.code) newErrors.code = 'Code is required';
-        if (!formData.trading_name) newErrors.trading_name = 'Trading name is required';
-        if (!formData.material_type) newErrors.material_type = 'Material type is required';
-        if (!formData.unit) newErrors.unit = 'Unit is required';
+        if (!formData.code) newErrors.code = 'Mã NVL là bắt buộc';
+        if (!formData.trading_name) newErrors.trading_name = 'Tên thương mại là bắt buộc';
+        if (!formData.material_type) newErrors.material_type = 'Loại NVL là bắt buộc';
+        if (!formData.unit) newErrors.unit = 'Đơn vị là bắt buộc';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -78,6 +78,8 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
 
             if (onSuccess) {
                 onSuccess();
+            } else if (isEditMode && material) {
+                navigate(`/materials/${material.id}`);
             } else {
                 navigate('/materials');
             }
@@ -100,10 +102,10 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
+                <h3 className="text-lg font-semibold mb-4">Thông Tin Cơ Bản</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Code *</label>
+                        <label className="label">Mã NVL *</label>
                         <input
                             type="text"
                             className={`input ${errors.code ? 'border-red-500' : ''}`}
@@ -116,56 +118,56 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     </div>
 
                     <div>
-                        <label className="label">Trading Name *</label>
+                        <label className="label">Tên Thương Mại *</label>
                         <input
                             type="text"
                             className={`input ${errors.trading_name ? 'border-red-500' : ''}`}
                             value={formData.trading_name}
                             onChange={(e) => handleChange('trading_name', e.target.value)}
-                            placeholder="e.g., Glycerin"
+                            placeholder="VD: Glycerin"
                         />
                         {errors.trading_name && <p className="text-red-500 text-sm mt-1">{errors.trading_name}</p>}
                     </div>
 
                     <div>
-                        <label className="label">INCI Name</label>
+                        <label className="label">Tên INCI</label>
                         <input
                             type="text"
                             className="input"
                             value={formData.inci_name || ''}
                             onChange={(e) => handleChange('inci_name', e.target.value)}
-                            placeholder="e.g., Glycerol"
+                            placeholder="VD: Glycerol"
                         />
                     </div>
 
                     <div>
-                        <label className="label">Material Type *</label>
+                        <label className="label">Loại NVL *</label>
                         <select
                             className={`input ${errors.material_type ? 'border-red-500' : ''}`}
                             value={formData.material_type}
                             onChange={(e) => handleChange('material_type', e.target.value)}
                         >
-                            <option value="RAW_MATERIAL">Raw Material</option>
-                            <option value="INGREDIENT">Ingredient</option>
-                            <option value="PACKAGING">Packaging</option>
-                            <option value="CONSUMABLE">Consumable</option>
+                            <option value="RAW_MATERIAL">Nguyên liệu thô</option>
+                            <option value="INGREDIENT">Thành phần</option>
+                            <option value="PACKAGING">Bao bì</option>
+                            <option value="CONSUMABLE">Vật tư tiêu hao</option>
                         </select>
                         {errors.material_type && <p className="text-red-500 text-sm mt-1">{errors.material_type}</p>}
                     </div>
 
                     <div>
-                        <label className="label">Category</label>
+                        <label className="label">Danh mục</label>
                         <input
                             type="text"
                             className="input"
                             value={formData.category || ''}
                             onChange={(e) => handleChange('category', e.target.value)}
-                            placeholder="e.g., Humectant"
+                            placeholder="VD: Chất giữ ẩm"
                         />
                     </div>
 
                     <div>
-                        <label className="label">Sub Category</label>
+                        <label className="label">Danh mục phụ</label>
                         <input
                             type="text"
                             className="input"
@@ -175,7 +177,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     </div>
 
                     <div>
-                        <label className="label">Unit *</label>
+                        <label className="label">Đơn vị tính *</label>
                         <select
                             className={`input ${errors.unit ? 'border-red-500' : ''}`}
                             value={formData.unit}
@@ -193,10 +195,10 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
 
             {/* Pricing */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Pricing</h3>
+                <h3 className="text-lg font-semibold mb-4">Giá</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Standard Cost</label>
+                        <label className="label">Giá vốn chuẩn (VND)</label>
                         <input
                             type="number"
                             step="0.01"
@@ -208,7 +210,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     </div>
 
                     <div>
-                        <label className="label">Last Purchase Price</label>
+                        <label className="label">Giá mua gần nhất (VND)</label>
                         <input
                             type="number"
                             step="0.01"
@@ -223,10 +225,10 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
 
             {/* Stock Control */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Stock Control</h3>
+                <h3 className="text-lg font-semibold mb-4">Kiểm Soát Tồn Kho</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Min Stock Level</label>
+                        <label className="label">Tồn kho tối thiểu</label>
                         <input
                             type="number"
                             step="0.001"
@@ -238,7 +240,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     </div>
 
                     <div>
-                        <label className="label">Max Stock Level</label>
+                        <label className="label">Tồn kho tối đa</label>
                         <input
                             type="number"
                             step="0.001"
@@ -250,7 +252,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     </div>
 
                     <div>
-                        <label className="label">Reorder Point</label>
+                        <label className="label">Điểm đặt hàng lại</label>
                         <input
                             type="number"
                             step="0.001"
@@ -262,7 +264,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     </div>
 
                     <div>
-                        <label className="label">Reorder Quantity</label>
+                        <label className="label">Số lượng đặt lại</label>
                         <input
                             type="number"
                             step="0.001"
@@ -277,10 +279,10 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
 
             {/* Quality & Safety */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Quality & Safety</h3>
+                <h3 className="text-lg font-semibold mb-4">Chất Lượng & An Toàn</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Shelf Life (Days)</label>
+                        <label className="label">Hạn sử dụng (ngày)</label>
                         <input
                             type="number"
                             className="input"
@@ -291,13 +293,13 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     </div>
 
                     <div>
-                        <label className="label">Storage Conditions</label>
+                        <label className="label">Điều kiện bảo quản</label>
                         <input
                             type="text"
                             className="input"
                             value={formData.storage_conditions || ''}
                             onChange={(e) => handleChange('storage_conditions', e.target.value)}
-                            placeholder="e.g., Cool, dry place"
+                            placeholder="VD: Nơi khô ráo, thoáng mát"
                         />
                     </div>
 
@@ -309,7 +311,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                             onChange={(e) => handleChange('requires_qc', e.target.checked)}
                             className="w-4 h-4"
                         />
-                        <label htmlFor="requires_qc" className="text-sm font-medium">Requires Quality Control</label>
+                        <label htmlFor="requires_qc" className="text-sm font-medium">Cần kiểm tra KCS</label>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -320,7 +322,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                             onChange={(e) => handleChange('hazardous', e.target.checked)}
                             className="w-4 h-4"
                         />
-                        <label htmlFor="hazardous" className="text-sm font-medium text-red-600">Hazardous Material</label>
+                        <label htmlFor="hazardous" className="text-sm font-medium text-red-600">Vật liệu nguy hiểm</label>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -331,20 +333,20 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                             onChange={(e) => handleChange('is_active', e.target.checked)}
                             className="w-4 h-4"
                         />
-                        <label htmlFor="is_active" className="text-sm font-medium">Active</label>
+                        <label htmlFor="is_active" className="text-sm font-medium">Đang hoạt động</label>
                     </div>
                 </div>
             </div>
 
             {/* Notes */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Notes</h3>
+                <h3 className="text-lg font-semibold mb-4">Ghi Chú</h3>
                 <textarea
                     className="input w-full"
                     rows={4}
                     value={formData.notes || ''}
                     onChange={(e) => handleChange('notes', e.target.value)}
-                    placeholder="Additional notes..."
+                    placeholder="Ghi chú thêm..."
                 />
             </div>
 
@@ -357,7 +359,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     disabled={isSaving}
                 >
                     <X className="w-5 h-5" />
-                    Cancel
+                    Hủy bỏ
                 </button>
                 <button
                     type="submit"
@@ -365,7 +367,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     disabled={isSaving}
                 >
                     <Save className="w-5 h-5" />
-                    {isSaving ? 'Saving...' : isEditMode ? 'Update Material' : 'Create Material'}
+                    {isSaving ? 'Đang lưu...' : isEditMode ? 'Cập Nhật NVL' : 'Tạo NVL'}
                 </button>
             </div>
         </form>

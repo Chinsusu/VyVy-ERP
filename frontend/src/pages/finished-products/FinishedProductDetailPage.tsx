@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import AuditLogPanel from '../../components/common/AuditLogPanel';
 import {
     ArrowLeft,
     Edit,
@@ -320,6 +321,11 @@ export default function FinishedProductDetailPage() {
                         <ProductFormulaTab productId={productId} productName={product.name} />
                     </div>
                 )}
+            </div>
+
+            {/* Audit Log History */}
+            <div className="mt-6">
+                <AuditLogPanel tableName="finished_products" recordId={product.id} />
             </div>
 
             {/* Modal Xác Nhận Xoá */}

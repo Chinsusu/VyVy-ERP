@@ -80,9 +80,9 @@ export interface MaterialRequestListResponse {
     success: boolean;
     data: MaterialRequest[];
     pagination: {
-        total: number;
         page: number;
-        page_size: number;
+        limit: number;
+        total_items: number;
         total_pages: number;
     };
 }

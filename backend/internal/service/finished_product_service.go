@@ -12,24 +12,25 @@ import (
 
 // FinishedProductService interface defines business logic for finished products
 type FinishedProductService interface {
-	CreateFinishedProduct(req *dto.CreateFinishedProductRequest, userID uint) (*models.SafeFinishedProduct, error)
+	CreateFinishedProduct(req *dto.CreateFinishedProductRequest, userID uint, username string) (*models.SafeFinishedProduct, error)
 	GetFinishedProductByID(id uint) (*models.SafeFinishedProduct, error)
 	GetFinishedProductByCode(code string) (*models.SafeFinishedProduct, error)
 	ListFinishedProducts(filter *dto.FinishedProductFilterRequest) ([]*models.SafeFinishedProduct, int64, error)
-	UpdateFinishedProduct(id uint, req *dto.UpdateFinishedProductRequest, userID uint) (*models.SafeFinishedProduct, error)
-	DeleteFinishedProduct(id uint) error
+	UpdateFinishedProduct(id uint, req *dto.UpdateFinishedProductRequest, userID uint, username string) (*models.SafeFinishedProduct, error)
+	DeleteFinishedProduct(id uint, userID int64, username string) error
 }
 
 type finishedProductService struct {
-	repo repository.FinishedProductRepository
+	repo     repository.FinishedProductRepository
+	auditSvc AuditLogService
 }
 
 // NewFinishedProductService creates a new instance of FinishedProductService
-func NewFinishedProductService(repo repository.FinishedProductRepository) FinishedProductService {
-	return &finishedProductService{repo: repo}
+func NewFinishedProductService(repo repository.FinishedProductRepository, auditSvc AuditLogService) FinishedProductService {
+	return &finishedProductService{repo: repo, auditSvc: auditSvc}
 }
 
-func (s *finishedProductService) CreateFinishedProduct(req *dto.CreateFinishedProductRequest, userID uint) (*models.SafeFinishedProduct, error) {
+func (s *finishedProductService) CreateFinishedProduct(req *dto.CreateFinishedProductRequest, userID uint, username string) (*models.SafeFinishedProduct, error) {
 	// Check if code already exists
 	existing, err := s.repo.GetByCode(req.Code)
 	if err == nil && existing != nil {
@@ -74,7 +75,10 @@ func (s *finishedProductService) CreateFinishedProduct(req *dto.CreateFinishedPr
 		return nil, err
 	}
 
-	return product.ToSafe(), nil
+	safe := product.ToSafe()
+	_ = s.auditSvc.Log("finished_products", "CREATE", int64(product.ID), int64(userID), username, nil, safe)
+
+	return safe, nil
 }
 
 func (s *finishedProductService) GetFinishedProductByID(id uint) (*models.SafeFinishedProduct, error) {
@@ -116,7 +120,7 @@ func (s *finishedProductService) ListFinishedProducts(filter *dto.FinishedProduc
 	return safeProducts, total, nil
 }
 
-func (s *finishedProductService) UpdateFinishedProduct(id uint, req *dto.UpdateFinishedProductRequest, userID uint) (*models.SafeFinishedProduct, error) {
+func (s *finishedProductService) UpdateFinishedProduct(id uint, req *dto.UpdateFinishedProductRequest, userID uint, username string) (*models.SafeFinishedProduct, error) {
 	// Get existing product
 	product, err := s.repo.GetByID(id)
 	if err != nil {
@@ -125,6 +129,9 @@ func (s *finishedProductService) UpdateFinishedProduct(id uint, req *dto.UpdateF
 		}
 		return nil, err
 	}
+
+	// Capture old values
+	oldValues := product.ToSafe()
 
 	// Update fields if provided
 	if req.Code != "" {
@@ -217,12 +224,15 @@ func (s *finishedProductService) UpdateFinishedProduct(id uint, req *dto.UpdateF
 		return nil, err
 	}
 
-	return product.ToSafe(), nil
+	newValues := product.ToSafe()
+	_ = s.auditSvc.Log("finished_products", "UPDATE", int64(product.ID), int64(userID), username, oldValues, newValues)
+
+	return newValues, nil
 }
 
-func (s *finishedProductService) DeleteFinishedProduct(id uint) error {
+func (s *finishedProductService) DeleteFinishedProduct(id uint, userID int64, username string) error {
 	// Check if product exists
-	_, err := s.repo.GetByID(id)
+	product, err := s.repo.GetByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("finished product not found")
@@ -230,5 +240,13 @@ func (s *finishedProductService) DeleteFinishedProduct(id uint) error {
 		return err
 	}
 
-	return s.repo.Delete(id)
+	oldValues := product.ToSafe()
+
+	if err := s.repo.Delete(id); err != nil {
+		return err
+	}
+
+	_ = s.auditSvc.Log("finished_products", "DELETE", int64(id), userID, username, oldValues, nil)
+
+	return nil
 }

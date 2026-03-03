@@ -11,25 +11,26 @@ import (
 
 // MaterialService interface defines business logic methods
 type MaterialService interface {
-	CreateMaterial(req dto.CreateMaterialRequest, userID int64) (*models.SafeMaterial, error)
+	CreateMaterial(req dto.CreateMaterialRequest, userID int64, username string) (*models.SafeMaterial, error)
 	GetMaterialByID(id int64) (*models.SafeMaterial, error)
 	ListMaterials(filter dto.MaterialFilterRequest) ([]*models.SafeMaterial, int64, error)
-	UpdateMaterial(id int64, req dto.UpdateMaterialRequest, userID int64) (*models.SafeMaterial, error)
-	DeleteMaterial(id int64) error
+	UpdateMaterial(id int64, req dto.UpdateMaterialRequest, userID int64, username string) (*models.SafeMaterial, error)
+	DeleteMaterial(id int64, userID int64, username string) error
 }
 
 // materialService implements MaterialService
 type materialService struct {
-	repo repository.MaterialRepository
+	repo     repository.MaterialRepository
+	auditSvc AuditLogService
 }
 
 // NewMaterialService creates a new material service
-func NewMaterialService(repo repository.MaterialRepository) MaterialService {
-	return &materialService{repo: repo}
+func NewMaterialService(repo repository.MaterialRepository, auditSvc AuditLogService) MaterialService {
+	return &materialService{repo: repo, auditSvc: auditSvc}
 }
 
 // CreateMaterial creates a new material
-func (s *materialService) CreateMaterial(req dto.CreateMaterialRequest, userID int64) (*models.SafeMaterial, error) {
+func (s *materialService) CreateMaterial(req dto.CreateMaterialRequest, userID int64, username string) (*models.SafeMaterial, error) {
 	// Check if code already exists
 	existing, err := s.repo.GetByCode(req.Code)
 	if err == nil && existing != nil {
@@ -69,7 +70,11 @@ func (s *materialService) CreateMaterial(req dto.CreateMaterialRequest, userID i
 		return nil, err
 	}
 
-	return material.ToSafe(), nil
+	// Audit log
+	safe := material.ToSafe()
+	_ = s.auditSvc.Log("materials", "CREATE", material.ID, userID, username, nil, safe)
+
+	return safe, nil
 }
 
 // GetMaterialByID retrieves a material by ID
@@ -100,7 +105,7 @@ func (s *materialService) ListMaterials(filter dto.MaterialFilterRequest) ([]*mo
 }
 
 // UpdateMaterial updates a material
-func (s *materialService) UpdateMaterial(id int64, req dto.UpdateMaterialRequest, userID int64) (*models.SafeMaterial, error) {
+func (s *materialService) UpdateMaterial(id int64, req dto.UpdateMaterialRequest, userID int64, username string) (*models.SafeMaterial, error) {
 	material, err := s.repo.GetByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -108,6 +113,9 @@ func (s *materialService) UpdateMaterial(id int64, req dto.UpdateMaterialRequest
 		}
 		return nil, err
 	}
+
+	// Capture old values before mutation
+	oldValues := material.ToSafe()
 
 	// Update fields if provided
 	if req.TradingName != nil {
@@ -174,12 +182,16 @@ func (s *materialService) UpdateMaterial(id int64, req dto.UpdateMaterialRequest
 		return nil, err
 	}
 
-	return material.ToSafe(), nil
+	newValues := material.ToSafe()
+	// Audit log
+	_ = s.auditSvc.Log("materials", "UPDATE", material.ID, userID, username, oldValues, newValues)
+
+	return newValues, nil
 }
 
 // DeleteMaterial soft deletes a material
-func (s *materialService) DeleteMaterial(id int64) error {
-	_, err := s.repo.GetByID(id)
+func (s *materialService) DeleteMaterial(id int64, userID int64, username string) error {
+	material, err := s.repo.GetByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("material not found")
@@ -187,5 +199,14 @@ func (s *materialService) DeleteMaterial(id int64) error {
 		return err
 	}
 
-	return s.repo.Delete(id)
+	oldValues := material.ToSafe()
+
+	if err := s.repo.Delete(id); err != nil {
+		return err
+	}
+
+	// Audit log
+	_ = s.auditSvc.Log("materials", "DELETE", id, userID, username, oldValues, nil)
+
+	return nil
 }

@@ -14,7 +14,7 @@ export default function SupplierEditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="flex items-center justify-center h-64">
-                        <div className="text-gray-500">Loading supplier...</div>
+                        <div className="text-gray-500">Đang tải nhà cung cấp...</div>
                     </div>
                 </div>
             </div>
@@ -26,14 +26,14 @@ export default function SupplierEditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        {error ? `Error: ${(error as Error).message}` : 'Supplier not found'}
+                        {error ? `Lỗi: ${(error as Error).message}` : 'Không tìm thấy nhà cung cấp'}
                     </div>
                     <Link
                         to="/suppliers"
                         className="text-primary hover:underline flex items-center gap-2 mt-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Suppliers
+                        Quay lại danh sách
                     </Link>
                 </div>
             </div>
@@ -50,11 +50,11 @@ export default function SupplierEditPage() {
                         className="text-primary hover:underline flex items-center gap-2 mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Supplier Details
+                        Quay lại chi tiết nhà cung cấp
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Edit Supplier</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Chỉnh Sửa Nhà Cung Cấp</h1>
                     <p className="text-gray-600 mt-1">
-                        Update information for {supplier.name} ({supplier.code})
+                        Cập nhật thông tin của {supplier.name} ({supplier.code})
                     </p>
                 </div>
 

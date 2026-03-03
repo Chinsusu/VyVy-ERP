@@ -8,12 +8,12 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     -- Changes
     old_values JSONB,
     new_values JSONB,
-    changed_fields TEXT[],
+    changed_fields JSONB,
     
     -- User context
     user_id BIGINT,
     username VARCHAR(100),
-    ip_address INET,
+    ip_address VARCHAR(45),
     user_agent TEXT,
     
     -- Timestamp

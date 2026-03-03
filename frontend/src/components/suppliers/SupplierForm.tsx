@@ -46,10 +46,10 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
     const validate = (): boolean => {
         const newErrors: Record<string, string> = {};
 
-        if (!formData.code) newErrors.code = 'Code is required';
-        if (!formData.name) newErrors.name = 'Name is required';
+        if (!formData.code) newErrors.code = 'Mã NCC là bắt buộc';
+        if (!formData.name) newErrors.name = 'Tên là bắt buộc';
         if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Invalid email format';
+            newErrors.email = 'Email không hợp lệ';
         }
 
         setErrors(newErrors);
@@ -95,10 +95,10 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
+                <h3 className="text-lg font-semibold mb-4">Thông Tin Cơ Bản</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Code *</label>
+                        <label className="label">Mã NCC *</label>
                         <input
                             type="text"
                             className={`input ${errors.code ? 'border-red-500' : ''}`}
@@ -111,7 +111,7 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                     </div>
 
                     <div>
-                        <label className="label">Name (Vietnamese) *</label>
+                        <label className="label">Tên (Tiếng Việt) *</label>
                         <input
                             type="text"
                             className={`input ${errors.name ? 'border-red-500' : ''}`}
@@ -123,7 +123,7 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                     </div>
 
                     <div>
-                        <label className="label">Name (English)</label>
+                        <label className="label">Tên (Tiếng Anh)</label>
                         <input
                             type="text"
                             className="input"
@@ -134,7 +134,7 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                     </div>
 
                     <div>
-                        <label className="label">Tax Code</label>
+                        <label className="label">Mã số thuế</label>
                         <input
                             type="text"
                             className="input"
@@ -148,10 +148,10 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
 
             {/* Contact Information */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
+                <h3 className="text-lg font-semibold mb-4">Thông Tin Liên Hệ</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Contact Person</label>
+                        <label className="label">Người liên hệ</label>
                         <input
                             type="text"
                             className="input"
@@ -162,7 +162,7 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                     </div>
 
                     <div>
-                        <label className="label">Phone</label>
+                        <label className="label">Điện thoại</label>
                         <input
                             type="text"
                             className="input"
@@ -188,21 +188,21 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
 
             {/* Address */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Address</h3>
+                <h3 className="text-lg font-semibold mb-4">Địa Chỉ</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
-                        <label className="label">Address</label>
+                        <label className="label">Địa chỉ</label>
                         <textarea
                             className="input w-full"
                             rows={2}
                             value={formData.address || ''}
                             onChange={(e) => handleChange('address', e.target.value)}
-                            placeholder="Street address"
+                            placeholder="Số nhà, tên đường..."
                         />
                     </div>
 
                     <div>
-                        <label className="label">City</label>
+                        <label className="label">Tỉnh/Thành phố</label>
                         <input
                             type="text"
                             className="input"
@@ -213,7 +213,7 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                     </div>
 
                     <div>
-                        <label className="label">Country</label>
+                        <label className="label">Quốc gia</label>
                         <input
                             type="text"
                             className="input"
@@ -227,21 +227,21 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
 
             {/* Payment Terms */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Payment Terms</h3>
+                <h3 className="text-lg font-semibold mb-4">Điều Kiện Thanh Toán</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="label">Payment Terms</label>
+                        <label className="label">Điều kiện thanh toán</label>
                         <input
                             type="text"
                             className="input"
                             value={formData.payment_terms || ''}
                             onChange={(e) => handleChange('payment_terms', e.target.value)}
-                            placeholder="e.g., Net 30 days"
+                            placeholder="VD: Thanh toán trước 30 ngày"
                         />
                     </div>
 
                     <div>
-                        <label className="label">Credit Limit</label>
+                        <label className="label">Hạn mức tín dụng (VND)</label>
                         <input
                             type="number"
                             step="0.01"
@@ -256,16 +256,16 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
 
             {/* Notes & Status */}
             <div className="card">
-                <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
+                <h3 className="text-lg font-semibold mb-4">Thông Tin Khác</h3>
                 <div className="space-y-4">
                     <div>
-                        <label className="label">Notes</label>
+                        <label className="label">Ghi chú</label>
                         <textarea
                             className="input w-full"
                             rows={4}
                             value={formData.notes || ''}
                             onChange={(e) => handleChange('notes', e.target.value)}
-                            placeholder="Additional notes..."
+                            placeholder="Ghi chú thêm..."
                         />
                     </div>
 
@@ -277,7 +277,7 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                             onChange={(e) => handleChange('is_active', e.target.checked)}
                             className="w-4 h-4"
                         />
-                        <label htmlFor="is_active" className="text-sm font-medium">Active</label>
+                        <label htmlFor="is_active" className="text-sm font-medium">Đang hoạt động</label>
                     </div>
                 </div>
             </div>
@@ -291,7 +291,7 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                     disabled={isSaving}
                 >
                     <X className="w-5 h-5" />
-                    Cancel
+                    Hủy bỏ
                 </button>
                 <button
                     type="submit"
@@ -299,7 +299,7 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                     disabled={isSaving}
                 >
                     <Save className="w-5 h-5" />
-                    {isSaving ? 'Saving...' : isEditMode ? 'Update Supplier' : 'Create Supplier'}
+                    {isSaving ? 'Đang lưu...' : isEditMode ? 'Cập Nhật Nhà Cung Cấp' : 'Tạo Nhà Cung Cấp'}
                 </button>
             </div>
         </form>

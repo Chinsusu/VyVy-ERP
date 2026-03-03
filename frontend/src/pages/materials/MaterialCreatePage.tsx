@@ -15,11 +15,11 @@ export default function MaterialCreatePage() {
                         className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
-                        Back to Materials
+                        Quay lại danh sách
                     </button>
                     <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                         <Package className="w-8 h-8 text-primary" />
-                        Create New Material
+                        Tạo Nguyên Vật Liệu Mới
                     </h1>
                 </div>
 

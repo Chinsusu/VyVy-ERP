@@ -21,7 +21,6 @@ func NewSupplierHandler(service service.SupplierService) *SupplierHandler {
 }
 
 // List retrieves suppliers with filters
-// @route GET /api/v1/suppliers
 func (h *SupplierHandler) List(c *gin.Context) {
 	var filter dto.SupplierFilterRequest
 	if err := c.ShouldBindQuery(&filter); err != nil {
@@ -45,7 +44,6 @@ func (h *SupplierHandler) List(c *gin.Context) {
 }
 
 // GetByID retrieves a supplier by ID
-// @route GET /api/v1/suppliers/:id
 func (h *SupplierHandler) GetByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -63,7 +61,6 @@ func (h *SupplierHandler) GetByID(c *gin.Context) {
 }
 
 // Create creates a new supplier
-// @route POST /api/v1/suppliers
 func (h *SupplierHandler) Create(c *gin.Context) {
 	var req dto.CreateSupplierRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -71,15 +68,16 @@ func (h *SupplierHandler) Create(c *gin.Context) {
 		return
 	}
 
-	// Get user ID from context (set by auth middleware)
 	val, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
 		return
 	}
 	userID := val.(int64)
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
 
-	supplier, err := h.service.CreateSupplier(&req, uint(userID))
+	supplier, err := h.service.CreateSupplier(&req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
@@ -89,7 +87,6 @@ func (h *SupplierHandler) Create(c *gin.Context) {
 }
 
 // Update updates a supplier
-// @route PUT /api/v1/suppliers/:id
 func (h *SupplierHandler) Update(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -103,15 +100,16 @@ func (h *SupplierHandler) Update(c *gin.Context) {
 		return
 	}
 
-	// Get user ID from context
 	val, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
 		return
 	}
 	userID := val.(int64)
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
 
-	supplier, err := h.service.UpdateSupplier(uint(id), &req, uint(userID))
+	supplier, err := h.service.UpdateSupplier(uint(id), &req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return
@@ -121,7 +119,6 @@ func (h *SupplierHandler) Update(c *gin.Context) {
 }
 
 // Delete soft deletes a supplier
-// @route DELETE /api/v1/suppliers/:id
 func (h *SupplierHandler) Delete(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -129,7 +126,16 @@ func (h *SupplierHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteSupplier(uint(id)); err != nil {
+	val, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
+		return
+	}
+	userID := val.(int64)
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
+
+	if err := h.service.DeleteSupplier(uint(id), userID, usernameStr); err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("DELETE_ERROR", err.Error()))
 		return
 	}

@@ -1,36 +1,38 @@
 package service
 
 import (
+	"errors"
+	"time"
+
 	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
 	"github.com/VyVy-ERP/warehouse-backend/internal/models"
 	"github.com/VyVy-ERP/warehouse-backend/internal/repository"
-	"errors"
-	"time"
 
 	"gorm.io/gorm"
 )
 
 // SupplierService defines the interface for supplier business logic
 type SupplierService interface {
-	CreateSupplier(req *dto.CreateSupplierRequest, userID uint) (*models.SafeSupplier, error)
+	CreateSupplier(req *dto.CreateSupplierRequest, userID uint, username string) (*models.SafeSupplier, error)
 	GetSupplierByID(id uint) (*models.SafeSupplier, error)
 	ListSuppliers(filter *dto.SupplierFilterRequest) ([]*models.SafeSupplier, int64, error)
-	UpdateSupplier(id uint, req *dto.UpdateSupplierRequest, userID uint) (*models.SafeSupplier, error)
-	DeleteSupplier(id uint) error
+	UpdateSupplier(id uint, req *dto.UpdateSupplierRequest, userID uint, username string) (*models.SafeSupplier, error)
+	DeleteSupplier(id uint, userID int64, username string) error
 }
 
 // supplierService implements SupplierService
 type supplierService struct {
-	repo repository.SupplierRepository
+	repo     repository.SupplierRepository
+	auditSvc AuditLogService
 }
 
 // NewSupplierService creates a new supplier service
-func NewSupplierService(repo repository.SupplierRepository) SupplierService {
-	return &supplierService{repo: repo}
+func NewSupplierService(repo repository.SupplierRepository, auditSvc AuditLogService) SupplierService {
+	return &supplierService{repo: repo, auditSvc: auditSvc}
 }
 
 // CreateSupplier creates a new supplier
-func (s *supplierService) CreateSupplier(req *dto.CreateSupplierRequest, userID uint) (*models.SafeSupplier, error) {
+func (s *supplierService) CreateSupplier(req *dto.CreateSupplierRequest, userID uint, username string) (*models.SafeSupplier, error) {
 	// Check if code already exists
 	existing, err := s.repo.GetByCode(req.Code)
 	if err == nil && existing != nil {
@@ -69,7 +71,10 @@ func (s *supplierService) CreateSupplier(req *dto.CreateSupplierRequest, userID 
 		return nil, err
 	}
 
-	return supplier.ToSafe(), nil
+	safe := supplier.ToSafe()
+	_ = s.auditSvc.Log("suppliers", "CREATE", int64(supplier.ID), int64(userID), username, nil, safe)
+
+	return safe, nil
 }
 
 // GetSupplierByID retrieves a supplier by ID
@@ -101,7 +106,7 @@ func (s *supplierService) ListSuppliers(filter *dto.SupplierFilterRequest) ([]*m
 }
 
 // UpdateSupplier updates a supplier
-func (s *supplierService) UpdateSupplier(id uint, req *dto.UpdateSupplierRequest, userID uint) (*models.SafeSupplier, error) {
+func (s *supplierService) UpdateSupplier(id uint, req *dto.UpdateSupplierRequest, userID uint, username string) (*models.SafeSupplier, error) {
 	// Get existing supplier
 	supplier, err := s.repo.GetByID(id)
 	if err != nil {
@@ -110,6 +115,9 @@ func (s *supplierService) UpdateSupplier(id uint, req *dto.UpdateSupplierRequest
 		}
 		return nil, err
 	}
+
+	// Capture old values
+	oldValues := supplier.ToSafe()
 
 	// Check if new code conflicts with existing supplier
 	if req.Code != "" && req.Code != supplier.Code {
@@ -170,13 +178,16 @@ func (s *supplierService) UpdateSupplier(id uint, req *dto.UpdateSupplierRequest
 		return nil, err
 	}
 
-	return supplier.ToSafe(), nil
+	newValues := supplier.ToSafe()
+	_ = s.auditSvc.Log("suppliers", "UPDATE", int64(supplier.ID), int64(userID), username, oldValues, newValues)
+
+	return newValues, nil
 }
 
 // DeleteSupplier soft deletes a supplier
-func (s *supplierService) DeleteSupplier(id uint) error {
+func (s *supplierService) DeleteSupplier(id uint, userID int64, username string) error {
 	// Check if supplier exists
-	_, err := s.repo.GetByID(id)
+	supplier, err := s.repo.GetByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("supplier not found")
@@ -184,5 +195,13 @@ func (s *supplierService) DeleteSupplier(id uint) error {
 		return err
 	}
 
-	return s.repo.Delete(id)
+	oldValues := supplier.ToSafe()
+
+	if err := s.repo.Delete(id); err != nil {
+		return err
+	}
+
+	_ = s.auditSvc.Log("suppliers", "DELETE", int64(id), userID, username, oldValues, nil)
+
+	return nil
 }

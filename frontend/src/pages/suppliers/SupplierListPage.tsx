@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Users, Plus, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSuppliers } from '../../hooks/useSuppliers';
 import type { SupplierFilters } from '../../types/supplier';
+import PageSizeSelector from '../../components/common/PageSizeSelector';
 
 export default function SupplierListPage() {
     const [filters, setFilters] = useState<SupplierFilters>({
@@ -22,12 +23,16 @@ export default function SupplierListPage() {
         setFilters({ ...filters, page: newPage });
     };
 
+    const handlePageSizeChange = (size: number) => {
+        setFilters({ ...filters, page_size: size, page: 1 });
+    };
+
     if (isLoading) {
         return (
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="flex items-center justify-center h-64">
-                        <div className="text-gray-500">Loading suppliers...</div>
+                        <div className="text-gray-500">Đang tải nhà cung cấp...</div>
                     </div>
                 </div>
             </div>
@@ -39,7 +44,7 @@ export default function SupplierListPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        Error loading suppliers: {(error as Error).message}
+                        Error: {(error as Error).message}
                     </div>
                 </div>
             </div>
@@ -58,16 +63,16 @@ export default function SupplierListPage() {
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                                 <Users className="w-8 h-8 text-primary" />
-                                Suppliers
+                                Nhà Cung Cấp
                             </h1>
-                            <p className="text-gray-600 mt-1">Manage suppliers and vendors</p>
+                            <p className="text-gray-600 mt-1">Quản lý danh sách nhà cung cấp</p>
                         </div>
                         <Link
                             to="/suppliers/new"
                             className="btn btn-primary flex items-center gap-2"
                         >
                             <Plus className="w-5 h-5" />
-                            Add Supplier
+                            Thêm Nhà Cung Cấp
                         </Link>
                     </div>
                 </div>
@@ -79,7 +84,7 @@ export default function SupplierListPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search by code, name, tax code, email..."
+                                placeholder="Tìm theo mã, tên, mã số thuế, email..."
                                 className="input pl-10 w-full"
                                 value={filters.search || ''}
                                 onChange={handleSearch}
@@ -87,7 +92,7 @@ export default function SupplierListPage() {
                         </div>
                         <button className="btn btn-secondary flex items-center gap-2">
                             <Filter className="w-5 h-5" />
-                            Filters
+                            Bộ lọc
                         </button>
                     </div>
                 </div>
@@ -99,21 +104,21 @@ export default function SupplierListPage() {
                             <table className="w-full">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
-                                        <th>Name</th>
-                                        <th>Contact Person</th>
-                                        <th>Phone</th>
+                                        <th>Mã NCC</th>
+                                        <th>Tên</th>
+                                        <th>Người liên hệ</th>
+                                        <th>Điện thoại</th>
                                         <th>Email</th>
-                                        <th>City</th>
-                                        <th className="text-center">Status</th>
-                                        <th className="text-right">Actions</th>
+                                        <th>Tỉnh/TP</th>
+                                        <th className="text-center">Trạng thái</th>
+                                        <th className="text-right">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {suppliers.length === 0 ? (
                                         <tr>
                                             <td colSpan={8} className="text-center p-12 text-gray-500">
-                                                No suppliers found. Add your first supplier to get started.
+                                                Chưa có nhà cung cấp nào. Thêm nhà cung cấp đầu tiên để bắt đầu.
                                             </td>
                                         </tr>
                                     ) : (
@@ -134,9 +139,9 @@ export default function SupplierListPage() {
                                                 <td className="p-4">{supplier.city || '-'}</td>
                                                 <td className="p-4 text-center">
                                                     {supplier.is_active ? (
-                                                        <span className="badge badge-success">Active</span>
+                                                        <span className="badge badge-success">Đang hoạt động</span>
                                                     ) : (
-                                                        <span className="badge badge-secondary">Inactive</span>
+                                                        <span className="badge badge-secondary">Ngừng hoạt động</span>
                                                     )}
                                                 </td>
                                                 <td className="p-4 text-right">
@@ -144,7 +149,7 @@ export default function SupplierListPage() {
                                                         to={`/suppliers/${supplier.id}/edit`}
                                                         className="text-primary hover:underline text-sm"
                                                     >
-                                                        Edit
+                                                        Sửa
                                                     </Link>
                                                 </td>
                                             </tr>
@@ -155,34 +160,43 @@ export default function SupplierListPage() {
                         </div>
 
                         {/* Pagination */}
-                        {pagination && pagination.total > 0 && (
-                            <div className="flex items-center justify-between p-4 border-t border-gray-200">
-                                <div className="text-sm text-gray-600">
-                                    Showing {((pagination.page - 1) * pagination.page_size) + 1} to{' '}
-                                    {Math.min(pagination.page * pagination.page_size, pagination.total)} of{' '}
-                                    {pagination.total} suppliers
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => handlePageChange(pagination.page - 1)}
-                                        disabled={pagination.page === 1}
-                                        className="btn btn-secondary btn-sm disabled:opacity-50"
-                                    >
-                                        <ChevronLeft className="w-4 h-4" />
-                                        Previous
-                                    </button>
-                                    <span className="text-sm text-gray-600">
-                                        Page {pagination.page} of {pagination.total_pages}
+                        {pagination && pagination.total_items > 0 && (
+                            <div className="flex items-center justify-between p-4 border-t border-gray-200 flex-wrap gap-3">
+                                <div className="flex items-center gap-4">
+                                    <PageSizeSelector
+                                        pageSize={filters.page_size || 20}
+                                        onChange={handlePageSizeChange}
+                                        totalItems={Number(pagination.total_items)}
+                                    />
+                                    <span className="text-sm text-gray-500">
+                                        {(filters.page_size || 0) >= 999999
+                                            ? `Tất cả ${pagination.total_items} nhà cung cấp`
+                                            : `Hiển thị ${((pagination.page - 1) * (filters.page_size || 20)) + 1}–${Math.min(pagination.page * (filters.page_size || 20), Number(pagination.total_items))} / ${pagination.total_items} nhà cung cấp`}
                                     </span>
-                                    <button
-                                        onClick={() => handlePageChange(pagination.page + 1)}
-                                        disabled={pagination.page >= pagination.total_pages}
-                                        className="btn btn-secondary btn-sm disabled:opacity-50"
-                                    >
-                                        Next
-                                        <ChevronRight className="w-4 h-4" />
-                                    </button>
                                 </div>
+                                {(filters.page_size || 0) < 999999 && pagination.total_pages > 1 && (
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => handlePageChange(pagination.page - 1)}
+                                            disabled={pagination.page === 1}
+                                            className="btn btn-secondary btn-sm disabled:opacity-50"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" />
+                                            Trước
+                                        </button>
+                                        <span className="text-sm text-gray-600">
+                                            Trang {pagination.page} / {pagination.total_pages}
+                                        </span>
+                                        <button
+                                            onClick={() => handlePageChange(pagination.page + 1)}
+                                            disabled={pagination.page >= pagination.total_pages}
+                                            className="btn btn-secondary btn-sm disabled:opacity-50"
+                                        >
+                                            Tiếp
+                                            <ChevronRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

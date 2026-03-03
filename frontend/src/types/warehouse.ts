@@ -57,8 +57,8 @@ export interface WarehouseListResponse {
     data: Warehouse[];
     pagination: {
         page: number;
-        page_size: number;
-        total: number;
+        limit: number;
+        total_items: number;
         total_pages: number;
     };
 }

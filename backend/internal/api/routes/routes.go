@@ -37,18 +37,20 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	carrierRepo := repository.NewCarrierRepository(db)
 	reconRepo := repository.NewReconciliationRepository(db)
 	roRepo := repository.NewReturnOrderRepository(db)
+	auditLogRepo := repository.NewAuditLogRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
-	materialService := service.NewMaterialService(materialRepo)
-	supplierService := service.NewSupplierService(supplierRepo)
+	auditLogService := service.NewAuditLogService(auditLogRepo)
+	materialService := service.NewMaterialService(materialRepo, auditLogService)
+	supplierService := service.NewSupplierService(supplierRepo, auditLogService)
 	warehouseService := service.NewWarehouseService(warehouseRepo, warehouseLocationRepo)
 	warehouseLocationService := service.NewWarehouseLocationService(warehouseLocationRepo, warehouseRepo)
-	finishedProductService := service.NewFinishedProductService(finishedProductRepo)
+	finishedProductService := service.NewFinishedProductService(finishedProductRepo, auditLogService)
 	productFormulaService := service.NewProductFormulaService(productFormulaRepo, finishedProductRepo, materialRepo)
 	purchaseOrderService := service.NewPurchaseOrderService(purchaseOrderRepo, purchaseOrderItemRepo, supplierRepo, warehouseRepo)
 	grnService := service.NewGRNService(db, grnRepo, grnItemRepo, purchaseOrderRepo, purchaseOrderItemRepo, warehouseRepo, stockLedgerRepo, stockBalanceRepo)
-	mrService := service.NewMaterialRequestService(db, mrRepo, mrItemRepo, warehouseRepo, materialRepo, stockBalanceRepo, stockReservationRepo)
+	mrService := service.NewMaterialRequestService(db, mrRepo, mrItemRepo, warehouseRepo, materialRepo, stockBalanceRepo, stockReservationRepo, auditLogService)
 	minService := service.NewMaterialIssueNoteService(minRepo, mrRepo, materialRepo, stockBalanceRepo, stockReservationRepo, db)
 	stockService := service.NewStockService(stockBalanceRepo)
 	doService := service.NewDeliveryOrderService(db, doRepo, warehouseRepo, finishedProductRepo, stockBalanceRepo, stockReservationRepo)
@@ -64,6 +66,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
+	auditLogHandler := handlers.NewAuditLogHandler(auditLogService)
 	materialHandler := handlers.NewMaterialHandler(materialService)
 	supplierHandler := handlers.NewSupplierHandler(supplierService)
 	warehouseHandler := handlers.NewWarehouseHandler(warehouseService)
@@ -282,6 +285,13 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		alertGroup.GET("/summary", alertHandler.GetAlertSummary)
 		alertGroup.GET("/low-stock", alertHandler.GetLowStockAlerts)
 		alertGroup.GET("/expiring-soon", alertHandler.GetExpiringSoonAlerts)
+	}
+
+	// Audit Log routes - All protected
+	auditGroup := v1.Group("/audit-logs")
+	auditGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		auditGroup.GET("", auditLogHandler.GetHistory)
 	}
 	// Carrier routes - All protected
 	carrierGroup := v1.Group("/carriers")

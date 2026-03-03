@@ -77,7 +77,13 @@ func (h *MaterialRequestHandler) Create(c *gin.Context) {
 	}
 	userID := val.(int64)
 
-	mr, err := h.service.CreateMaterialRequest(&req, uint(userID))
+	// Get username from context
+	username := ""
+	if u, ok := c.Get("username"); ok {
+		username, _ = u.(string)
+	}
+
+	mr, err := h.service.CreateMaterialRequest(&req, uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
@@ -109,7 +115,13 @@ func (h *MaterialRequestHandler) Update(c *gin.Context) {
 	}
 	userID := val.(int64)
 
-	mr, err := h.service.UpdateMaterialRequest(uint(id), &req, uint(userID))
+	// Get username from context
+	username := ""
+	if u, ok := c.Get("username"); ok {
+		username, _ = u.(string)
+	}
+
+	mr, err := h.service.UpdateMaterialRequest(uint(id), &req, uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return
@@ -127,7 +139,17 @@ func (h *MaterialRequestHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err = h.service.DeleteMaterialRequest(uint(id))
+	// Get user ID from context
+	userID := int64(0)
+	if val, exists := c.Get("user_id"); exists {
+		userID = val.(int64)
+	}
+	username := ""
+	if u, ok := c.Get("username"); ok {
+		username, _ = u.(string)
+	}
+
+	err = h.service.DeleteMaterialRequest(uint(id), uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("DELETE_ERROR", err.Error()))
 		return
@@ -153,7 +175,13 @@ func (h *MaterialRequestHandler) Approve(c *gin.Context) {
 	}
 	userID := val.(int64)
 
-	mr, err := h.service.ApproveMaterialRequest(uint(id), uint(userID))
+	// Get username from context
+	username := ""
+	if u, ok := c.Get("username"); ok {
+		username, _ = u.(string)
+	}
+
+	mr, err := h.service.ApproveMaterialRequest(uint(id), uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("APPROVE_ERROR", err.Error()))
 		return
@@ -171,7 +199,17 @@ func (h *MaterialRequestHandler) Cancel(c *gin.Context) {
 		return
 	}
 
-	mr, err := h.service.CancelMaterialRequest(uint(id))
+	// Get user ID from context
+	userID := int64(0)
+	if val, exists := c.Get("user_id"); exists {
+		userID = val.(int64)
+	}
+	username := ""
+	if u, ok := c.Get("username"); ok {
+		username, _ = u.(string)
+	}
+
+	mr, err := h.service.CancelMaterialRequest(uint(id), uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CANCEL_ERROR", err.Error()))
 		return

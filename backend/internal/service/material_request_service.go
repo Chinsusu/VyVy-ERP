@@ -12,13 +12,13 @@ import (
 
 // MaterialRequestService defines the interface for material request business logic
 type MaterialRequestService interface {
-	CreateMaterialRequest(req *dto.CreateMaterialRequestRequest, userID uint) (*models.SafeMaterialRequest, error)
+	CreateMaterialRequest(req *dto.CreateMaterialRequestRequest, userID uint, username string) (*models.SafeMaterialRequest, error)
 	GetMaterialRequestByID(id uint) (*models.SafeMaterialRequest, error)
 	ListMaterialRequests(filter *dto.MaterialRequestFilterRequest) ([]*models.SafeMaterialRequest, int64, error)
-	UpdateMaterialRequest(id uint, req *dto.UpdateMaterialRequestRequest, userID uint) (*models.SafeMaterialRequest, error)
-	DeleteMaterialRequest(id uint) error
-	ApproveMaterialRequest(id uint, userID uint) (*models.SafeMaterialRequest, error)
-	CancelMaterialRequest(id uint) (*models.SafeMaterialRequest, error)
+	UpdateMaterialRequest(id uint, req *dto.UpdateMaterialRequestRequest, userID uint, username string) (*models.SafeMaterialRequest, error)
+	DeleteMaterialRequest(id uint, userID uint, username string) error
+	ApproveMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error)
+	CancelMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error)
 }
 
 type materialRequestService struct {
@@ -29,6 +29,7 @@ type materialRequestService struct {
 	materialRepo   repository.MaterialRepository
 	stockRepo      repository.StockBalanceRepository
 	reservationRepo repository.StockReservationRepository
+	auditSvc       AuditLogService
 }
 
 // NewMaterialRequestService creates a new MaterialRequestService
@@ -40,6 +41,7 @@ func NewMaterialRequestService(
 	materialRepo repository.MaterialRepository,
 	stockRepo repository.StockBalanceRepository,
 	reservationRepo repository.StockReservationRepository,
+	auditSvc AuditLogService,
 ) MaterialRequestService {
 	return &materialRequestService{
 		db:             db,
@@ -49,11 +51,12 @@ func NewMaterialRequestService(
 		materialRepo:   materialRepo,
 		stockRepo:      stockRepo,
 		reservationRepo: reservationRepo,
+		auditSvc:       auditSvc,
 	}
 }
 
 // CreateMaterialRequest creates a new material request with items
-func (s *materialRequestService) CreateMaterialRequest(req *dto.CreateMaterialRequestRequest, userID uint) (*models.SafeMaterialRequest, error) {
+func (s *materialRequestService) CreateMaterialRequest(req *dto.CreateMaterialRequestRequest, userID uint, username string) (*models.SafeMaterialRequest, error) {
 	// Validate MR number uniqueness
 	existing, err := s.mrRepo.GetByMRNumber(req.MRNumber)
 	if err == nil && existing.ID > 0 {
@@ -125,6 +128,11 @@ func (s *materialRequestService) CreateMaterialRequest(req *dto.CreateMaterialRe
 		return nil, err
 	}
 
+	// Log audit
+	if s.auditSvc != nil {
+		_ = s.auditSvc.Log("material_requests", "CREATE", int64(mr.ID), int64(userID), username, nil, mr)
+	}
+
 	return mr.ToSafe(), nil
 }
 
@@ -156,8 +164,8 @@ func (s *materialRequestService) ListMaterialRequests(filter *dto.MaterialReques
 }
 
 // UpdateMaterialRequest updates a material request
-func (s *materialRequestService) UpdateMaterialRequest(id uint, req *dto.UpdateMaterialRequestRequest, userID uint) (*models.SafeMaterialRequest, error) {
-	// Get existing MR
+func (s *materialRequestService) UpdateMaterialRequest(id uint, req *dto.UpdateMaterialRequestRequest, userID uint, username string) (*models.SafeMaterialRequest, error) {
+	// Get existing MR (save old value for audit)
 	mr, err := s.mrRepo.GetByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -165,6 +173,7 @@ func (s *materialRequestService) UpdateMaterialRequest(id uint, req *dto.UpdateM
 		}
 		return nil, err
 	}
+	oldValues := *mr
 
 	// Check if MR is in draft status
 	if mr.Status != "draft" {
@@ -244,11 +253,16 @@ func (s *materialRequestService) UpdateMaterialRequest(id uint, req *dto.UpdateM
 		return nil, err
 	}
 
+	// Log audit
+	if s.auditSvc != nil {
+		_ = s.auditSvc.Log("material_requests", "UPDATE", int64(mr.ID), int64(userID), username, &oldValues, mr)
+	}
+
 	return mr.ToSafe(), nil
 }
 
 // DeleteMaterialRequest deletes a material request
-func (s *materialRequestService) DeleteMaterialRequest(id uint) error {
+func (s *materialRequestService) DeleteMaterialRequest(id uint, userID uint, username string) error {
 	mr, err := s.mrRepo.GetByID(id)
 	if err != nil {
 		return err
@@ -258,11 +272,20 @@ func (s *materialRequestService) DeleteMaterialRequest(id uint) error {
 		return errors.New("can only delete material requests in draft status")
 	}
 
-	return s.mrRepo.Delete(id)
+	if err := s.mrRepo.Delete(id); err != nil {
+		return err
+	}
+
+	// Log audit
+	if s.auditSvc != nil {
+		_ = s.auditSvc.Log("material_requests", "DELETE", int64(id), int64(userID), username, mr, nil)
+	}
+
+	return nil
 }
 
 // ApproveMaterialRequest approves a material request
-func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint) (*models.SafeMaterialRequest, error) {
+func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error) {
 	mr, err := s.mrRepo.GetByID(id)
 	if err != nil {
 		return nil, err
@@ -346,11 +369,21 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint) (*
 		return nil, err
 	}
 
-	return s.GetMaterialRequestByID(id)
+	result, err := s.GetMaterialRequestByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Log audit
+	if s.auditSvc != nil {
+		_ = s.auditSvc.Log("material_requests", "APPROVE", int64(id), int64(userID), username, nil, result)
+	}
+
+	return result, nil
 }
 
 // CancelMaterialRequest cancels a material request
-func (s *materialRequestService) CancelMaterialRequest(id uint) (*models.SafeMaterialRequest, error) {
+func (s *materialRequestService) CancelMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error) {
 	mr, err := s.mrRepo.GetByID(id)
 	if err != nil {
 		return nil, err
@@ -364,5 +397,15 @@ func (s *materialRequestService) CancelMaterialRequest(id uint) (*models.SafeMat
 		return nil, err
 	}
 
-	return s.GetMaterialRequestByID(id)
+	result, err := s.GetMaterialRequestByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Log audit
+	if s.auditSvc != nil {
+		_ = s.auditSvc.Log("material_requests", "CANCEL", int64(id), int64(userID), username, nil, result)
+	}
+
+	return result, nil
 }

@@ -9,13 +9,15 @@ import {
     ShoppingCart, ClipboardCheck, FileText, Send, Truck, Store,
     ArrowLeftRight, BarChart3, TrendingDown, Clock,
     Bell, LogOut, ChevronLeft, Menu, User,
-    AlertTriangle, Calendar, BoxesIcon, Activity, Globe, FileCheck, RotateCcw
+    AlertTriangle, Calendar, BoxesIcon, Activity, Globe, FileCheck, RotateCcw,
+    CreditCard, BookOpen, Building2
 } from 'lucide-react';
 
 interface NavItem {
     labelKey: string;
     path: string;
     icon: React.ReactNode;
+    disabled?: boolean;
 }
 
 interface NavGroup {
@@ -33,10 +35,14 @@ const navGroups: NavGroup[] = [
     {
         titleKey: 'groups.masterData',
         items: [
+            { labelKey: 'nav.suppliers', path: '/suppliers', icon: <Building2 className="w-5 h-5" /> },
+            { labelKey: 'nav.customers', path: '/customers', icon: <Users className="w-5 h-5" />, disabled: true },
+            { labelKey: 'nav.salesChannels', path: '/sales-channels', icon: <Store className="w-5 h-5" />, disabled: true },
+            { labelKey: 'nav.warehouses', path: '/warehouses', icon: <Warehouse className="w-5 h-5" /> },
+            { labelKey: 'nav.accountingAccounts', path: '/accounting-accounts', icon: <CreditCard className="w-5 h-5" />, disabled: true },
+            { labelKey: 'nav.openingBalances', path: '/opening-balances', icon: <BookOpen className="w-5 h-5" />, disabled: true },
             { labelKey: 'nav.materials', path: '/materials', icon: <Package className="w-5 h-5" /> },
             { labelKey: 'nav.finishedProducts', path: '/finished-products', icon: <ShoppingBag className="w-5 h-5" /> },
-            { labelKey: 'nav.suppliers', path: '/suppliers', icon: <Users className="w-5 h-5" /> },
-            { labelKey: 'nav.warehouses', path: '/warehouses', icon: <Warehouse className="w-5 h-5" /> },
         ],
     },
     {
@@ -57,7 +63,6 @@ const navGroups: NavGroup[] = [
         titleKey: 'groups.sales',
         items: [
             { labelKey: 'nav.deliveryOrders', path: '/delivery-orders', icon: <Truck className="w-5 h-5" /> },
-            { labelKey: 'nav.salesChannels', path: '/sales-channels', icon: <Store className="w-5 h-5" /> },
             { labelKey: 'nav.carriers', path: '/carriers', icon: <Package className="w-5 h-5" /> },
             { labelKey: 'nav.reconciliation', path: '/reconciliations', icon: <FileCheck className="w-5 h-5" /> },
             { labelKey: 'nav.returnOrders', path: '/return-orders', icon: <RotateCcw className="w-5 h-5" /> },
@@ -159,29 +164,45 @@ export default function AppLayout() {
                             )}
                             {collapsed && <div className="my-2 border-t border-slate-100" />}
                             {group.items.map((item) => (
-                                <NavLink
-                                    key={item.path}
-                                    to={item.path}
-                                    className={({ isActive }) =>
-                                        `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group relative ${isActive
-                                            ? 'bg-violet-50 text-violet-700'
-                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                                        } ${collapsed ? 'justify-center px-0' : ''}`
-                                    }
-                                    title={collapsed ? t(item.labelKey) : undefined}
-                                >
-                                    {({ isActive }) => (
-                                        <>
-                                            {isActive && (
-                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-600 rounded-r-full" />
-                                            )}
-                                            <span className={`shrink-0 ${isActive ? 'text-violet-600' : 'text-slate-400 group-hover:text-slate-600'}`}>
-                                                {item.icon}
+                                item.disabled ? (
+                                    <div
+                                        key={item.path}
+                                        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium opacity-40 cursor-not-allowed select-none ${collapsed ? 'justify-center px-0' : ''}`}
+                                        title={collapsed ? t(item.labelKey) : undefined}
+                                    >
+                                        <span className="shrink-0 text-slate-400">{item.icon}</span>
+                                        {!collapsed && (
+                                            <span className="flex items-center gap-1.5">
+                                                {t(item.labelKey)}
+                                                <span className="text-[10px] bg-slate-100 text-slate-400 px-1 py-0.5 rounded font-normal">Sắp ra mắt</span>
                                             </span>
-                                            {!collapsed && <span>{t(item.labelKey)}</span>}
-                                        </>
-                                    )}
-                                </NavLink>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <NavLink
+                                        key={item.path}
+                                        to={item.path}
+                                        className={({ isActive }) =>
+                                            `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group relative ${isActive
+                                                ? 'bg-violet-50 text-violet-700'
+                                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                            } ${collapsed ? 'justify-center px-0' : ''}`
+                                        }
+                                        title={collapsed ? t(item.labelKey) : undefined}
+                                    >
+                                        {({ isActive }) => (
+                                            <>
+                                                {isActive && (
+                                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-violet-600 rounded-r-full" />
+                                                )}
+                                                <span className={`shrink-0 ${isActive ? 'text-violet-600' : 'text-slate-400 group-hover:text-slate-600'}`}>
+                                                    {item.icon}
+                                                </span>
+                                                {!collapsed && <span>{t(item.labelKey)}</span>}
+                                            </>
+                                        )}
+                                    </NavLink>
+                                )
                             ))}
                         </div>
                     ))}

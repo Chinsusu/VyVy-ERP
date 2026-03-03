@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Search, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFinishedProducts } from '../../hooks/useFinishedProducts';
 import type { FinishedProductFilters } from '../../types/finishedProduct';
+import PageSizeSelector from '../../components/common/PageSizeSelector';
 
 export default function FinishedProductListPage() {
     const [filters, setFilters] = useState<FinishedProductFilters>({
@@ -20,6 +21,10 @@ export default function FinishedProductListPage() {
 
     const handlePageChange = (newPage: number) => {
         setFilters({ ...filters, page: newPage });
+    };
+
+    const handlePageSizeChange = (size: number) => {
+        setFilters({ ...filters, page_size: size, page: 1 });
     };
 
     if (error) {
@@ -156,31 +161,43 @@ export default function FinishedProductListPage() {
                             </div>
 
                             {/* Pagination */}
-                            {pagination && pagination.total > 0 && (
-                                <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between">
-                                    <div className="text-sm text-gray-700">
-                                        Hiển thị {(pagination.page - 1) * pagination.page_size + 1} –{' '}
-                                        {Math.min(pagination.page * pagination.page_size, pagination.total)} trong tổng số{' '}
-                                        {pagination.total} sản phẩm
+                            {pagination && pagination.total_items > 0 && (
+                                <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
+                                    <div className="flex items-center gap-4">
+                                        <PageSizeSelector
+                                            pageSize={filters.page_size || 20}
+                                            onChange={handlePageSizeChange}
+                                            totalItems={Number(pagination.total_items)}
+                                        />
+                                        <span className="text-sm text-gray-500">
+                                            {(filters.page_size || 0) >= 999999
+                                                ? `Tất cả ${pagination.total_items} sản phẩm`
+                                                : `Hiển thị ${(pagination.page - 1) * (filters.page_size || 20) + 1}–${Math.min(pagination.page * (filters.page_size || 20), Number(pagination.total_items))} / ${pagination.total_items} sản phẩm`}
+                                        </span>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => handlePageChange(pagination.page - 1)}
-                                            disabled={pagination.page === 1}
-                                            className="btn btn-secondary btn-sm"
-                                        >
-                                            <ChevronLeft className="w-4 h-4" />
-                                            Trước
-                                        </button>
-                                        <button
-                                            onClick={() => handlePageChange(pagination.page + 1)}
-                                            disabled={pagination.page >= pagination.total_pages}
-                                            className="btn btn-secondary btn-sm"
-                                        >
-                                            Sau
-                                            <ChevronRight className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                                    {(filters.page_size || 0) < 999999 && pagination.total_pages > 1 && (
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => handlePageChange(pagination.page - 1)}
+                                                disabled={pagination.page === 1}
+                                                className="btn btn-secondary btn-sm"
+                                            >
+                                                <ChevronLeft className="w-4 h-4" />
+                                                Trước
+                                            </button>
+                                            <span className="text-sm text-gray-600 self-center">
+                                                Trang {pagination.page} / {pagination.total_pages}
+                                            </span>
+                                            <button
+                                                onClick={() => handlePageChange(pagination.page + 1)}
+                                                disabled={pagination.page >= pagination.total_pages}
+                                                className="btn btn-secondary btn-sm"
+                                            >
+                                                Sau
+                                                <ChevronRight className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </>

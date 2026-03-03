@@ -1,7 +1,7 @@
 {
     "groups": {
         "overview": "Tổng quan",
-        "masterData": "Dữ liệu chính",
+        "masterData": "Thiết Lập Dữ Liệu",
         "purchasing": "Mua hàng",
         "production": "Sản xuất",
         "sales": "Bán hàng",
@@ -13,7 +13,10 @@
         "materials": "Nguyên vật liệu",
         "finishedProducts": "Thành phẩm",
         "suppliers": "Nhà cung cấp",
+        "customers": "Khách hàng",
         "warehouses": "Kho hàng",
+        "accountingAccounts": "Tài khoản kế toán",
+        "openingBalances": "Số dư đầu kỳ",
         "purchaseOrders": "Đơn mua hàng",
         "goodsReceipt": "Phiếu nhập kho",
         "materialRequests": "Kế hoạch sản xuất",

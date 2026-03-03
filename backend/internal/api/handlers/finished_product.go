@@ -19,22 +19,6 @@ func NewFinishedProductHandler(service service.FinishedProductService) *Finished
 	return &FinishedProductHandler{service: service}
 }
 
-// List godoc
-// @Summary List finished products
-// @Description Get a list of finished products with optional filters
-// @Tags finished-products
-// @Accept json
-// @Produce json
-// @Param search query string false "Search by code, name, or barcode"
-// @Param category query string false "Filter by category"
-// @Param sub_category query string false "Filter by sub-category"
-// @Param is_active query boolean false "Filter by active status"
-// @Param page query int false "Page number"
-// @Param page_size query int false "Page size"
-// @Param sort_by query string false "Sort by field"
-// @Param sort_order query string false "Sort order (asc/desc)"
-// @Success 200 {object} utils.Response
-// @Router /api/v1/finished-products [get]
 func (h *FinishedProductHandler) List(c *gin.Context) {
 	var filter dto.FinishedProductFilterRequest
 	if err := c.ShouldBindQuery(&filter); err != nil {
@@ -57,15 +41,6 @@ func (h *FinishedProductHandler) List(c *gin.Context) {
 	})
 }
 
-// GetByID godoc
-// @Summary Get finished product by ID
-// @Description Get a single finished product by ID
-// @Tags finished-products
-// @Accept json
-// @Produce json
-// @Param id path int true "Finished Product ID"
-// @Success 200 {object} utils.Response
-// @Router /api/v1/finished-products/:id [get]
 func (h *FinishedProductHandler) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
@@ -83,15 +58,6 @@ func (h *FinishedProductHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.SuccessResponse(product))
 }
 
-// Create godoc
-// @Summary Create finished product
-// @Description Create a new finished product
-// @Tags finished-products
-// @Accept json
-// @Produce json
-// @Param product body dto.CreateFinishedProductRequest true "Finished Product data"
-// @Success 201 {object} utils.Response
-// @Router /api/v1/finished-products [post]
 func (h *FinishedProductHandler) Create(c *gin.Context) {
 	var req dto.CreateFinishedProductRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -99,15 +65,16 @@ func (h *FinishedProductHandler) Create(c *gin.Context) {
 		return
 	}
 
-	// Get user ID from context (set by auth middleware)
 	val, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
 		return
 	}
 	userID := val.(int64)
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
 
-	product, err := h.service.CreateFinishedProduct(&req, uint(userID))
+	product, err := h.service.CreateFinishedProduct(&req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
@@ -116,16 +83,6 @@ func (h *FinishedProductHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, utils.SuccessResponse(product))
 }
 
-// Update godoc
-// @Summary Update finished product
-// @Description Update an existing finished product
-// @Tags finished-products
-// @Accept json
-// @Produce json
-// @Param id path int true "Finished Product ID"
-// @Param product body dto.UpdateFinishedProductRequest true "Finished Product data"
-// @Success 200 {object} utils.Response
-// @Router /api/v1/finished-products/:id [put]
 func (h *FinishedProductHandler) Update(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
@@ -140,15 +97,16 @@ func (h *FinishedProductHandler) Update(c *gin.Context) {
 		return
 	}
 
-	// Get user ID from context
 	val, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
 		return
 	}
 	userID := val.(int64)
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
 
-	product, err := h.service.UpdateFinishedProduct(uint(id), &req, uint(userID))
+	product, err := h.service.UpdateFinishedProduct(uint(id), &req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return
@@ -157,15 +115,6 @@ func (h *FinishedProductHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.SuccessResponse(product))
 }
 
-// Delete godoc
-// @Summary Delete finished product
-// @Description Delete a finished product
-// @Tags finished-products
-// @Accept json
-// @Produce json
-// @Param id path int true "Finished Product ID"
-// @Success 200 {object} utils.Response
-// @Router /api/v1/finished-products/:id [delete]
 func (h *FinishedProductHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
@@ -174,7 +123,16 @@ func (h *FinishedProductHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteFinishedProduct(uint(id)); err != nil {
+	val, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
+		return
+	}
+	userID := val.(int64)
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
+
+	if err := h.service.DeleteFinishedProduct(uint(id), userID, usernameStr); err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("DELETE_ERROR", err.Error()))
 		return
 	}

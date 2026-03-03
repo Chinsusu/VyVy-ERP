@@ -22,6 +22,7 @@ import {
     useDeleteMaterialRequest
 } from '../../hooks/useMaterialRequests';
 import type { MaterialRequestItem } from '../../types/materialRequest';
+import AuditLogPanel from '../../components/common/AuditLogPanel';
 
 export default function MRDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -359,6 +360,11 @@ export default function MRDetailPage() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Lịch Sử Thay Đổi */}
+            <div className="mt-6">
+                <AuditLogPanel tableName="material_requests" recordId={mrId} />
             </div>
         </div>
     );

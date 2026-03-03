@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { Package, Plus, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMaterials } from '../../hooks/useMaterials';
 import type { MaterialFilters } from '../../types/material';
+import PageSizeSelector from '../../components/common/PageSizeSelector';
 
 export default function MaterialListPage() {
     const [filters, setFilters] = useState<MaterialFilters>({
         page: 1,
         page_size: 20,
-        sort_by: 'created_at',
+        sort_by: 'updated_at',
         sort_order: 'desc',
     });
 
@@ -22,12 +23,16 @@ export default function MaterialListPage() {
         setFilters({ ...filters, page: newPage });
     };
 
+    const handlePageSizeChange = (size: number) => {
+        setFilters({ ...filters, page_size: size, page: 1 });
+    };
+
     if (isLoading) {
         return (
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="flex items-center justify-center h-64">
-                        <div className="text-gray-500">Loading materials...</div>
+                        <div className="text-gray-500">Đang tải nguyên vật liệu...</div>
                     </div>
                 </div>
             </div>
@@ -39,7 +44,7 @@ export default function MaterialListPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        Error loading materials: {(error as Error).message}
+                        Lỗi tải dữ liệu: {(error as Error).message}
                     </div>
                 </div>
             </div>
@@ -58,16 +63,16 @@ export default function MaterialListPage() {
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                                 <Package className="w-8 h-8 text-primary" />
-                                Materials
+                                Nguyên Vật Liệu
                             </h1>
-                            <p className="text-gray-600 mt-1">Manage raw materials and ingredients</p>
+                            <p className="text-gray-600 mt-1">Quản lý nguyên vật liệu và thành phần</p>
                         </div>
                         <Link
                             to="/materials/new"
                             className="btn btn-primary flex items-center gap-2"
                         >
                             <Plus className="w-5 h-5" />
-                            Add Material
+                            + Thêm NVL
                         </Link>
                     </div>
                 </div>
@@ -79,7 +84,7 @@ export default function MaterialListPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search by code, name, or INCI name..."
+                                placeholder="Tìm theo mã, tên hoặc tên INCI..."
                                 className="input pl-10 w-full"
                                 value={filters.search || ''}
                                 onChange={handleSearch}
@@ -87,7 +92,7 @@ export default function MaterialListPage() {
                         </div>
                         <button className="btn btn-secondary flex items-center gap-2">
                             <Filter className="w-5 h-5" />
-                            Filters
+                            Bộ lọc
                         </button>
                     </div>
                 </div>
@@ -99,22 +104,22 @@ export default function MaterialListPage() {
                             <table className="w-full">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
-                                        <th>Trading Name</th>
-                                        <th>Type</th>
-                                        <th>Category</th>
-                                        <th>Unit</th>
-                                        <th className="text-center">QC</th>
-                                        <th className="text-center">Hazardous</th>
-                                        <th className="text-center">Status</th>
-                                        <th className="text-right">Actions</th>
+                                        <th>Mã</th>
+                                        <th>Tên Thương Mại</th>
+                                        <th>Loại</th>
+                                        <th>Danh Mục</th>
+                                        <th>Đơn Vị</th>
+                                        <th className="text-center">KCS</th>
+                                        <th className="text-center">Nguy Hiểm</th>
+                                        <th className="text-center">Trạng Thái</th>
+                                        <th className="text-right">Thao Tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {materials.length === 0 ? (
                                         <tr>
                                             <td colSpan={9} className="text-center p-12 text-gray-500">
-                                                No materials found. Add your first material to get started.
+                                                Chưa có nguyên vật liệu. Thêm NVL đầu tiên để bắt đầu.
                                             </td>
                                         </tr>
                                     ) : (
@@ -136,23 +141,23 @@ export default function MaterialListPage() {
                                                 <td className="p-4">{material.unit}</td>
                                                 <td className="p-4 text-center">
                                                     {material.requires_qc ? (
-                                                        <span className="badge badge-warning">Yes</span>
+                                                        <span className="badge badge-warning">Có</span>
                                                     ) : (
-                                                        <span className="text-gray-400">No</span>
+                                                        <span className="text-gray-400">Không</span>
                                                     )}
                                                 </td>
                                                 <td className="p-4 text-center">
                                                     {material.hazardous ? (
-                                                        <span className="badge badge-danger">Yes</span>
+                                                        <span className="badge badge-danger">Có</span>
                                                     ) : (
-                                                        <span className="text-gray-400">No</span>
+                                                        <span className="text-gray-400">Không</span>
                                                     )}
                                                 </td>
                                                 <td className="p-4 text-center">
                                                     {material.is_active ? (
-                                                        <span className="badge badge-success">Active</span>
+                                                        <span className="badge badge-success">Đang HĐ</span>
                                                     ) : (
-                                                        <span className="badge badge-secondary">Inactive</span>
+                                                        <span className="badge badge-secondary">Ngừng HĐ</span>
                                                     )}
                                                 </td>
                                                 <td className="p-4 text-right">
@@ -160,7 +165,7 @@ export default function MaterialListPage() {
                                                         to={`/materials/${material.id}/edit`}
                                                         className="text-primary hover:underline text-sm"
                                                     >
-                                                        Edit
+                                                        Sửa
                                                     </Link>
                                                 </td>
                                             </tr>
@@ -171,34 +176,43 @@ export default function MaterialListPage() {
                         </div>
 
                         {/* Pagination */}
-                        {pagination && pagination.total > 0 && (
-                            <div className="flex items-center justify-between p-4 border-t border-gray-200">
-                                <div className="text-sm text-gray-600">
-                                    Showing {((pagination.page - 1) * pagination.page_size) + 1} to{' '}
-                                    {Math.min(pagination.page * pagination.page_size, pagination.total)} of{' '}
-                                    {pagination.total} materials
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => handlePageChange(pagination.page - 1)}
-                                        disabled={pagination.page === 1}
-                                        className="btn btn-secondary btn-sm disabled:opacity-50"
-                                    >
-                                        <ChevronLeft className="w-4 h-4" />
-                                        Previous
-                                    </button>
-                                    <span className="text-sm text-gray-600">
-                                        Page {pagination.page} of {pagination.total_pages}
+                        {pagination && pagination.total_items > 0 && (
+                            <div className="flex items-center justify-between p-4 border-t border-gray-200 flex-wrap gap-3">
+                                <div className="flex items-center gap-4">
+                                    <PageSizeSelector
+                                        pageSize={filters.page_size || 20}
+                                        onChange={handlePageSizeChange}
+                                        totalItems={Number(pagination.total_items)}
+                                    />
+                                    <span className="text-sm text-gray-500">
+                                        {(filters.page_size || 0) >= 999999
+                                            ? `Tất cả ${pagination.total_items} NVL`
+                                            : `Hiển thị ${((pagination.page - 1) * (filters.page_size || 20)) + 1}–${Math.min(pagination.page * (filters.page_size || 20), Number(pagination.total_items))} / ${pagination.total_items} NVL`}
                                     </span>
-                                    <button
-                                        onClick={() => handlePageChange(pagination.page + 1)}
-                                        disabled={pagination.page >= pagination.total_pages}
-                                        className="btn btn-secondary btn-sm disabled:opacity-50"
-                                    >
-                                        Next
-                                        <ChevronRight className="w-4 h-4" />
-                                    </button>
                                 </div>
+                                {(filters.page_size || 0) < 999999 && pagination.total_pages > 1 && (
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => handlePageChange(pagination.page - 1)}
+                                            disabled={pagination.page === 1}
+                                            className="btn btn-secondary btn-sm disabled:opacity-50"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" />
+                                            Trước
+                                        </button>
+                                        <span className="text-sm text-gray-600">
+                                            Trang {pagination.page} / {pagination.total_pages}
+                                        </span>
+                                        <button
+                                            onClick={() => handlePageChange(pagination.page + 1)}
+                                            disabled={pagination.page >= pagination.total_pages}
+                                            className="btn btn-secondary btn-sm disabled:opacity-50"
+                                        >
+                                            Tiếp
+                                            <ChevronRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

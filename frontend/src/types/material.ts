@@ -87,9 +87,9 @@ export interface MaterialListResponse {
     success: boolean;
     data: Material[];
     pagination: {
-        total: number;
         page: number;
-        page_size: number;
+        limit: number;
+        total_items: number;
         total_pages: number;
     };
 }
