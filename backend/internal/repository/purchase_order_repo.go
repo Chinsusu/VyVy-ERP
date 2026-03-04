@@ -154,6 +154,11 @@ func (r *purchaseOrderRepository) List(filter *dto.PurchaseOrderFilterRequest) (
 
 // Update updates a purchase order
 func (r *purchaseOrderRepository) Update(po *models.PurchaseOrder) error {
+	// Nil-out preloaded associations so GORM uses the FK fields (SupplierID, WarehouseID)
+	// instead of the associated object's ID, which could overwrite our changes.
+	po.Supplier = nil
+	po.Warehouse = nil
+	po.Items = nil
 	return r.db.Save(po).Error
 }
 
