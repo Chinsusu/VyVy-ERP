@@ -123,19 +123,28 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
         if (!files || files.length === 0) return;
         const item = items[index];
         const existingList = item._attachmentList || [];
-        const newAttachments: ItemAttachment[] = Array.from(files).map(f => ({
-            name: f.name,
-            url: URL.createObjectURL(f),
-            size: f.size,
+
+        // Convert each file to base64 data URL so it can be stored in DB and opened later
+        const promises = Array.from(files).map(f => new Promise<ItemAttachment>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve({
+                name: f.name,
+                url: e.target?.result as string, // base64 data URL
+                size: f.size,
+            });
+            reader.readAsDataURL(f);
         }));
-        const merged = [...existingList, ...newAttachments];
-        const newItems = [...items];
-        newItems[index] = {
-            ...newItems[index],
-            _attachmentList: merged,
-            attachments: JSON.stringify(merged),
-        };
-        setItems(newItems);
+
+        Promise.all(promises).then(newAttachments => {
+            const merged = [...existingList, ...newAttachments];
+            const newItems = [...items];
+            newItems[index] = {
+                ...newItems[index],
+                _attachmentList: merged,
+                attachments: JSON.stringify(merged),
+            };
+            setItems(newItems);
+        });
     };
 
     const removeAttachment = (itemIndex: number, attachIndex: number) => {
