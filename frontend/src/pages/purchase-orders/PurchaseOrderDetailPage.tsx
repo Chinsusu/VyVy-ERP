@@ -20,6 +20,7 @@ import {
     useDeletePurchaseOrder
 } from '../../hooks/usePurchaseOrders';
 import type { PurchaseOrderItem } from '../../types/purchaseOrder';
+import AuditLogPanel from '../../components/common/AuditLogPanel';
 
 export default function PurchaseOrderDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -312,6 +313,11 @@ export default function PurchaseOrderDetailPage() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Lịch Sử Thay Đổi */}
+            <div className="mt-8">
+                <AuditLogPanel tableName="purchase_orders" recordId={poId} />
             </div>
 
             {/* Confirmation Modals */}
