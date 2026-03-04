@@ -39,11 +39,34 @@ func (r *materialRequestRepository) GetByID(id uint) (*models.MaterialRequest, e
 	var mr models.MaterialRequest
 	err := r.db.
 		Preload("Warehouse").
-		Preload("ApprovedByUser").
 		Preload("Items").
 		Preload("Items.Material").
 		First(&mr, id).Error
-	return &mr, err
+	if err != nil {
+		return &mr, err
+	}
+
+	// Manually load user relationships to avoid GORM convention confusion
+	if mr.CreatedBy != nil {
+		var user models.User
+		if e := r.db.First(&user, *mr.CreatedBy).Error; e == nil {
+			mr.CreatedByUser = &user
+		}
+	}
+	if mr.UpdatedBy != nil {
+		var user models.User
+		if e := r.db.First(&user, *mr.UpdatedBy).Error; e == nil {
+			mr.UpdatedByUser = &user
+		}
+	}
+	if mr.ApprovedBy != nil {
+		var user models.User
+		if e := r.db.First(&user, *mr.ApprovedBy).Error; e == nil {
+			mr.ApprovedByUser = &user
+		}
+	}
+
+	return &mr, nil
 }
 
 // GetByMRNumber retrieves a material request by MR number

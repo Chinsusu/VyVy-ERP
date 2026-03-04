@@ -81,6 +81,9 @@ type SafeMaterialRequest struct {
 	Status       string                    `json:"status"`
 	ApprovedBy   *uint                     `json:"approved_by,omitempty"`
 	ApprovedAt   *time.Time                `json:"approved_at,omitempty"`
+	ApprovedByUser *SafeUser               `json:"approved_by_user,omitempty"`
+	CreatedByUser  *SafeUser               `json:"created_by_user,omitempty"`
+	UpdatedByUser  *SafeUser               `json:"updated_by_user,omitempty"`
 	Purpose      string                    `json:"purpose,omitempty"`
 	Notes        string                    `json:"notes,omitempty"`
 	Items        []*SafeMaterialRequestItem `json:"items,omitempty"`
@@ -119,6 +122,19 @@ func (mr *MaterialRequest) ToSafe() *SafeMaterialRequest {
 
 	if mr.Warehouse != nil {
 		safe.Warehouse = mr.Warehouse.ToSafe()
+	}
+
+	if mr.CreatedByUser != nil {
+		u := mr.CreatedByUser.ToSafeUser()
+		safe.CreatedByUser = &u
+	}
+	if mr.UpdatedByUser != nil {
+		u := mr.UpdatedByUser.ToSafeUser()
+		safe.UpdatedByUser = &u
+	}
+	if mr.ApprovedByUser != nil {
+		u := mr.ApprovedByUser.ToSafeUser()
+		safe.ApprovedByUser = &u
 	}
 
 	if mr.Items != nil {
