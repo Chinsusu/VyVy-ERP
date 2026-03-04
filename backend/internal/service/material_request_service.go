@@ -20,6 +20,7 @@ type MaterialRequestService interface {
 	DeleteMaterialRequest(id uint, userID uint, username string) error
 	ApproveMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error)
 	CancelMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error)
+	GetRelatedPurchaseOrders(id uint) ([]*models.SafePurchaseOrder, error)
 }
 
 type materialRequestService struct {
@@ -537,5 +538,32 @@ func (s *materialRequestService) CancelMaterialRequest(id uint, userID uint, use
 		_ = s.auditSvc.Log("material_requests", "CANCEL", int64(id), int64(userID), username, nil, result)
 	}
 
+	return result, nil
+}
+
+// GetRelatedPurchaseOrders returns POs that were auto-created when this MR was approved
+func (s *materialRequestService) GetRelatedPurchaseOrders(id uint) ([]*models.SafePurchaseOrder, error) {
+	mr, err := s.mrRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var pos []*models.PurchaseOrder
+	// POs created from this MR have notes like "Liên quan KHSX: {mr_number}"
+	pattern := "%" + mr.MRNumber + "%"
+	if err := s.db.
+		Preload("Supplier").
+		Preload("Items").
+		Preload("Items.Material").
+		Where("notes ILIKE ?", pattern).
+		Order("created_at DESC").
+		Find(&pos).Error; err != nil {
+		return nil, err
+	}
+
+	result := make([]*models.SafePurchaseOrder, len(pos))
+	for i, po := range pos {
+		result[i] = po.ToSafe()
+	}
 	return result, nil
 }

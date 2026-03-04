@@ -217,3 +217,21 @@ func (h *MaterialRequestHandler) Cancel(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.SuccessResponse(mr))
 }
+
+// GetRelatedPOs returns purchase orders auto-created from this material request
+func (h *MaterialRequestHandler) GetRelatedPOs(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid material request ID"))
+		return
+	}
+
+	pos, err := h.service.GetRelatedPurchaseOrders(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("FETCH_ERROR", err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(pos))
+}

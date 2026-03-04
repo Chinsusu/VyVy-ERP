@@ -26,6 +26,7 @@ import AuditLogPanel from '../../components/common/AuditLogPanel';
 import ProductionTaskPanel from '../../components/production/ProductionTaskPanel';
 import ProductionTimeline from '../../components/production/ProductionTimeline';
 import ProductionProgressChart from '../../components/production/ProductionProgressChart';
+import RelatedPOsPanel from '../../components/production/RelatedPOsPanel';
 import { useProductionTasks } from '../../hooks/useProductionTasks';
 
 export default function MRDetailPage() {
@@ -383,6 +384,11 @@ export default function MRDetailPage() {
                     </div>
                 </div>
             )}
+
+            {/* Đơn Mua Hàng Tự Động */}
+            <div className="mt-6">
+                <RelatedPOsPanel mrId={mrId} />
+            </div>
 
             {/* Lịch Sử Thay Đổi */}
             <div className="mt-6">

@@ -235,6 +235,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		mrGroup.POST("/:id/tasks", productionTaskHandler.Create)
 		mrGroup.PUT("/:id/tasks/:taskId", productionTaskHandler.Update)
 		mrGroup.DELETE("/:id/tasks/:taskId", productionTaskHandler.Delete)
+
+		// Related purchase orders (auto-created on approve)
+		mrGroup.GET("/:id/purchase-orders", mrHandler.GetRelatedPOs)
 	}
 
 	// Material Issue Note (MIN) routes - All protected
