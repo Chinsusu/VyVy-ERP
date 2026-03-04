@@ -1,3 +1,25 @@
+import type { Supplier } from './supplier';
+
+export interface MaterialSupplierEntry {
+    id: number;
+    material_id: number;
+    supplier_id: number;
+    supplier?: Supplier;
+    priority: number;
+    unit_price?: number | null;
+    lead_time_days?: number | null;
+    notes?: string | null;
+    created_at: string;
+}
+
+export interface MaterialSupplierInput {
+    supplier_id: number;
+    priority: number;
+    unit_price?: number;
+    lead_time_days?: number;
+    notes?: string;
+}
+
 export interface Material {
     id: number;
     code: string;
@@ -20,6 +42,7 @@ export interface Material {
     hazardous: boolean;
     is_active: boolean;
     notes?: string | null;
+    suppliers?: MaterialSupplierEntry[];
     created_at: string;
     updated_at: string;
 }
@@ -45,6 +68,7 @@ export interface CreateMaterialInput {
     hazardous: boolean;
     is_active: boolean;
     notes?: string;
+    suppliers?: MaterialSupplierInput[];
 }
 
 export interface UpdateMaterialInput {
@@ -67,6 +91,7 @@ export interface UpdateMaterialInput {
     hazardous?: boolean;
     is_active?: boolean;
     notes?: string;
+    suppliers?: MaterialSupplierInput[]; // undefined = no change; [] = remove all
 }
 
 export interface MaterialFilters {

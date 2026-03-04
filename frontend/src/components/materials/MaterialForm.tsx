@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, X } from 'lucide-react';
+import { Save, X, Plus, Trash2, Building2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useCreateMaterial, useUpdateMaterial } from '../../hooks/useMaterials';
-import type { Material, CreateMaterialInput, UpdateMaterialInput } from '../../types/material';
+import { useSuppliers } from '../../hooks/useSuppliers';
+import type { Material, CreateMaterialInput, UpdateMaterialInput, MaterialSupplierInput } from '../../types/material';
 
 interface MaterialFormProps {
     material?: Material;
@@ -10,12 +11,22 @@ interface MaterialFormProps {
     onCancel?: () => void;
 }
 
+const emptySupplier = (): MaterialSupplierInput => ({
+    supplier_id: 0,
+    priority: 1,
+    unit_price: undefined,
+    lead_time_days: undefined,
+    notes: '',
+});
+
 export default function MaterialForm({ material, onSuccess, onCancel }: MaterialFormProps) {
     const navigate = useNavigate();
     const isEditMode = !!material;
 
     const createMaterial = useCreateMaterial();
     const updateMaterial = useUpdateMaterial();
+    const { data: suppliersData } = useSuppliers({ page_size: 500 });
+    const supplierOptions = suppliersData?.data || [];
 
     const [formData, setFormData] = useState<CreateMaterialInput>({
         code: material?.code || '',
@@ -38,6 +49,13 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
         hazardous: material?.hazardous || false,
         is_active: material?.is_active ?? true,
         notes: material?.notes || '',
+        suppliers: material?.suppliers?.map(ms => ({
+            supplier_id: ms.supplier_id,
+            priority: ms.priority,
+            unit_price: ms.unit_price || undefined,
+            lead_time_days: ms.lead_time_days || undefined,
+            notes: ms.notes || '',
+        })) || [],
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -49,6 +67,36 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
         }
     };
 
+    // ── Supplier rows ──
+    const supplierRows = formData.suppliers || [];
+
+    const addSupplierRow = () => {
+        const next = emptySupplier();
+        next.priority = supplierRows.length + 1;
+        setFormData({ ...formData, suppliers: [...supplierRows, next] });
+    };
+
+    const removeSupplierRow = (idx: number) => {
+        const updated = supplierRows
+            .filter((_, i) => i !== idx)
+            .map((s, i) => ({ ...s, priority: i + 1 }));
+        setFormData({ ...formData, suppliers: updated });
+    };
+
+    const moveSupplierRow = (idx: number, direction: 'up' | 'down') => {
+        const newRows = [...supplierRows];
+        const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+        if (swapIdx < 0 || swapIdx >= newRows.length) return;
+        [newRows[idx], newRows[swapIdx]] = [newRows[swapIdx], newRows[idx]];
+        const updated = newRows.map((s, i) => ({ ...s, priority: i + 1 }));
+        setFormData({ ...formData, suppliers: updated });
+    };
+
+    const updateSupplierRow = (idx: number, field: keyof MaterialSupplierInput, value: any) => {
+        const updated = supplierRows.map((s, i) => i === idx ? { ...s, [field]: value } : s);
+        setFormData({ ...formData, suppliers: updated });
+    };
+
     const validate = (): boolean => {
         const newErrors: Record<string, string> = {};
 
@@ -56,6 +104,13 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
         if (!formData.trading_name) newErrors.trading_name = 'Tên thương mại là bắt buộc';
         if (!formData.material_type) newErrors.material_type = 'Loại NVL là bắt buộc';
         if (!formData.unit) newErrors.unit = 'Đơn vị là bắt buộc';
+
+        // Validate supplier rows
+        for (let i = 0; i < supplierRows.length; i++) {
+            if (!supplierRows[i].supplier_id) {
+                newErrors[`supplier_${i}`] = 'Chọn nhà cung cấp';
+            }
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -70,7 +125,10 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
             if (isEditMode && material) {
                 await updateMaterial.mutateAsync({
                     id: material.id,
-                    input: formData as UpdateMaterialInput,
+                    input: {
+                        ...(formData as UpdateMaterialInput),
+                        suppliers: supplierRows,
+                    },
                 });
             } else {
                 await createMaterial.mutateAsync(formData);
@@ -147,16 +205,15 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                             value={formData.material_type}
                             onChange={(e) => handleChange('material_type', e.target.value)}
                         >
-                            <option value="RAW_MATERIAL">Nguyên liệu thô</option>
-                            <option value="INGREDIENT">Thành phần</option>
-                            <option value="PACKAGING">Bao bì</option>
-                            <option value="CONSUMABLE">Vật tư tiêu hao</option>
+                            <option value="HOA_PHAM">Hóa phẩm</option>
+                            <option value="HUONG_LIEU">Hương liệu</option>
+                            <option value="BAO_BI">Bao bì</option>
                         </select>
                         {errors.material_type && <p className="text-red-500 text-sm mt-1">{errors.material_type}</p>}
                     </div>
 
                     <div>
-                        <label className="label">Danh mục</label>
+                        <label className="label">Đặc tính</label>
                         <input
                             type="text"
                             className="input"
@@ -167,7 +224,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                     </div>
 
                     <div>
-                        <label className="label">Danh mục phụ</label>
+                        <label className="label">Đặc tính phụ</label>
                         <input
                             type="text"
                             className="input"
@@ -184,13 +241,136 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                             onChange={(e) => handleChange('unit', e.target.value)}
                         >
                             <option value="KG">KG</option>
+                            <option value="G">G</option>
                             <option value="L">L</option>
+                            <option value="ML">ML</option>
                             <option value="PCS">PCS</option>
                             <option value="BOX">BOX</option>
+                            <option value="BAG">BAG</option>
                         </select>
                         {errors.unit && <p className="text-red-500 text-sm mt-1">{errors.unit}</p>}
                     </div>
                 </div>
+            </div>
+
+            {/* Suppliers */}
+            <div className="card">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Building2 className="w-5 h-5 text-primary" />
+                        Nhà Cung Cấp
+                    </h3>
+                    <button
+                        type="button"
+                        onClick={addSupplierRow}
+                        className="btn btn-secondary flex items-center gap-2 text-sm"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Thêm NCC
+                    </button>
+                </div>
+
+                {supplierRows.length === 0 ? (
+                    <p className="text-sm text-gray-400 italic py-4 text-center">
+                        Chưa có nhà cung cấp nào. Nhấn "Thêm NCC" để bắt đầu.
+                    </p>
+                ) : (
+                    <div className="space-y-3">
+                        {supplierRows.map((row, idx) => (
+                            <div key={idx} className="grid grid-cols-12 gap-2 items-start p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                {/* Priority badge + move buttons */}
+                                <div className="col-span-1 flex flex-col items-center gap-0.5 pt-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => moveSupplierRow(idx, 'up')}
+                                        disabled={idx === 0}
+                                        className="text-gray-400 hover:text-gray-700 disabled:opacity-20"
+                                    >
+                                        <ChevronUp className="w-4 h-4" />
+                                    </button>
+                                    <div className="w-7 h-7 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
+                                        {idx + 1}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => moveSupplierRow(idx, 'down')}
+                                        disabled={idx === supplierRows.length - 1}
+                                        className="text-gray-400 hover:text-gray-700 disabled:opacity-20"
+                                    >
+                                        <ChevronDown className="w-4 h-4" />
+                                    </button>
+                                </div>
+
+                                {/* Supplier select */}
+                                <div className="col-span-4">
+                                    <label className="text-xs text-gray-500 mb-1 block">Nhà cung cấp *</label>
+                                    <select
+                                        className={`input text-sm ${errors[`supplier_${idx}`] ? 'border-red-500' : ''}`}
+                                        value={row.supplier_id || ''}
+                                        onChange={(e) => updateSupplierRow(idx, 'supplier_id', parseInt(e.target.value))}
+                                    >
+                                        <option value="">-- Chọn NCC --</option>
+                                        {supplierOptions.map((s) => (
+                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                        ))}
+                                    </select>
+                                    {errors[`supplier_${idx}`] && (
+                                        <p className="text-red-500 text-xs mt-1">{errors[`supplier_${idx}`]}</p>
+                                    )}
+                                </div>
+
+                                {/* Unit price */}
+                                <div className="col-span-2">
+                                    <label className="text-xs text-gray-500 mb-1 block">Giá (₫)</label>
+                                    <input
+                                        type="number"
+                                        step="1"
+                                        className="input text-sm"
+                                        value={row.unit_price || ''}
+                                        onChange={(e) => updateSupplierRow(idx, 'unit_price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                                        placeholder="0"
+                                    />
+                                </div>
+
+                                {/* Lead time */}
+                                <div className="col-span-2">
+                                    <label className="text-xs text-gray-500 mb-1 block">Thời gian giao hàng (ngày)</label>
+                                    <input
+                                        type="number"
+                                        className="input text-sm"
+                                        value={row.lead_time_days || ''}
+                                        onChange={(e) => updateSupplierRow(idx, 'lead_time_days', e.target.value ? parseInt(e.target.value) : undefined)}
+                                        placeholder="0"
+                                    />
+                                </div>
+
+                                {/* Notes */}
+                                <div className="col-span-2">
+                                    <label className="text-xs text-gray-500 mb-1 block">Ghi chú</label>
+                                    <input
+                                        type="text"
+                                        className="input text-sm"
+                                        value={row.notes || ''}
+                                        onChange={(e) => updateSupplierRow(idx, 'notes', e.target.value)}
+                                        placeholder="..."
+                                    />
+                                </div>
+
+                                {/* Remove */}
+                                <div className="col-span-1 flex justify-center pt-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => removeSupplierRow(idx)}
+                                        className="text-red-400 hover:text-red-600"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        <p className="text-xs text-gray-400">Thứ tự từ trên xuống = ưu tiên từ cao đến thấp (1 = ưu tiên nhất)</p>
+                    </div>
+                )}
             </div>
 
             {/* Pricing */}

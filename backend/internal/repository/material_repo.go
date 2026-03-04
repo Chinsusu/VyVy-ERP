@@ -36,7 +36,9 @@ func (r *materialRepository) Create(material *models.Material) error {
 // GetByID retrieves a material by ID
 func (r *materialRepository) GetByID(id int64) (*models.Material, error) {
 	var material models.Material
-	err := r.db.First(&material, id).Error
+	err := r.db.Preload("Suppliers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("priority ASC")
+	}).Preload("Suppliers.Supplier").First(&material, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +78,7 @@ func (r *materialRepository) List(filter dto.MaterialFilterRequest) ([]models.Ma
 	}
 
 	if filter.SupplierID != nil {
-		query = query.Where("supplier_id = ?", *filter.SupplierID)
+		query = query.Joins("JOIN material_suppliers ms ON ms.material_id = materials.id AND ms.supplier_id = ?", *filter.SupplierID)
 	}
 
 	if filter.RequiresQC != nil {
@@ -121,7 +123,9 @@ func (r *materialRepository) List(filter dto.MaterialFilterRequest) ([]models.Ma
 	query = query.Limit(pageSize).Offset(offset)
 
 	// Execute query
-	if err := query.Find(&materials).Error; err != nil {
+	if err := query.Preload("Suppliers", func(db *gorm.DB) *gorm.DB {
+		return db.Order("priority ASC")
+	}).Preload("Suppliers.Supplier").Find(&materials).Error; err != nil {
 		return nil, 0, err
 	}
 

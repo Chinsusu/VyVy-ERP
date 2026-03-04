@@ -66,7 +66,7 @@ const FIELD_LABELS: Record<string, string> = {
 };
 
 function formatValue(value: unknown): string {
-    if (value === null || value === undefined) return '—';
+    if (value === null || value === undefined) return '\u2014';
     if (typeof value === 'boolean') return value ? 'Có' : 'Không';
     if (typeof value === 'number') return value.toLocaleString('vi-VN');
     if (typeof value === 'string') {
@@ -75,6 +75,14 @@ function formatValue(value: unknown): string {
             return new Date(value).toLocaleString('vi-VN');
         }
         return value;
+    }
+    if (Array.isArray(value)) return `(${value.length} mục)`;
+    if (typeof value === 'object') {
+        // Try to extract a meaningful label from common objects
+        const obj = value as Record<string, unknown>;
+        if (obj.name) return String(obj.name);
+        if (obj.trading_name) return String(obj.trading_name);
+        return JSON.stringify(value);
     }
     return String(value);
 }
@@ -156,29 +164,52 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                                     </div>
 
                                     {/* Changed fields */}
-                                    {log.action === 'UPDATE' && log.changed_fields && log.changed_fields.length > 0 && (
-                                        <div className="space-y-1 mt-2">
-                                            {log.changed_fields.map((field) => {
-                                                const label = FIELD_LABELS[field] || field;
-                                                const oldVal = log.old_values?.[field];
-                                                const newVal = log.new_values?.[field];
+                                    {log.action === 'UPDATE' && (() => {
+                                        const NOISE = new Set(['updated_at', 'created_at', 'deleted_at', 'updated_by', 'created_by']);
+                                        const ARRAY_FIELDS = new Set(['items', 'suppliers']);
+                                        const changedFields: string[] = log.changed_fields || [];
+                                        const visible = changedFields.filter((f: string) => !NOISE.has(f));
+
+                                        if (visible.length === 0) {
+                                            return (
+                                                <p className="text-xs text-gray-400 mt-1 italic">Cập nhật hệ thống</p>
+                                            );
+                                        }
+
+                                        const rows = visible.map((field: string) => {
+                                            const label = FIELD_LABELS[field] || field;
+                                            const oldVal = log.old_values?.[field];
+                                            const newVal = log.new_values?.[field];
+                                            if (oldVal === undefined && newVal === undefined) return null;
+                                            if (ARRAY_FIELDS.has(field)) {
                                                 return (
                                                     <div key={field} className="flex items-start gap-2 text-xs">
                                                         <span className="text-gray-500 min-w-[120px] pt-0.5">{label}:</span>
-                                                        <div className="flex items-center gap-1 flex-wrap">
-                                                            <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">
-                                                                {formatValue(oldVal)}
-                                                            </span>
-                                                            <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
-                                                            <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
-                                                                {formatValue(newVal)}
-                                                            </span>
-                                                        </div>
+                                                        <span className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">Đã cập nhật</span>
                                                     </div>
                                                 );
-                                            })}
-                                        </div>
-                                    )}
+                                            }
+                                            return (
+                                                <div key={field} className="flex items-start gap-2 text-xs">
+                                                    <span className="text-gray-500 min-w-[120px] pt-0.5">{label}:</span>
+                                                    <div className="flex items-center gap-1 flex-wrap">
+                                                        <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">
+                                                            {formatValue(oldVal)}
+                                                        </span>
+                                                        <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
+                                                        <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
+                                                            {formatValue(newVal)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }).filter(Boolean);
+
+                                        if (rows.length === 0) {
+                                            return <p className="text-xs text-gray-400 mt-1 italic">Cập nhật hệ thống</p>;
+                                        }
+                                        return <div className="space-y-1 mt-2">{rows}</div>;
+                                    })()}
 
                                     {/* Summary for CREATE */}
                                     {log.action === 'CREATE' && (

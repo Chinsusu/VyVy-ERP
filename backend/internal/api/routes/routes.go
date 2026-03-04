@@ -15,6 +15,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
 	materialRepo := repository.NewMaterialRepository(db)
+	materialSupplierRepo := repository.NewMaterialSupplierRepository(db)
 	supplierRepo := repository.NewSupplierRepository(db)
 	warehouseRepo := repository.NewWarehouseRepository(db)
 	warehouseLocationRepo := repository.NewWarehouseLocationRepository(db)
@@ -43,7 +44,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
 	auditLogService := service.NewAuditLogService(auditLogRepo)
-	materialService := service.NewMaterialService(materialRepo, auditLogService)
+	materialService := service.NewMaterialService(materialRepo, materialSupplierRepo, auditLogService)
 	supplierService := service.NewSupplierService(supplierRepo, auditLogService)
 	warehouseService := service.NewWarehouseService(warehouseRepo, warehouseLocationRepo)
 	warehouseLocationService := service.NewWarehouseLocationService(warehouseLocationRepo, warehouseRepo)
@@ -65,6 +66,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	reconService := service.NewReconciliationService(reconRepo, carrierRepo)
 	roService := service.NewReturnOrderService(db, roRepo, doRepo)
 	productionTaskService := service.NewProductionTaskService(productionTaskRepo)
+
+	supplierDocHandler := handlers.NewSupplierDocumentHandler(db)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -123,6 +126,10 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		supplierGroup.POST("", supplierHandler.Create)
 		supplierGroup.PUT("/:id", supplierHandler.Update)
 		supplierGroup.DELETE("/:id", middleware.RequireRole("admin"), supplierHandler.Delete)
+		// Documents
+		supplierGroup.GET("/:id/documents", supplierDocHandler.List)
+		supplierGroup.POST("/:id/documents", supplierDocHandler.Upload)
+		supplierGroup.DELETE("/:id/documents/:docId", supplierDocHandler.Delete)
 	}
 
 	// Warehouse routes - All protected
@@ -344,5 +351,12 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		roGroup.PUT("/:id/items/:itemId/inspect", roHandler.InspectItem)
 		roGroup.POST("/:id/complete", middleware.RequireRole("warehouse_manager"), roHandler.Complete)
 		roGroup.POST("/:id/cancel", roHandler.Cancel)
+	}
+
+	// Static file serving for uploads (authenticated)
+	uploadsGroup := v1.Group("/uploads")
+	uploadsGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		uploadsGroup.GET("/supplier_documents/:supplierId/:filename", supplierDocHandler.ServeFile)
 	}
 }

@@ -7,6 +7,32 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc17] - 2026-03-04
+
+### Added
+- **Supplier Documents (Chứng Từ NCC)**: Upload, xem, tải xuống và xóa chứng từ (PDF, DOC, XLS, ảnh...) cho mỗi nhà cung cấp.
+  - Migration `000032_create_supplier_documents`: Bảng `supplier_documents` với FK → suppliers và users.
+  - Backend: Handler `SupplierDocumentHandler` với 4 endpoints: List, Upload (multipart), Delete, ServeFile.
+  - Backend: Files lưu trong Docker volume `uploads_data` tại `/app/uploads/supplier_documents/`.
+  - Frontend: Component `SupplierDocuments.tsx` với prop `readOnly` — ẩn upload/delete khi xem chi tiết.
+  - API client `supplierDocuments.ts`: `listDocuments`, `uploadDocument`, `deleteDocument`, `getDownloadUrl`.
+
+- **Supplier Materials List**: Trang chi tiết NCC giờ hiển thị danh sách Nguyên Vật Liệu mà NCC đó cung cấp (via `useMaterials({ supplier_id })`).
+
+### Fixed
+- **Materials Filter by Supplier**: Backend `material_repo.go` dùng `WHERE supplier_id = ?` trực tiếp trên bảng `materials` dù không có cột đó — đã fix bằng `JOIN material_suppliers ON ms.material_id = materials.id AND ms.supplier_id = ?`.
+- **Audit Log diff không hiển thị**: `AuditLogPanel.tsx` dùng `!oldVal && !newVal` bỏ qua giá trị `null` hợp lệ từ DB — đã fix bằng `oldVal === undefined && newVal === undefined`.
+- **Audit Log entries rỗng**: UPDATE entries chỉ thay đổi `updated_at` (noise) trước đây hiện trống — giờ hiện nhãn *"Cập nhật hệ thống"* thay vì trống hoàn toàn.
+- **Upload button trigger form submit**: Nút Tải lên trong `SupplierDocuments` nằm bên trong `<form>` của `SupplierForm`, thiếu `type="button"` → click mở file picker nhưng đồng thời submit form. Đã thêm `type="button"`.
+- **Navigate sau khi save**: `SupplierForm` sau khi update thành công navigate về `/suppliers` (list) thay vì `/suppliers/:id` (detail) → user phải refresh thủ công. Đã fix navigate về trang chi tiết.
+
+### Changed
+- **Nginx Upload Config** (`frontend/nginx.conf`): `client_max_body_size 25m`, `proxy_request_buffering off`, `proxy_read_timeout 120s` để hỗ trợ upload file lớn (≤ 20MB) không bị timeout.
+- **SupplierForm**: `SupplierDocuments` component được tích hợp vào trong form (chỉ khi edit mode), hiển thị ngay trước nút [Hủy] [Cập Nhật] — người dùng upload chứng từ trong cùng trang chỉnh sửa.
+- **SupplierEditPage**: Loại bỏ `SupplierDocuments` block riêng lẻ (đã chuyển vào `SupplierForm`).
+
+---
+
 ## [1.0.0-rc16] - 2026-03-04
 
 ### Added

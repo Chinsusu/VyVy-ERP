@@ -24,6 +24,7 @@ func main() {
 	err = db.AutoMigrate(
 		&models.User{},
 		&models.Material{},
+		&models.MaterialSupplier{},
 		&models.Supplier{},
 		&models.Warehouse{},
 		&models.WarehouseLocation{},

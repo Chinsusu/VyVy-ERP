@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Package, Edit, Trash2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Package, Edit, Trash2, AlertTriangle, Building2, Star } from 'lucide-react';
 import { useMaterial, useDeleteMaterial } from '../../hooks/useMaterials';
 import AuditLogPanel from '../../components/common/AuditLogPanel';
+
 
 export default function MaterialDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -107,14 +108,18 @@ export default function MaterialDetailPage() {
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Loại NVL</p>
-                                    <span className="badge badge-secondary">{material.material_type}</span>
+                                    <span className="badge badge-secondary">{{
+                                        HOA_PHAM: 'Hóa phẩm',
+                                        HUONG_LIEU: 'Hương liệu',
+                                        BAO_BI: 'Bao bì',
+                                    }[material.material_type] || material.material_type}</span>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Danh mục</p>
+                                    <p className="text-sm text-gray-600">Đặc tính</p>
                                     <p className="font-medium">{material.category || '-'}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-600">Danh mục phụ</p>
+                                    <p className="text-sm text-gray-600">Đặc tính phụ</p>
                                     <p className="font-medium">{material.sub_category || '-'}</p>
                                 </div>
                                 <div>
@@ -138,13 +143,57 @@ export default function MaterialDetailPage() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-sm text-gray-600">Giá vốn chuẩn</p>
-                                    <p className="font-medium">{material.standard_cost ? `$${material.standard_cost.toFixed(2)}` : '-'}</p>
+                                    <p className="font-medium">{material.standard_cost ? `${material.standard_cost.toLocaleString('vi-VN')} ₫` : '-'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Giá mua gần nhất</p>
-                                    <p className="font-medium">{material.last_purchase_price ? `$${material.last_purchase_price.toFixed(2)}` : '-'}</p>
+                                    <p className="font-medium">{material.last_purchase_price ? `${material.last_purchase_price.toLocaleString('vi-VN')} ₫` : '-'}</p>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Suppliers */}
+                        <div className="card">
+                            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                <Building2 className="w-5 h-5 text-primary" />
+                                Nhà Cung Cấp
+                                <span className="text-sm text-gray-400 font-normal">({material.suppliers?.length || 0})</span>
+                            </h3>
+                            {material.suppliers && material.suppliers.length > 0 ? (
+                                <div className="space-y-3">
+                                    {material.suppliers.map((ms) => (
+                                        <div key={ms.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                            <div className="flex items-start gap-3">
+                                                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-white text-xs font-bold shrink-0">
+                                                    {ms.priority}
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-sm">{ms.supplier?.name || `Supplier #${ms.supplier_id}`}</p>
+                                                    {ms.unit_price && (
+                                                        <p className="text-xs text-gray-500">Giá: {ms.unit_price.toLocaleString('vi-VN')} ₫/{material.unit}</p>
+                                                    )}
+                                                    {ms.lead_time_days && (
+                                                        <p className="text-xs text-gray-500">Thời gian giao hàng: {ms.lead_time_days} ngày</p>
+                                                    )}
+                                                    {ms.notes && (
+                                                        <p className="text-xs text-gray-400 mt-1">{ms.notes}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {ms.priority === 1 ? (
+                                                <span className="flex items-center gap-1 text-xs font-semibold text-white bg-amber-500 px-2.5 py-1 rounded-full shadow-sm">
+                                                    <Star className="w-3 h-3 fill-white text-white" />
+                                                    ưu tiên
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-0.5 rounded-full font-medium">#{ms.priority}</span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-gray-400 italic">Chưa có nhà cung cấp nào.</p>
+                            )}
                         </div>
 
                         {/* Stock Control */}
@@ -215,24 +264,11 @@ export default function MaterialDetailPage() {
                             </div>
                         </div>
 
-                        {/* Timestamps */}
-                        <div className="card">
-                            <h3 className="text-lg font-semibold mb-4">Thông Tin Hệ Thống</h3>
-                            <div className="space-y-3">
-                                <div>
-                                    <p className="text-sm text-gray-600">Ngày tạo</p>
-                                    <p className="text-sm font-medium">{new Date(material.created_at).toLocaleString()}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-600">Cập nhật lúc</p>
-                                    <p className="text-sm font-medium">{new Date(material.updated_at).toLocaleString()}</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                {/* Audit Log History */}
+
+                {/* Audit Log */}
                 <div className="mt-6">
                     <AuditLogPanel tableName="materials" recordId={material.id} />
                 </div>

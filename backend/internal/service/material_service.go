@@ -20,13 +20,30 @@ type MaterialService interface {
 
 // materialService implements MaterialService
 type materialService struct {
-	repo     repository.MaterialRepository
-	auditSvc AuditLogService
+	repo         repository.MaterialRepository
+	supplierRepo repository.MaterialSupplierRepository
+	auditSvc     AuditLogService
 }
 
 // NewMaterialService creates a new material service
-func NewMaterialService(repo repository.MaterialRepository, auditSvc AuditLogService) MaterialService {
-	return &materialService{repo: repo, auditSvc: auditSvc}
+func NewMaterialService(repo repository.MaterialRepository, supplierRepo repository.MaterialSupplierRepository, auditSvc AuditLogService) MaterialService {
+	return &materialService{repo: repo, supplierRepo: supplierRepo, auditSvc: auditSvc}
+}
+
+// buildMaterialSuppliers converts DTO inputs to model structs
+func buildMaterialSuppliers(inputs []dto.MaterialSupplierInput, materialID int64) []models.MaterialSupplier {
+	result := make([]models.MaterialSupplier, len(inputs))
+	for i, in := range inputs {
+		result[i] = models.MaterialSupplier{
+			MaterialID:   materialID,
+			SupplierID:   in.SupplierID,
+			Priority:     in.Priority,
+			UnitPrice:    in.UnitPrice,
+			LeadTimeDays: in.LeadTimeDays,
+			Notes:        in.Notes,
+		}
+	}
+	return result
 }
 
 // CreateMaterial creates a new material
@@ -70,8 +87,22 @@ func (s *materialService) CreateMaterial(req dto.CreateMaterialRequest, userID i
 		return nil, err
 	}
 
+	// Insert suppliers if provided
+	if len(req.Suppliers) > 0 {
+		suppliers := buildMaterialSuppliers(req.Suppliers, material.ID)
+		if err := s.supplierRepo.UpsertByMaterialID(material.ID, suppliers); err != nil {
+			return nil, err
+		}
+	}
+
+	// Reload to get suppliers
+	reloaded, err := s.repo.GetByID(material.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	// Audit log
-	safe := material.ToSafe()
+	safe := reloaded.ToSafe()
 	_ = s.auditSvc.Log("materials", "CREATE", material.ID, userID, username, nil, safe)
 
 	return safe, nil
@@ -182,7 +213,21 @@ func (s *materialService) UpdateMaterial(id int64, req dto.UpdateMaterialRequest
 		return nil, err
 	}
 
-	newValues := material.ToSafe()
+	// Update suppliers if provided (nil = no change; non-nil = replace all)
+	if req.Suppliers != nil {
+		suppliers := buildMaterialSuppliers(*req.Suppliers, id)
+		if err := s.supplierRepo.UpsertByMaterialID(id, suppliers); err != nil {
+			return nil, err
+		}
+	}
+
+	// Reload to get updated suppliers
+	reloaded, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	newValues := reloaded.ToSafe()
 	// Audit log
 	_ = s.auditSvc.Log("materials", "UPDATE", material.ID, userID, username, oldValues, newValues)
 

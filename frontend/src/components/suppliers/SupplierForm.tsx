@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Save, X } from 'lucide-react';
 import { useCreateSupplier, useUpdateSupplier } from '../../hooks/useSuppliers';
 import type { Supplier, CreateSupplierInput } from '../../types/supplier';
+import SupplierDocuments from './SupplierDocuments';
 
 interface SupplierFormProps {
     supplier?: Supplier;
@@ -56,30 +57,57 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
         return Object.keys(newErrors).length === 0;
     };
 
+    const sanitize = (s: string | undefined | null): string | undefined =>
+        s && s.trim() !== '' ? s.trim() : undefined;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!validate()) return;
 
+        const payload = {
+            code: formData.code,
+            name: formData.name,
+            name_en: sanitize(formData.name_en),
+            tax_code: sanitize(formData.tax_code),
+            contact_person: sanitize(formData.contact_person),
+            phone: sanitize(formData.phone),
+            email: sanitize(formData.email),
+            address: sanitize(formData.address),
+            city: sanitize(formData.city),
+            country: formData.country || 'Vietnam',
+            payment_terms: sanitize(formData.payment_terms),
+            credit_limit: formData.credit_limit,
+            is_active: formData.is_active,
+            notes: sanitize(formData.notes),
+        };
+
         try {
             if (isEditMode && supplier) {
                 await updateSupplier.mutateAsync({
                     id: supplier.id,
-                    input: formData,
+                    input: payload as any,
                 });
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    // Navigate back to detail page so user sees updated data immediately
+                    navigate(`/suppliers/${supplier.id}`);
+                }
             } else {
-                await createSupplier.mutateAsync(formData);
-            }
-
-            if (onSuccess) {
-                onSuccess();
-            } else {
-                navigate('/suppliers');
+                const created = await createSupplier.mutateAsync(payload as any);
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    // Navigate to the new supplier's detail page
+                    navigate(created?.id ? `/suppliers/${created.id}` : '/suppliers');
+                }
             }
         } catch (error) {
             console.error('Error saving supplier:', error);
         }
     };
+
 
     const handleCancel = () => {
         if (onCancel) {
@@ -281,6 +309,13 @@ export default function SupplierForm({ supplier, onSuccess, onCancel }: Supplier
                     </div>
                 </div>
             </div>
+
+            {/* Documents — only in edit mode, above action buttons */}
+            {isEditMode && supplier?.id && (
+                <div className="pt-2">
+                    <SupplierDocuments supplierId={supplier.id} />
+                </div>
+            )}
 
             {/* Actions */}
             <div className="flex items-center justify-end gap-4">

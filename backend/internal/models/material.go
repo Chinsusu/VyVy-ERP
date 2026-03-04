@@ -47,6 +47,7 @@ type Material struct {
 
 	// Relations (optional, for eager loading)
 	// Supplier *Supplier `gorm:"foreignKey:SupplierID" json:"supplier,omitempty"`
+	Suppliers []MaterialSupplier `gorm:"foreignKey:MaterialID" json:"suppliers,omitempty"`
 }
 
 // TableName specifies the table name
@@ -89,15 +90,16 @@ type SafeMaterial struct {
 	ShelfLifeDays      *int     `json:"shelf_life_days,omitempty"`
 	StorageConditions  *string  `json:"storage_conditions,omitempty"`
 	Hazardous          bool     `json:"hazardous"`
-	IsActive           *bool    `json:"is_active"`
-	Notes              *string  `json:"notes,omitempty"`
-	CreatedAt          string   `json:"created_at"`
-	UpdatedAt          string   `json:"updated_at"`
+	IsActive           *bool                  `json:"is_active"`
+	Notes              *string                `json:"notes,omitempty"`
+	Suppliers          []SafeMaterialSupplier `json:"suppliers,omitempty"`
+	CreatedAt          string                 `json:"created_at"`
+	UpdatedAt          string                 `json:"updated_at"`
 }
 
 // ToSafe converts Material to SafeMaterial
 func (m *Material) ToSafe() *SafeMaterial {
-	return &SafeMaterial{
+	result := &SafeMaterial{
 		ID:                m.ID,
 		Code:              m.Code,
 		TradingName:       m.TradingName,
@@ -122,4 +124,12 @@ func (m *Material) ToSafe() *SafeMaterial {
 		CreatedAt:         m.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:         m.UpdatedAt.Format(time.RFC3339),
 	}
+	if len(m.Suppliers) > 0 {
+		safe := make([]SafeMaterialSupplier, len(m.Suppliers))
+		for i, ms := range m.Suppliers {
+			safe[i] = ms.ToSafe()
+		}
+		result.Suppliers = safe
+	}
+	return result
 }
