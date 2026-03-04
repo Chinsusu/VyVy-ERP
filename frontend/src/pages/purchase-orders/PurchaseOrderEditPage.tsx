@@ -36,8 +36,8 @@ export default function PurchaseOrderEditPage() {
         );
     }
 
-    // Block editing for cancelled/closed POs only
-    if (po.status === 'cancelled' || po.status === 'closed') {
+    // Block editing for cancelled POs only (draft and approved can be edited)
+    if (po.status === 'cancelled') {
         return (
             <div className="animate-fade-in p-6">
                 <div>
