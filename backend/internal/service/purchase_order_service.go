@@ -176,9 +176,9 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		return nil, err
 	}
 
-	// Check if PO is in draft status
-	if po.Status != "draft" {
-		return nil, errors.New("can only update purchase orders in draft status")
+	// Check if PO can be updated (draft or approved)
+	if po.Status != "draft" && po.Status != "approved" {
+		return nil, errors.New("can only update purchase orders in draft or approved status")
 	}
 
 	// Validate PO number uniqueness if changed

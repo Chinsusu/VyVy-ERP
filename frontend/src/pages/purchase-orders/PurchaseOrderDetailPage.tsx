@@ -134,13 +134,19 @@ export default function PurchaseOrderDetailPage() {
                             </>
                         )}
                         {po.status === 'approved' && (
-                            <button
-                                onClick={() => setShowConfirmModal('cancel')}
-                                className="btn btn-warning flex items-center gap-2"
-                            >
-                                <XCircle className="w-4 h-4" />
-                                Cancel Order
-                            </button>
+                            <>
+                                <Link to={`/purchase-orders/${poId}/edit`} className="btn btn-secondary flex items-center gap-2">
+                                    <Edit className="w-4 h-4" />
+                                    Edit
+                                </Link>
+                                <button
+                                    onClick={() => setShowConfirmModal('cancel')}
+                                    className="btn btn-warning flex items-center gap-2"
+                                >
+                                    <XCircle className="w-4 h-4" />
+                                    Cancel Order
+                                </button>
+                            </>
                         )}
                     </div>
                 </div>
