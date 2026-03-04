@@ -479,41 +479,46 @@ export default function PurchaseOrderDetailPage() {
                                             {new Date(log.created_at).toLocaleString('vi-VN')}
                                         </span>
                                     </div>
-                                    {log.action === 'UPDATE' && log.changed_fields && log.changed_fields.length > 0 && (
-                                        <div className="space-y-1 mt-2">
-                                            {log.changed_fields.map((field: string) => {
-                                                if (field === 'items') {
-                                                    const oldItems = (log.old_values?.['items'] as ItemSnapshot[]) || [];
-                                                    const newItems = (log.new_values?.['items'] as ItemSnapshot[]) || [];
+                                    {log.action === 'UPDATE' && log.changed_fields && log.changed_fields.length > 0 && (() => {
+                                        const NOISE_FIELDS = new Set(['updated_at', 'created_at', 'deleted_at', 'updated_by', 'created_by']);
+                                        const visibleFields = log.changed_fields.filter((f: string) => !NOISE_FIELDS.has(f));
+                                        if (visibleFields.length === 0) return null;
+                                        return (
+                                            <div className="space-y-1 mt-2">
+                                                {visibleFields.map((field: string) => {
+                                                    if (field === 'items') {
+                                                        const oldItems = (log.old_values?.['items'] as ItemSnapshot[]) || [];
+                                                        const newItems = (log.new_values?.['items'] as ItemSnapshot[]) || [];
+                                                        return (
+                                                            <div key={field} className="text-xs">
+                                                                <span className="text-gray-500 font-medium">Danh sách sản phẩm:</span>
+                                                                <div className="mt-1 pl-2 border-l-2 border-blue-100">
+                                                                    {renderItemDiff(oldItems, newItems)}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    const label = PO_FIELD_LABELS[field] || field;
+                                                    const oldVal = log.old_values?.[field];
+                                                    const newVal = log.new_values?.[field];
                                                     return (
-                                                        <div key={field} className="text-xs">
-                                                            <span className="text-gray-500 font-medium">Danh sách sản phẩm:</span>
-                                                            <div className="mt-1 pl-2 border-l-2 border-blue-100">
-                                                                {renderItemDiff(oldItems, newItems)}
+                                                        <div key={field} className="flex items-start gap-2 text-xs">
+                                                            <span className="text-gray-500 min-w-[140px] pt-0.5">{label}:</span>
+                                                            <div className="flex items-center gap-1 flex-wrap">
+                                                                <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">
+                                                                    {poFormatValue(oldVal)}
+                                                                </span>
+                                                                <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
+                                                                <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
+                                                                    {poFormatValue(newVal)}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     );
-                                                }
-                                                const label = PO_FIELD_LABELS[field] || field;
-                                                const oldVal = log.old_values?.[field];
-                                                const newVal = log.new_values?.[field];
-                                                return (
-                                                    <div key={field} className="flex items-start gap-2 text-xs">
-                                                        <span className="text-gray-500 min-w-[140px] pt-0.5">{label}:</span>
-                                                        <div className="flex items-center gap-1 flex-wrap">
-                                                            <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">
-                                                                {poFormatValue(oldVal)}
-                                                            </span>
-                                                            <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
-                                                            <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
-                                                                {poFormatValue(newVal)}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
+                                                })}
+                                            </div>
+                                        )
+                                    })()}
                                 </div>
                             </div>
                         ))}
