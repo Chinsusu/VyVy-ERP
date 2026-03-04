@@ -65,7 +65,7 @@ func (r *materialRepository) List(filter dto.MaterialFilterRequest) ([]models.Ma
 	// Apply filters
 	if filter.Search != "" {
 		searchPattern := "%" + filter.Search + "%"
-		query = query.Where("code ILIKE ? OR trading_name ILIKE ? OR inci_name ILIKE ?",
+		query = query.Where("unaccent(code) ILIKE unaccent(?) OR unaccent(trading_name) ILIKE unaccent(?) OR unaccent(inci_name) ILIKE unaccent(?)",
 			searchPattern, searchPattern, searchPattern)
 	}
 

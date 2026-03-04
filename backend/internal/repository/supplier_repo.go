@@ -65,7 +65,7 @@ func (r *supplierRepository) List(filter *dto.SupplierFilterRequest) ([]*models.
 	if filter.Search != "" {
 		searchPattern := "%" + filter.Search + "%"
 		query = query.Where(
-			"code ILIKE ? OR name ILIKE ? OR name_en ILIKE ? OR tax_code ILIKE ?",
+			"unaccent(code) ILIKE unaccent(?) OR unaccent(name) ILIKE unaccent(?) OR unaccent(name_en) ILIKE unaccent(?) OR unaccent(tax_code) ILIKE unaccent(?)",
 			searchPattern, searchPattern, searchPattern, searchPattern,
 		)
 	}

@@ -65,7 +65,7 @@ func (r *warehouseRepository) List(filter *dto.WarehouseFilterRequest) ([]*model
 	// Apply search filter
 	if filter.Search != "" {
 		searchPattern := "%" + filter.Search + "%"
-		query = query.Where("code ILIKE ? OR name ILIKE ?", searchPattern, searchPattern)
+		query = query.Where("unaccent(code) ILIKE unaccent(?) OR unaccent(name) ILIKE unaccent(?)", searchPattern, searchPattern)
 	}
 
 	// Apply warehouse_type filter

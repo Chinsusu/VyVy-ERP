@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Plus, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, Plus, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSuppliers } from '../../hooks/useSuppliers';
 import type { SupplierFilters } from '../../types/supplier';
 import PageSizeSelector from '../../components/common/PageSizeSelector';
+import SearchInput from '../../components/common/SearchInput';
 
 export default function SupplierListPage() {
     const [filters, setFilters] = useState<SupplierFilters>({
@@ -14,10 +15,6 @@ export default function SupplierListPage() {
     });
 
     const { data, isLoading, error } = useSuppliers(filters);
-
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFilters({ ...filters, search: e.target.value, page: 1 });
-    };
 
     const handlePageChange = (newPage: number) => {
         setFilters({ ...filters, page: newPage });
@@ -80,16 +77,12 @@ export default function SupplierListPage() {
                 {/* Filters */}
                 <div className="card mb-6">
                     <div className="flex items-center gap-4">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Tìm theo mã, tên, mã số thuế, email..."
-                                className="input pl-10 w-full"
-                                value={filters.search || ''}
-                                onChange={handleSearch}
-                            />
-                        </div>
+                        <SearchInput
+                            value={filters.search || ''}
+                            onChange={(val) => setFilters({ ...filters, search: val, page: 1 })}
+                            placeholder="Tìm theo mã, tên, mã số thuế, email..."
+                            width="flex-1"
+                        />
                         <button className="btn btn-secondary flex items-center gap-2">
                             <Filter className="w-5 h-5" />
                             Bộ lọc

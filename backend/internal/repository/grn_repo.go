@@ -63,7 +63,7 @@ func (r *goodsReceiptNoteRepository) List(filter *dto.GRNFilterRequest) ([]*mode
 
 	if filter.Search != "" {
 		searchPattern := "%" + filter.Search + "%"
-		query = query.Where("grn_number ILIKE ? OR notes ILIKE ?", searchPattern, searchPattern)
+		query = query.Where("unaccent(grn_number) ILIKE unaccent(?) OR unaccent(notes) ILIKE unaccent(?)", searchPattern, searchPattern)
 	}
 
 	if filter.PurchaseOrderID != nil {

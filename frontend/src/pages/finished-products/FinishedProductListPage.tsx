@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useFinishedProducts } from '../../hooks/useFinishedProducts';
 import type { FinishedProductFilters } from '../../types/finishedProduct';
 import PageSizeSelector from '../../components/common/PageSizeSelector';
+import SearchInput from '../../components/common/SearchInput';
 
 export default function FinishedProductListPage() {
     const [filters, setFilters] = useState<FinishedProductFilters>({
@@ -14,10 +15,6 @@ export default function FinishedProductListPage() {
     const { data, isLoading, error } = useFinishedProducts(filters);
     const products = data?.data || [];
     const pagination = data?.pagination;
-
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFilters({ ...filters, search: e.target.value, page: 1 });
-    };
 
     const handlePageChange = (newPage: number) => {
         setFilters({ ...filters, page: newPage });
@@ -62,16 +59,12 @@ export default function FinishedProductListPage() {
                 {/* Filters */}
                 <div className="card mb-6">
                     <div className="flex items-center gap-4">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                                type="text"
-                                placeholder="Tìm theo mã, tên sản phẩm hoặc barcode..."
-                                className="input pl-10 w-full"
-                                value={filters.search || ''}
-                                onChange={handleSearch}
-                            />
-                        </div>
+                        <SearchInput
+                            value={filters.search || ''}
+                            onChange={(val) => setFilters({ ...filters, search: val, page: 1 })}
+                            placeholder="Tìm theo mã, tên sản phẩm hoặc barcode..."
+                            width="flex-1"
+                        />
                     </div>
                 </div>
 

@@ -60,7 +60,7 @@ func (r *salesChannelRepository) List(platformType string, isActive *bool, searc
 	}
 	if search != "" {
 		searchPattern := "%" + search + "%"
-		query = query.Where("name ILIKE ? OR code ILIKE ?", searchPattern, searchPattern)
+		query = query.Where("unaccent(name) ILIKE unaccent(?) OR unaccent(code) ILIKE unaccent(?)", searchPattern, searchPattern)
 	}
 
 	if err := query.Count(&total).Error; err != nil {

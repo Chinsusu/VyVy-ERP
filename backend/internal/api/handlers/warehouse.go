@@ -97,7 +97,10 @@ func (h *WarehouseHandler) Create(c *gin.Context) {
 	}
 	userID := val.(int64)
 
-	warehouse, err := h.service.CreateWarehouse(&req, uint(userID))
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
+
+	warehouse, err := h.service.CreateWarehouse(&req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
@@ -129,7 +132,10 @@ func (h *WarehouseHandler) Update(c *gin.Context) {
 	}
 	userID := val.(int64)
 
-	warehouse, err := h.service.UpdateWarehouse(uint(id), &req, uint(userID))
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
+
+	warehouse, err := h.service.UpdateWarehouse(uint(id), &req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return
@@ -147,7 +153,18 @@ func (h *WarehouseHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteWarehouse(uint(id)); err != nil {
+	// Get user ID from context
+	val, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User ID not found"))
+		return
+	}
+	userID := val.(int64)
+
+	username, _ := c.Get("username")
+	usernameStr, _ := username.(string)
+
+	if err := h.service.DeleteWarehouse(uint(id), userID, usernameStr); err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("DELETE_ERROR", err.Error()))
 		return
 	}

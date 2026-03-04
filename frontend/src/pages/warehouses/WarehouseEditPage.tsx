@@ -12,10 +12,8 @@ export default function WarehouseEditPage() {
     if (isLoading) {
         return (
             <div className="animate-fade-in p-6">
-                <div>
-                    <div className="flex items-center justify-center h-64">
-                        <div className="text-gray-500">Loading warehouse...</div>
-                    </div>
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-gray-500">Đang tải kho hàng...</div>
                 </div>
             </div>
         );
@@ -24,18 +22,16 @@ export default function WarehouseEditPage() {
     if (error || !warehouse) {
         return (
             <div className="animate-fade-in p-6">
-                <div>
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        {error ? `Error: ${(error as Error).message}` : 'Warehouse not found'}
-                    </div>
-                    <Link
-                        to="/warehouses"
-                        className="text-primary hover:underline flex items-center gap-2 mt-4"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Warehouses
-                    </Link>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+                    {error ? `Lỗi: ${(error as Error).message}` : 'Không tìm thấy kho hàng'}
                 </div>
+                <Link
+                    to="/warehouses"
+                    className="text-primary hover:underline flex items-center gap-2 mt-4"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Quay lại danh sách
+                </Link>
             </div>
         );
     }
@@ -50,11 +46,11 @@ export default function WarehouseEditPage() {
                         className="text-primary hover:underline flex items-center gap-2 mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Warehouse Details
+                        Quay lại chi tiết kho
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Edit Warehouse</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Chỉnh Sửa Kho Hàng</h1>
                     <p className="text-gray-600 mt-1">
-                        Update information for {warehouse.name} ({warehouse.code})
+                        Cập nhật thông tin cho {warehouse.name} ({warehouse.code})
                     </p>
                 </div>
 

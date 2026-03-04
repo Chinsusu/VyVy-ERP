@@ -88,7 +88,7 @@ func (r *purchaseOrderRepository) List(filter *dto.PurchaseOrderFilterRequest) (
 	// Apply search filter
 	if filter.Search != "" {
 		searchPattern := "%" + filter.Search + "%"
-		query = query.Where("po_number ILIKE ? OR notes ILIKE ?", searchPattern, searchPattern)
+		query = query.Where("unaccent(po_number) ILIKE unaccent(?) OR unaccent(notes) ILIKE unaccent(?)", searchPattern, searchPattern)
 	}
 
 	// Apply supplier filter

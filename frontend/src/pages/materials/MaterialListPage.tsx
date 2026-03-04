@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Plus, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, Plus, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMaterials } from '../../hooks/useMaterials';
 import type { MaterialFilters } from '../../types/material';
 import PageSizeSelector from '../../components/common/PageSizeSelector';
+import SearchInput from '../../components/common/SearchInput';
 
 export default function MaterialListPage() {
     const [filters, setFilters] = useState<MaterialFilters>({
@@ -14,10 +15,6 @@ export default function MaterialListPage() {
     });
 
     const { data, isLoading, error } = useMaterials(filters);
-
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFilters({ ...filters, search: e.target.value, page: 1 });
-    };
 
     const handlePageChange = (newPage: number) => {
         setFilters({ ...filters, page: newPage });
@@ -80,16 +77,12 @@ export default function MaterialListPage() {
                 {/* Filters */}
                 <div className="card mb-6">
                     <div className="flex items-center gap-4">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Tìm theo mã, tên hoặc tên INCI..."
-                                className="input pl-10 w-full"
-                                value={filters.search || ''}
-                                onChange={handleSearch}
-                            />
-                        </div>
+                        <SearchInput
+                            value={filters.search || ''}
+                            onChange={(val) => setFilters({ ...filters, search: val, page: 1 })}
+                            placeholder="Tìm theo mã, tên hoặc tên INCI..."
+                            width="flex-1"
+                        />
                         <button className="btn btn-secondary flex items-center gap-2">
                             <Filter className="w-5 h-5" />
                             Bộ lọc

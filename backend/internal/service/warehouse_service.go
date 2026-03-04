@@ -12,11 +12,11 @@ import (
 
 // WarehouseService defines the interface for warehouse business logic
 type WarehouseService interface {
-	CreateWarehouse(req *dto.CreateWarehouseRequest, userID uint) (*models.SafeWarehouse, error)
+	CreateWarehouse(req *dto.CreateWarehouseRequest, userID uint, username string) (*models.SafeWarehouse, error)
 	GetWarehouseByID(id uint) (*models.SafeWarehouse, error)
 	ListWarehouses(filter *dto.WarehouseFilterRequest) ([]*models.SafeWarehouse, int64, error)
-	UpdateWarehouse(id uint, req *dto.UpdateWarehouseRequest, userID uint) (*models.SafeWarehouse, error)
-	DeleteWarehouse(id uint) error
+	UpdateWarehouse(id uint, req *dto.UpdateWarehouseRequest, userID uint, username string) (*models.SafeWarehouse, error)
+	DeleteWarehouse(id uint, userID int64, username string) error
 	GetWarehouseLocations(id uint) ([]*models.SafeWarehouseLocation, error)
 }
 
@@ -24,18 +24,20 @@ type WarehouseService interface {
 type warehouseService struct {
 	repo         repository.WarehouseRepository
 	locationRepo repository.WarehouseLocationRepository
+	auditSvc     AuditLogService
 }
 
 // NewWarehouseService creates a new warehouse service
-func NewWarehouseService(repo repository.WarehouseRepository, locationRepo repository.WarehouseLocationRepository) WarehouseService {
+func NewWarehouseService(repo repository.WarehouseRepository, locationRepo repository.WarehouseLocationRepository, auditSvc AuditLogService) WarehouseService {
 	return &warehouseService{
 		repo:         repo,
 		locationRepo: locationRepo,
+		auditSvc:     auditSvc,
 	}
 }
 
 // CreateWarehouse creates a new warehouse
-func (s *warehouseService) CreateWarehouse(req *dto.CreateWarehouseRequest, userID uint) (*models.SafeWarehouse, error) {
+func (s *warehouseService) CreateWarehouse(req *dto.CreateWarehouseRequest, userID uint, username string) (*models.SafeWarehouse, error) {
 	// Check if code already exists
 	existing, err := s.repo.GetByCode(req.Code)
 	if err == nil && existing != nil {
@@ -69,7 +71,10 @@ func (s *warehouseService) CreateWarehouse(req *dto.CreateWarehouseRequest, user
 		return nil, err
 	}
 
-	return warehouse.ToSafe(), nil
+	safe := warehouse.ToSafe()
+	_ = s.auditSvc.Log("warehouses", "CREATE", int64(warehouse.ID), int64(userID), username, nil, safe)
+
+	return safe, nil
 }
 
 // GetWarehouseByID retrieves a warehouse by ID
@@ -118,7 +123,7 @@ func (s *warehouseService) ListWarehouses(filter *dto.WarehouseFilterRequest) ([
 }
 
 // UpdateWarehouse updates a warehouse
-func (s *warehouseService) UpdateWarehouse(id uint, req *dto.UpdateWarehouseRequest, userID uint) (*models.SafeWarehouse, error) {
+func (s *warehouseService) UpdateWarehouse(id uint, req *dto.UpdateWarehouseRequest, userID uint, username string) (*models.SafeWarehouse, error) {
 	// Get existing warehouse
 	warehouse, err := s.repo.GetByID(id)
 	if err != nil {
@@ -127,6 +132,9 @@ func (s *warehouseService) UpdateWarehouse(id uint, req *dto.UpdateWarehouseRequ
 		}
 		return nil, err
 	}
+
+	// Capture old values before update
+	oldValues := warehouse.ToSafe()
 
 	// Check if new code conflicts with existing warehouse
 	if req.Code != "" && req.Code != warehouse.Code {
@@ -169,21 +177,22 @@ func (s *warehouseService) UpdateWarehouse(id uint, req *dto.UpdateWarehouseRequ
 		return nil, err
 	}
 
-	safe := warehouse.ToSafe()
+	newValues := warehouse.ToSafe()
+	_ = s.auditSvc.Log("warehouses", "UPDATE", int64(warehouse.ID), int64(userID), username, oldValues, newValues)
 
 	// Get locations count
 	count, err := s.repo.GetLocationsCount(id)
 	if err == nil {
-		safe.LocationsCount = int(count)
+		newValues.LocationsCount = int(count)
 	}
 
-	return safe, nil
+	return newValues, nil
 }
 
 // DeleteWarehouse soft deletes a warehouse
-func (s *warehouseService) DeleteWarehouse(id uint) error {
+func (s *warehouseService) DeleteWarehouse(id uint, userID int64, username string) error {
 	// Check if warehouse exists
-	_, err := s.repo.GetByID(id)
+	warehouse, err := s.repo.GetByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("warehouse not found")
@@ -200,7 +209,15 @@ func (s *warehouseService) DeleteWarehouse(id uint) error {
 		return errors.New("cannot delete warehouse with existing locations")
 	}
 
-	return s.repo.Delete(id)
+	oldValues := warehouse.ToSafe()
+
+	if err := s.repo.Delete(id); err != nil {
+		return err
+	}
+
+	_ = s.auditSvc.Log("warehouses", "DELETE", int64(id), userID, username, oldValues, nil)
+
+	return nil
 }
 
 // GetWarehouseLocations retrieves all locations for a warehouse

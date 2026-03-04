@@ -57,7 +57,7 @@ func (r *finishedProductRepository) List(filter *dto.FinishedProductFilterReques
 	// Apply search filter
 	if filter.Search != "" {
 		searchPattern := "%" + filter.Search + "%"
-		query = query.Where("code ILIKE ? OR name ILIKE ? OR name_en ILIKE ? OR barcode ILIKE ?", 
+		query = query.Where("unaccent(code) ILIKE unaccent(?) OR unaccent(name) ILIKE unaccent(?) OR unaccent(name_en) ILIKE unaccent(?) OR unaccent(barcode) ILIKE unaccent(?)", 
 			searchPattern, searchPattern, searchPattern, searchPattern)
 	}
 

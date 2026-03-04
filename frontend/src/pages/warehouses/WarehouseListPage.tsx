@@ -1,9 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Warehouse as WarehouseIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Warehouse as WarehouseIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import type { WarehouseFilters } from '../../types/warehouse';
 import PageSizeSelector from '../../components/common/PageSizeSelector';
+import SearchInput from '../../components/common/SearchInput';
+
+const WAREHOUSE_TYPE_LABELS: Record<string, string> = {
+    main: 'Kho Tổng',
+    satellite: 'Kho Vệ Tinh',
+    returns: 'Kho Hoàn Hàng',
+    staging: 'Kho Trung Chuyển',
+    other: 'Khác',
+};
 
 export default function WarehouseListPage() {
     const [filters, setFilters] = useState<WarehouseFilters>({
@@ -32,7 +41,7 @@ export default function WarehouseListPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        Error loading warehouses: {(error as Error).message}
+                        Lỗi tải kho hàng: {(error as Error).message}
                     </div>
                 </div>
             </div>
@@ -43,18 +52,18 @@ export default function WarehouseListPage() {
         <div className="animate-fade-in">
             <div>
                 {/* Header */}
-                <div className="mb-6">
+                <div className="mb-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
                                 <WarehouseIcon className="w-8 h-8 text-primary" />
-                                Warehouses
+                                Kho Hàng
                             </h1>
-                            <p className="text-gray-600 mt-1">Manage warehouse locations and facilities</p>
+                            <p className="text-gray-600 mt-1">Quản lý kho hàng và vị trí lưu trữ</p>
                         </div>
                         <Link to="/warehouses/new" className="btn btn-primary flex items-center gap-2">
                             <Plus className="w-5 h-5" />
-                            Add Warehouse
+                            Thêm Kho Hàng
                         </Link>
                     </div>
                 </div>
@@ -62,16 +71,12 @@ export default function WarehouseListPage() {
                 {/* Filters */}
                 <div className="card mb-6">
                     <div className="flex items-center gap-4">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                                type="text"
-                                placeholder="Search by code or name..."
-                                className="input pl-10 w-full"
-                                value={filters.search || ''}
-                                onChange={handleSearch}
-                            />
-                        </div>
+                        <SearchInput
+                            value={filters.search || ''}
+                            onChange={(val) => handleSearch({ target: { value: val } } as any)}
+                            placeholder="Tìm theo mã hoặc tên kho..."
+                            width="w-80"
+                        />
                     </div>
                 </div>
 
@@ -81,15 +86,15 @@ export default function WarehouseListPage() {
                         <div className="flex items-center justify-center py-12">
                             <div className="text-gray-500 flex items-center gap-2">
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-                                Loading warehouses...
+                                Đang tải kho hàng...
                             </div>
                         </div>
                     ) : warehouses.length === 0 ? (
                         <div className="text-center py-12">
                             <WarehouseIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-500">No warehouses found</p>
+                            <p className="text-gray-500">Chưa có kho hàng nào</p>
                             <Link to="/warehouses/new" className="btn btn-primary mt-4">
-                                Create First Warehouse
+                                Tạo Kho Hàng Đầu Tiên
                             </Link>
                         </div>
                     ) : (
@@ -98,13 +103,13 @@ export default function WarehouseListPage() {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th className="w-32">Code</th>
-                                            <th className="min-w-[180px]">Name</th>
-                                            <th>Type</th>
-                                            <th>City</th>
-                                            <th>Locations</th>
-                                            <th>Status</th>
-                                            <th className="text-right">Actions</th>
+                                            <th className="w-32">Mã kho</th>
+                                            <th className="min-w-[180px]">Tên kho</th>
+                                            <th>Loại kho</th>
+                                            <th>Tỉnh/TP</th>
+                                            <th>Vị trí</th>
+                                            <th>Trạng thái</th>
+                                            <th className="text-right">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -117,21 +122,21 @@ export default function WarehouseListPage() {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span className="badge badge-secondary capitalize">
-                                                        {warehouse.warehouse_type}
+                                                    <span className="badge badge-secondary">
+                                                        {WAREHOUSE_TYPE_LABELS[warehouse.warehouse_type] || warehouse.warehouse_type}
                                                     </span>
                                                 </td>
                                                 <td>{warehouse.city || <span className="text-gray-400">-</span>}</td>
                                                 <td>
                                                     <span className="badge badge-info">
-                                                        {warehouse.locations_count || 0} locations
+                                                        {warehouse.locations_count || 0} vị trí
                                                     </span>
                                                 </td>
                                                 <td>
                                                     {warehouse.is_active ? (
-                                                        <span className="badge badge-success">Active</span>
+                                                        <span className="badge badge-success">Đang hoạt động</span>
                                                     ) : (
-                                                        <span className="badge badge-secondary">Inactive</span>
+                                                        <span className="badge badge-secondary">Ngừng hoạt động</span>
                                                     )}
                                                 </td>
                                                 <td>
@@ -140,13 +145,13 @@ export default function WarehouseListPage() {
                                                             to={`/warehouses/${warehouse.id}`}
                                                             className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
-                                                            View
+                                                            Xem
                                                         </Link>
                                                         <Link
                                                             to={`/warehouses/${warehouse.id}/edit`}
                                                             className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
-                                                            Edit
+                                                            Sửa
                                                         </Link>
                                                     </div>
                                                 </td>
@@ -168,7 +173,7 @@ export default function WarehouseListPage() {
                                         <span className="text-sm text-gray-500">
                                             {(filters.page_size || 0) >= 999999
                                                 ? `Tất cả ${pagination.total_items} kho`
-                                                : `${(pagination.page - 1) * (filters.page_size || 20) + 1}–${Math.min(pagination.page * (filters.page_size || 20), Number(pagination.total_items))} / ${pagination.total_items} kho`}
+                                                : `Hiển thị ${(pagination.page - 1) * (filters.page_size || 20) + 1}–${Math.min(pagination.page * (filters.page_size || 20), Number(pagination.total_items))} / ${pagination.total_items} kho`}
                                         </span>
                                     </div>
                                     {(filters.page_size || 0) < 999999 && pagination.total_pages > 1 && (
@@ -176,7 +181,7 @@ export default function WarehouseListPage() {
                                             <button
                                                 onClick={() => handlePageChange(pagination.page - 1)}
                                                 disabled={pagination.page === 1}
-                                                className="btn btn-secondary btn-sm"
+                                                className="btn btn-secondary btn-sm disabled:opacity-50"
                                             >
                                                 <ChevronLeft className="w-4 h-4" />
                                                 Trước
@@ -187,7 +192,7 @@ export default function WarehouseListPage() {
                                             <button
                                                 onClick={() => handlePageChange(pagination.page + 1)}
                                                 disabled={pagination.page >= pagination.total_pages}
-                                                className="btn btn-secondary btn-sm"
+                                                className="btn btn-secondary btn-sm disabled:opacity-50"
                                             >
                                                 Tiếp
                                                 <ChevronRight className="w-4 h-4" />

@@ -51,7 +51,7 @@ func (r *CarrierRepository) List(filters map[string]interface{}) ([]models.Carri
 		query = query.Where("is_active = ?", isActive)
 	}
 	if search, ok := filters["search"]; ok {
-		query = query.Where("name ILIKE ? OR code ILIKE ?", "%"+search.(string)+"%", "%"+search.(string)+"%")
+		query = query.Where("unaccent(name) ILIKE unaccent(?) OR unaccent(code) ILIKE unaccent(?)", "%"+search.(string)+"%", "%"+search.(string)+"%")
 	}
 
 	query.Count(&total)

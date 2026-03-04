@@ -7,7 +7,26 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc19] - 2026-03-04
+
+### Added
+- **SearchInput Component** (`frontend/src/components/common/SearchInput.tsx`): Component tìm kiếm tái sử dụng với icon kính lúp, realtime search (trigger trên mỗi keystroke), nút clear (X) có auto-focus, và prop `width` tuỳ chỉnh.
+- **Hỗ Trợ Tìm Kiếm Tiếng Việt Không Dấu**: PostgreSQL `unaccent` extension được enable — gõ "nguyen", "nha cung cap", "ke hoach"... sẽ tìm ra kết quả đúng.
+  - Migration `000035_enable_unaccent`: `CREATE EXTENSION IF NOT EXISTS unaccent`.
+  - Backend: 10 repository đổi từ `column ILIKE ?` sang `unaccent(column) ILIKE unaccent(?)`: `supplier_repo`, `material_repo`, `finished_product_repo`, `production_plan_repo`, `warehouse_repo`, `purchase_order_repo`, `grn_repo`, `warehouse_location_repo`, `carrier_repo`, `sales_channel_repo`.
+
+### Changed
+- **SearchInput áp dụng toàn hệ thống**: Thay inline search block (`div.relative + <input>` hoặc `<form onSubmit>`) bằng `<SearchInput>` trong:
+  - `SupplierListPage.tsx`, `MaterialListPage.tsx`, `FinishedProductListPage.tsx`
+  - `MRListPage.tsx` (Kế Hoạch Sản Xuất), `PurchaseOrderListPage.tsx`
+  - `WarehouseListPage.tsx`, `WarehouseDetailPage.tsx`
+- **Kho Hàng (Warehouse) — Việt Hóa**: Toàn bộ giao diện Warehouse (List, Detail, Create, Edit) được dịch sang tiếng Việt. Thêm hiển thị tồn kho nguyên liệu/thành phẩm theo kho với đơn vị và số lượng.
+- **Kho Hàng — Audit Log**: Thêm `AuditLogPanel` vào `WarehouseDetailPage` — track lịch sử thay đổi thông tin kho.
+
+---
+
 ## [1.0.0-rc18] - 2026-03-04
+
 
 ### Fixed
 - **Material Type Display (legacy data)**: NVL có `material_type = 'raw_material'` (seed data cũ lowercase) hiển thị sai trong form — select dropdown render "Hóa phẩm" về mặt visual nhưng React state vẫn giữ `'raw_material'`, khiến khi save không thực sự thay đổi giá trị.

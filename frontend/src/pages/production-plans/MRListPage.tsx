@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, FileText } from 'lucide-react';
+import { Plus, FileText } from 'lucide-react';
 import { useProductionPlans } from '../../hooks/useProductionPlans';
 import type { ProductionPlan, ProductionPlanFilters } from '../../types/productionPlan';
 import PageSizeSelector from '../../components/common/PageSizeSelector';
+import SearchInput from '../../components/common/SearchInput';
 
 export default function MRListPage() {
     const [filters, setFilters] = useState<ProductionPlanFilters>({
@@ -32,16 +33,6 @@ export default function MRListPage() {
         }
     };
 
-    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        setFilters({
-            ...filters,
-            search: formData.get('search') as string,
-            page: 1,
-        });
-    };
-
     const handlePageSizeChange = (size: number) => {
         setFilters({ ...filters, page_size: size, page: 1 });
     };
@@ -63,21 +54,14 @@ export default function MRListPage() {
 
                 {/* Search and Filters */}
                 <div className="card mb-6">
-                    <form onSubmit={handleSearch} className="flex items-center gap-4">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                                type="text"
-                                name="search"
-                                placeholder="Tìm theo số MR, phòng ban hoặc mục đích..."
-                                className="input pl-10 w-full"
-                                defaultValue={filters.search}
-                            />
-                        </div>
-                        <button type="submit" className="btn btn-secondary">
-                            Tìm kiếm
-                        </button>
-                    </form>
+                    <div className="flex items-center gap-4">
+                        <SearchInput
+                            value={filters.search || ''}
+                            onChange={(val) => setFilters({ ...filters, search: val, page: 1 })}
+                            placeholder="Tìm theo số kế hoạch, phòng ban hoặc mục đích..."
+                            width="flex-1"
+                        />
+                    </div>
 
                     {/* Additional Filters */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">

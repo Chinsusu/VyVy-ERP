@@ -86,7 +86,7 @@ func (r *productionPlanRepository) List(filter *dto.ProductionPlanFilterRequest)
 	// Apply search filter
 	if filter.Search != "" {
 		searchPattern := "%" + filter.Search + "%"
-		query = query.Where("plan_number ILIKE ? OR department ILIKE ? OR purpose ILIKE ?", searchPattern, searchPattern, searchPattern)
+		query = query.Where("unaccent(plan_number) ILIKE unaccent(?) OR unaccent(department) ILIKE unaccent(?) OR unaccent(purpose) ILIKE unaccent(?)", searchPattern, searchPattern, searchPattern)
 	}
 
 	// Apply warehouse filter

@@ -31,10 +31,10 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
         const newErrors: Record<string, string> = {};
 
         if (!formData.code.trim()) {
-            newErrors.code = 'Code is required';
+            newErrors.code = 'Vui lòng nhập mã kho';
         }
         if (!formData.name.trim()) {
-            newErrors.name = 'Name is required';
+            newErrors.name = 'Vui lòng nhập tên kho';
         }
 
         setErrors(newErrors);
@@ -48,24 +48,22 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
 
         try {
             if (warehouse) {
-                // Update existing warehouse
                 await updateWarehouse.mutateAsync({
                     id: warehouse.id,
                     input: formData,
                 });
+                navigate(`/warehouses/${warehouse.id}`);
             } else {
-                // Create new warehouse
                 await createWarehouse.mutateAsync(formData);
+                navigate('/warehouses');
             }
 
             if (onSuccess) {
                 onSuccess();
-            } else {
-                navigate('/warehouses');
             }
         } catch (error) {
             console.error('Error saving warehouse:', error);
-            setErrors({ submit: 'Failed to save warehouse. Please try again.' });
+            setErrors({ submit: 'Lưu thất bại. Vui lòng thử lại.' });
         }
     };
 
@@ -79,7 +77,6 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
 
     const handleChange = (field: keyof CreateWarehouseInput, value: any) => {
         setFormData({ ...formData, [field]: value });
-        // Clear field error when user starts typing
         if (errors[field]) {
             setErrors({ ...errors, [field]: '' });
         }
@@ -90,7 +87,7 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
     return (
         <form onSubmit={handleSubmit} className="card">
             <h2 className="text-xl font-semibold mb-6">
-                {warehouse ? 'Edit Warehouse' : 'Create New Warehouse'}
+                {warehouse ? 'Chỉnh Sửa Kho Hàng' : 'Tạo Kho Hàng Mới'}
             </h2>
 
             {errors.submit && (
@@ -100,13 +97,13 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
             )}
 
             <div className="space-y-6">
-                {/* Basic Information */}
+                {/* Thông tin cơ bản */}
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Basic Information</h3>
+                    <h3 className="text-lg font-medium mb-4">Thông Tin Cơ Bản</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">
-                                Code <span className="text-red-500">*</span>
+                                Mã kho <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -114,14 +111,14 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
                                 value={formData.code}
                                 onChange={(e) => handleChange('code', e.target.value)}
                                 disabled={!!warehouse || isSubmitting}
-                                placeholder="e.g. WH001"
+                                placeholder="VD: KHO-001"
                             />
                             {errors.code && <p className="text-red-500 text-sm mt-1">{errors.code}</p>}
                         </div>
 
                         <div>
                             <label className="label">
-                                Name <span className="text-red-500">*</span>
+                                Tên kho <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -129,70 +126,70 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
                                 value={formData.name}
                                 onChange={(e) => handleChange('name', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. Main Warehouse"
+                                placeholder="VD: Kho Tổng Hà Nội"
                             />
                             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                         </div>
 
                         <div>
-                            <label className="label">Warehouse Type</label>
+                            <label className="label">Loại kho</label>
                             <select
                                 className="input"
                                 value={formData.warehouse_type}
                                 onChange={(e) => handleChange('warehouse_type', e.target.value)}
                                 disabled={isSubmitting}
                             >
-                                <option value="main">Main</option>
-                                <option value="satellite">Satellite</option>
-                                <option value="returns">Returns</option>
-                                <option value="staging">Staging</option>
-                                <option value="other">Other</option>
+                                <option value="main">Kho Tổng</option>
+                                <option value="satellite">Kho Vệ Tinh</option>
+                                <option value="returns">Kho Hoàn Hàng</option>
+                                <option value="staging">Kho Trung Chuyển</option>
+                                <option value="other">Khác</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className="label">City</label>
+                            <label className="label">Tỉnh/Thành phố</label>
                             <input
                                 type="text"
                                 className="input"
                                 value={formData.city}
                                 onChange={(e) => handleChange('city', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="e.g. Ho Chi Minh City"
+                                placeholder="VD: Hồ Chí Minh"
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Address */}
+                {/* Địa chỉ */}
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Address</h3>
+                    <h3 className="text-lg font-medium mb-4">Địa Chỉ</h3>
                     <div>
-                        <label className="label">Full Address</label>
+                        <label className="label">Địa chỉ đầy đủ</label>
                         <textarea
                             className="input"
                             rows={3}
                             value={formData.address}
                             onChange={(e) => handleChange('address', e.target.value)}
                             disabled={isSubmitting}
-                            placeholder="Enter complete address..."
+                            placeholder="Nhập địa chỉ đầy đủ của kho..."
                         />
                     </div>
                 </div>
 
-                {/* Additional Information */}
+                {/* Thông tin bổ sung */}
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Additional Information</h3>
+                    <h3 className="text-lg font-medium mb-4">Thông Tin Bổ Sung</h3>
                     <div className="space-y-4">
                         <div>
-                            <label className="label">Notes</label>
+                            <label className="label">Ghi chú</label>
                             <textarea
                                 className="input"
                                 rows={4}
                                 value={formData.notes}
                                 onChange={(e) => handleChange('notes', e.target.value)}
                                 disabled={isSubmitting}
-                                placeholder="Additional notes about the warehouse..."
+                                placeholder="Ghi chú thêm về kho hàng..."
                             />
                         </div>
 
@@ -206,7 +203,7 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
                                 className="mr-2"
                             />
                             <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
-                                Active
+                                Đang hoạt động
                             </label>
                         </div>
                     </div>
@@ -221,10 +218,10 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
                     className="btn btn-secondary"
                     disabled={isSubmitting}
                 >
-                    Cancel
+                    Hủy bỏ
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                    {isSubmitting ? 'Saving...' : warehouse ? 'Update Warehouse' : 'Create Warehouse'}
+                    {isSubmitting ? 'Đang lưu...' : warehouse ? 'Cập Nhật Kho Hàng' : 'Tạo Kho Hàng'}
                 </button>
             </div>
         </form>
