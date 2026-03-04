@@ -395,19 +395,40 @@ func (s *productionPlanService) ApproveProductionPlan(id uint, userID uint, user
 				continue
 			}
 
-			// Load material with supplier info via raw DB query
+			// Load preferred supplier from material_suppliers (priority=1 is highest)
+			var matSupplier models.MaterialSupplier
+			err2 := s.db.
+				Where("material_id = ?", item.MaterialID).
+				Order("priority ASC").
+				First(&matSupplier).Error
+
+			supplierKey := int64(-1)
+			unitPrice := 0.0
+
+			if err2 == nil {
+				// Use highest-priority supplier and its negotiated unit price
+				supplierKey = matSupplier.SupplierID
+				if matSupplier.UnitPrice != nil {
+					unitPrice = *matSupplier.UnitPrice
+				}
+			} else {
+				// Fallback: use default supplier on the material record
+				var matFallback models.Material
+				if err3 := s.db.First(&matFallback, item.MaterialID).Error; err3 == nil {
+					if matFallback.SupplierID != nil {
+						supplierKey = *matFallback.SupplierID
+					}
+					if matFallback.LastPurchasePrice != nil {
+						unitPrice = *matFallback.LastPurchasePrice
+					} else if matFallback.StandardCost != nil {
+						unitPrice = *matFallback.StandardCost
+					}
+				}
+			}
+
+			// Load material for name/unit info
 			var mat models.Material
-			if err2 := s.db.First(&mat, item.MaterialID).Error; err2 == nil {
-				supplierKey := int64(-1)
-				if mat.SupplierID != nil {
-					supplierKey = *mat.SupplierID
-				}
-				unitPrice := 0.0
-				if mat.LastPurchasePrice != nil {
-					unitPrice = *mat.LastPurchasePrice
-				} else if mat.StandardCost != nil {
-					unitPrice = *mat.StandardCost
-				}
+			if err3 := s.db.First(&mat, item.MaterialID).Error; err3 == nil {
 				supplierItems[supplierKey] = append(supplierItems[supplierKey], poItem{
 					materialID: uint(mat.ID),
 					name:       mat.TradingName,
