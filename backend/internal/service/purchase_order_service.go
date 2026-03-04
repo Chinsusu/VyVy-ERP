@@ -182,14 +182,14 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 
 	// Capture old header + items before mutation
 	type poItemSnapshot struct {
-		MaterialID           uint     `json:"material_id"`
-		MaterialName         string   `json:"material_name"`
-		Quantity             float64  `json:"quantity"`
-		UnitPrice            float64  `json:"unit_price"`
-		TaxRate              float64  `json:"tax_rate"`
-		DiscountRate         float64  `json:"discount_rate"`
-		ExpectedDeliveryDate *string  `json:"expected_delivery_date,omitempty"`
-		Notes                string   `json:"notes"`
+		MaterialID           uint    `json:"material_id"`
+		MaterialName         string  `json:"material_name"`
+		Quantity             float64 `json:"quantity"`
+		UnitPrice            float64 `json:"unit_price"`
+		TaxRate              float64 `json:"tax_rate"`
+		DiscountRate         float64 `json:"discount_rate"`
+		ExpectedDeliveryDate *string `json:"expected_delivery_date,omitempty"`
+		Notes                string  `json:"notes"`
 	}
 	type poHeaderSnapshot struct {
 		PONumber             string           `json:"po_number"`
@@ -202,6 +202,17 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		Notes                string           `json:"notes"`
 		Status               string           `json:"status"`
 		Items                []poItemSnapshot `json:"items"`
+	}
+	// normalizeDate trims timestamps down to YYYY-MM-DD to avoid false-positive diffs
+	normalizeDate := func(s *string) *string {
+		if s == nil {
+			return nil
+		}
+		if len(*s) > 10 {
+			v := (*s)[:10]
+			return &v
+		}
+		return s
 	}
 	oldItems := make([]poItemSnapshot, len(po.Items))
 	for i, it := range po.Items {
@@ -216,7 +227,7 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 			UnitPrice:            it.UnitPrice,
 			TaxRate:              it.TaxRate,
 			DiscountRate:         it.DiscountRate,
-			ExpectedDeliveryDate: it.ExpectedDeliveryDate,
+			ExpectedDeliveryDate: normalizeDate(it.ExpectedDeliveryDate),
 			Notes:                it.Notes,
 		}
 	}
