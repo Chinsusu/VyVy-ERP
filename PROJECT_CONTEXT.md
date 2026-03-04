@@ -1,7 +1,7 @@
 # VyVy ERP — Project Context
 
 > **Mục đích**: Đọc file này đầu tiên trong mỗi conversation mới để nắm ngữ cảnh dự án.
-> **Cập nhật lần cuối**: 2026-03-04
+> **Cập nhật lần cuối**: 2026-03-04 (rc16 — PO item-level audit log)
 
 ---
 
@@ -254,8 +254,12 @@ Frontend dùng `limit` (không phải `page_size`), `total_items` (không phải
 ## Audit Log
 
 - **Đã fix**: `changed_fields TEXT[]` → `JSONB`, `ip_address INET` → `VARCHAR(45)`
-- Các service đã tích hợp: materials, suppliers, finished_products, material_requests
+- Các service đã tích hợp: materials, suppliers, finished_products, material_requests, **purchase_orders** (bao gồm item-level snapshot)
 - Frontend component: `AuditLogPanel` hiển thị field label tiếng Việt, giá trị cũ → mới, user đã sửa
+- **PO đặc biệt**: 
+  - Backend dùng `poHeaderSnapshot` + `poItemSnapshot[]` (có `material_name`) để log trước/sau update
+  - Frontend `renderItemDiff()` nhận `materialLookup Map<number, string>` từ PO hiện tại làm fallback khi log cũ không có `material_name`
+  - `NOISE_FIELDS = {updated_at, created_at, deleted_at, updated_by, created_by}` bị filter khỏi display
 
 ---
 

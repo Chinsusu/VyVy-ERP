@@ -7,7 +7,28 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc16] - 2026-03-04
+
+### Added
+- **PO Audit Log — Item-Level Tracking**: Purchase Order edits giờ track changes ở cấp độ từng sản phẩm (quantity, unit_price, tax_rate, discount_rate, expected_delivery_date, notes).
+- **PO Timeline**: Thêm timeline dọc kiểu MR vào `PurchaseOrderDetailPage`, thay thế tab "Lịch Sử Chỉnh Sửa" riêng. Hiển thị chronological events (tạo, chỉnh sửa, duyệt).
+- **PO Timeline — Diff Display**: Mỗi edit entry hiển thị chi tiết đã sửa field nào, giá trị cũ → mới (strikethrough đỏ → xanh lá).
+- **Material Name trong Item Diff**: Audit log hiển thị tên đầy đủ vật tư (vd: "Hộp sản phẩm (As a habit 250gr)") thay vì `#97`.
+- **`poItemSnapshot` struct** (backend): field `MaterialName` populated từ `Material.TradingName`.
+
+### Fixed
+- **`updated_at` ẩn khỏi timeline**: Loại bỏ noise fields (`updated_at`, `created_at`, `deleted_at`) khỏi changed_fields display — áp dụng cả với log cũ trong DB.
+- **Material Name fallback cho old logs**: Frontend tra tên vật tư từ current PO items khi snapshot cũ không có `material_name`.
+- **IIFE syntax**: Fix lỗi `')' expected` trong JSX do arrow function chưa được invoke đúng cách.
+
+### Changed
+- **`purchase_order_service.go`**: `UpdatePurchaseOrder` dùng `poHeaderSnapshot` + `poItemSnapshot[]` để capture before/after state chính xác, exclude noise fields.
+- **`PurchaseOrderDetailPage.tsx`**: `renderItemDiff()` nhận `materialLookup Map<number, string>` làm fallback; `NOISE_FIELDS` filter áp dụng trước khi render timeline.
+
+---
+
 ## [1.0.0-rc15] - 2026-02-23
+
 
 ### Fixed
 - **Seed Data FK Violations**: Fixed `seed_transactions.sql` purchase orders — replaced hardcoded `supplier_id` and `warehouse_id` with subquery lookups by `code`. This ensures correct FK references regardless of database ID offsets.
