@@ -180,8 +180,30 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		return nil, err
 	}
 
-	// Capture old values before mutation
-	oldValues := po.ToSafe()
+	// Capture old header-only values (exclude items/timestamps to avoid noise)
+	type poHeaderSnapshot struct {
+		PONumber             string  `json:"po_number"`
+		SupplierID           uint    `json:"supplier_id"`
+		WarehouseID          uint    `json:"warehouse_id"`
+		OrderDate            string  `json:"order_date"`
+		ExpectedDeliveryDate *string `json:"expected_delivery_date,omitempty"`
+		PaymentTerms         string  `json:"payment_terms"`
+		ShippingMethod       string  `json:"shipping_method"`
+		Notes                string  `json:"notes"`
+		Status               string  `json:"status"`
+	}
+	oldSnapshot := poHeaderSnapshot{
+		PONumber:             po.PONumber,
+		SupplierID:           po.SupplierID,
+		WarehouseID:          po.WarehouseID,
+		OrderDate:            po.OrderDate,
+		ExpectedDeliveryDate: po.ExpectedDeliveryDate,
+		PaymentTerms:         po.PaymentTerms,
+		ShippingMethod:       po.ShippingMethod,
+		Notes:                po.Notes,
+		Status:               po.Status,
+	}
+
 
 	// Check if PO can be updated (draft or approved)
 	if po.Status != "draft" && po.Status != "approved" {
@@ -288,8 +310,20 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		return nil, err
 	}
 
-	// Audit log - UPDATE
-	_ = s.auditSvc.Log("purchase_orders", "UPDATE", int64(po.ID), int64(userID), username, oldValues, po.ToSafe())
+	// Audit log - UPDATE (compare header fields only)
+	newSnapshot := poHeaderSnapshot{
+		PONumber:             po.PONumber,
+		SupplierID:           po.SupplierID,
+		WarehouseID:          po.WarehouseID,
+		OrderDate:            po.OrderDate,
+		ExpectedDeliveryDate: po.ExpectedDeliveryDate,
+		PaymentTerms:         po.PaymentTerms,
+		ShippingMethod:       po.ShippingMethod,
+		Notes:                po.Notes,
+		Status:               po.Status,
+	}
+	_ = s.auditSvc.Log("purchase_orders", "UPDATE", int64(po.ID), int64(userID), username, oldSnapshot, newSnapshot)
+
 
 	return po.ToSafe(), nil
 }
