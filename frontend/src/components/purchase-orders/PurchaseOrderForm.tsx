@@ -190,9 +190,10 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                 const result = await createMutation.mutateAsync(payload);
                 navigate(`/purchase-orders/${result.id}`);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to save PO:', err);
-            alert('Lỗi khi lưu đơn mua hàng. Vui lòng kiểm tra lại.');
+            const serverMsg = err?.response?.data?.message || err?.response?.data?.error || err?.message || 'Unknown error';
+            alert(`Lỗi khi lưu đơn mua hàng:\n${serverMsg}`);
         }
     };
 

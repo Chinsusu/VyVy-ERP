@@ -4,6 +4,7 @@ import (
 	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
 	"github.com/VyVy-ERP/warehouse-backend/internal/service"
 	"github.com/VyVy-ERP/warehouse-backend/internal/utils"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -65,6 +66,7 @@ func (h *PurchaseOrderHandler) GetByID(c *gin.Context) {
 func (h *PurchaseOrderHandler) Create(c *gin.Context) {
 	var req dto.CreatePurchaseOrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Printf("[PO Create] Binding error: %v | Body: %+v", err, req)
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
 		return
 	}

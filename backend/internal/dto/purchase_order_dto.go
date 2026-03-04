@@ -6,7 +6,7 @@ import "time"
 type CreatePurchaseOrderItemRequest struct {
 	MaterialID           uint    `json:"material_id" binding:"required"`
 	Quantity             float64 `json:"quantity" binding:"required,gt=0"`
-	UnitPrice            float64 `json:"unit_price" binding:"required,gte=0"`
+	UnitPrice            float64 `json:"unit_price" binding:"gte=0"`
 	TaxRate              float64 `json:"tax_rate" binding:"gte=0,lte=100"`
 	DiscountRate         float64 `json:"discount_rate" binding:"gte=0,lte=100"`
 	Notes                string  `json:"notes"`
