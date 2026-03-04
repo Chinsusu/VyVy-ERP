@@ -41,6 +41,8 @@ func (r *purchaseOrderRepository) GetByID(id uint) (*models.PurchaseOrder, error
 	err := r.db.
 		Preload("Supplier").
 		Preload("Warehouse").
+		Preload("CreatedByUser").
+		Preload("UpdatedByUser").
 		Preload("ApprovedByUser").
 		Preload("Items").
 		Preload("Items.Material").

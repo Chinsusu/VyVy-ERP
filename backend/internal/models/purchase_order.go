@@ -95,6 +95,9 @@ type SafePurchaseOrder struct {
 	Notes                string                    `json:"notes,omitempty"`
 	ApprovedBy           *uint                     `json:"approved_by,omitempty"`
 	ApprovedAt           *time.Time                `json:"approved_at,omitempty"`
+	CreatedByUser        *SafeUser                 `json:"created_by_user,omitempty"`
+	UpdatedByUser        *SafeUser                 `json:"updated_by_user,omitempty"`
+	ApprovedByUser       *SafeUser                 `json:"approved_by_user,omitempty"`
 	Items                []*SafePurchaseOrderItem  `json:"items,omitempty"`
 	CreatedAt            time.Time                 `json:"created_at"`
 	UpdatedAt            time.Time                 `json:"updated_at"`
@@ -139,6 +142,18 @@ func (po *PurchaseOrder) ToSafe() *SafePurchaseOrder {
 	}
 	if po.Warehouse != nil {
 		safe.Warehouse = po.Warehouse.ToSafe()
+	}
+	if po.CreatedByUser != nil {
+		safeUser := po.CreatedByUser.ToSafeUser()
+		safe.CreatedByUser = &safeUser
+	}
+	if po.UpdatedByUser != nil {
+		safeUser := po.UpdatedByUser.ToSafeUser()
+		safe.UpdatedByUser = &safeUser
+	}
+	if po.ApprovedByUser != nil {
+		safeUser := po.ApprovedByUser.ToSafeUser()
+		safe.ApprovedByUser = &safeUser
 	}
 	if po.Items != nil {
 		safe.Items = make([]*SafePurchaseOrderItem, len(po.Items))

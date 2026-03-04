@@ -2,6 +2,14 @@ import type { Supplier } from './supplier';
 import type { Warehouse } from './warehouse';
 import type { Material } from './material';
 
+export interface UserBrief {
+    id: number;
+    username: string;
+    full_name: string;
+    email?: string;
+    role?: string;
+}
+
 export interface PurchaseOrder {
     id: number;
     po_number: string;
@@ -21,6 +29,9 @@ export interface PurchaseOrder {
     notes?: string;
     approved_by?: number;
     approved_at?: string;
+    created_by_user?: UserBrief;
+    updated_by_user?: UserBrief;
+    approved_by_user?: UserBrief;
     items: PurchaseOrderItem[];
     created_at: string;
     updated_at: string;

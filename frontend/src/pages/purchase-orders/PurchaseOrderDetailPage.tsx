@@ -281,21 +281,24 @@ export default function PurchaseOrderDetailPage() {
                         <div className="card space-y-6 bg-white">
                             <div className="space-y-4">
                                 <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
-                                    <User className="w-3 h-3" /> System Audit
+                                    <User className="w-3 h-3" /> Kiểm Soát Hệ Thống
                                 </h4>
                                 <div className="text-xs space-y-3">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Created At</span>
-                                        <span className="font-medium text-gray-800">{new Date(po.created_at).toLocaleString('vi-VN')}</span>
+                                    <div className="space-y-1 border-b pb-3">
+                                        <span className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Người tạo đơn</span>
+                                        <p className="font-semibold text-gray-800">{po.created_by_user?.full_name || po.created_by_user?.username || <span className="text-gray-400 italic">—</span>}</p>
+                                        <p className="text-gray-500">{new Date(po.created_at).toLocaleString('vi-VN')}</p>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Last Updated</span>
-                                        <span className="font-medium text-gray-800">{new Date(po.updated_at).toLocaleString('vi-VN')}</span>
+                                    <div className="space-y-1 border-b pb-3">
+                                        <span className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Chỉnh sửa gần nhất</span>
+                                        <p className="font-semibold text-gray-800">{po.updated_by_user?.full_name || po.updated_by_user?.username || <span className="text-gray-400 italic">—</span>}</p>
+                                        <p className="text-gray-500">{new Date(po.updated_at).toLocaleString('vi-VN')}</p>
                                     </div>
                                     {po.approved_at && (
-                                        <div className="flex justify-between pt-3 border-t">
-                                            <span className="text-gray-500">Approved At</span>
-                                            <span className="font-bold text-success-700">{new Date(po.approved_at).toLocaleString('vi-VN')}</span>
+                                        <div className="space-y-1">
+                                            <span className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Người duyệt đơn</span>
+                                            <p className="font-bold text-green-700">{po.approved_by_user?.full_name || po.approved_by_user?.username || <span className="text-gray-400 italic">—</span>}</p>
+                                            <p className="text-gray-500">{new Date(po.approved_at).toLocaleString('vi-VN')}</p>
                                         </div>
                                     )}
                                 </div>
