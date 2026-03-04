@@ -183,6 +183,7 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 	// Capture old header + items before mutation
 	type poItemSnapshot struct {
 		MaterialID           uint     `json:"material_id"`
+		MaterialName         string   `json:"material_name"`
 		Quantity             float64  `json:"quantity"`
 		UnitPrice            float64  `json:"unit_price"`
 		TaxRate              float64  `json:"tax_rate"`
@@ -204,8 +205,13 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 	}
 	oldItems := make([]poItemSnapshot, len(po.Items))
 	for i, it := range po.Items {
+		matName := ""
+		if it.Material != nil {
+			matName = it.Material.TradingName
+		}
 		oldItems[i] = poItemSnapshot{
 			MaterialID:           it.MaterialID,
+			MaterialName:         matName,
 			Quantity:             it.Quantity,
 			UnitPrice:            it.UnitPrice,
 			TaxRate:              it.TaxRate,

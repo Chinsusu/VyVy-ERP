@@ -25,6 +25,7 @@ const PO_FIELD_LABELS: Record<string, string> = {
 
 interface ItemSnapshot {
     material_id: number;
+    material_name?: string;
     quantity: number;
     unit_price: number;
     tax_rate: number;
@@ -58,25 +59,30 @@ function renderItemDiff(oldItems: ItemSnapshot[], newItems: ItemSnapshot[]) {
             diffs.push({ materialId: mid, field: '__removed__', oldVal: null, newVal: null });
         }
     });
-    // Changed fields
+    // Changed fields (exclude metadata fields)
+    const COMPARABLE_FIELDS = ['quantity', 'unit_price', 'tax_rate', 'discount_rate', 'expected_delivery_date', 'notes'] as (keyof ItemSnapshot)[];
     newMap.forEach((newIt, mid) => {
         const oldIt = oldMap.get(mid);
         if (!oldIt) return;
-        (['quantity', 'unit_price', 'tax_rate', 'discount_rate', 'expected_delivery_date', 'notes'] as (keyof ItemSnapshot)[]).forEach(f => {
+        COMPARABLE_FIELDS.forEach(f => {
             if (String(oldIt[f] ?? '') !== String(newIt[f] ?? '')) {
                 diffs.push({ materialId: mid, field: f, oldVal: oldIt[f], newVal: newIt[f] });
             }
         });
     });
     if (diffs.length === 0) return <span className="text-xs text-gray-400">Không có thay đổi chi tiết</span>;
+    const getMaterialLabel = (mid: number) => {
+        const item = newMap.get(mid) || oldMap.get(mid);
+        return item?.material_name ? item.material_name : `#${mid}`;
+    };
     return (
         <div className="space-y-1">
             {diffs.map((d, i) => (
                 <div key={i} className="flex items-start gap-2 text-xs">
                     <span className="text-gray-500 min-w-[160px] pt-0.5">
-                        {d.field === '__added__' ? `Thêm sản phẩm #${d.materialId}` :
-                            d.field === '__removed__' ? `Xóa sản phẩm #${d.materialId}` :
-                                `SP #${d.materialId} – ${ITEM_LABELS[d.field] || d.field}`}:
+                        {d.field === '__added__' ? `Thêm: ${getMaterialLabel(d.materialId)}` :
+                            d.field === '__removed__' ? `Xóa: ${getMaterialLabel(d.materialId)}` :
+                                `${getMaterialLabel(d.materialId)} – ${ITEM_LABELS[d.field] || d.field}`}:
                     </span>
                     {d.field !== '__added__' && d.field !== '__removed__' && (
                         <div className="flex items-center gap-1 flex-wrap">
