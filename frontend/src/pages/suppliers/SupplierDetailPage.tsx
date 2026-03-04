@@ -201,10 +201,10 @@ export default function SupplierDetailPage() {
                                                     <td className="py-2.5 pr-4 text-gray-800">{m.trading_name}</td>
                                                     <td className="py-2.5 pr-4">
                                                         <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600">
-                                                            {m.material_type === 'HOA_PHAM' ? 'Hóa phẩm'
-                                                                : m.material_type === 'HUONG_LIEU' ? 'Hương liệu'
-                                                                    : m.material_type === 'BAO_BI' ? 'Bao bì'
-                                                                        : m.material_type}
+                                                            {m.material_type === 'HOA_PHAM' || m.material_type === 'raw_material' ? 'Hóa phẩm'
+                                                                : m.material_type === 'HUONG_LIEU' || m.material_type === 'fragrance' ? 'Hương liệu'
+                                                                    : m.material_type === 'BAO_BI' || m.material_type === 'packaging' ? 'Bao bì'
+                                                                        : m.material_type || 'Hóa phẩm'}
                                                         </span>
                                                     </td>
                                                     <td className="py-2.5 pr-4 text-gray-600">{m.unit}</td>

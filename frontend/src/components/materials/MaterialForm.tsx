@@ -11,6 +11,19 @@ interface MaterialFormProps {
     onCancel?: () => void;
 }
 
+// Normalize legacy material_type values from seed data (raw_material, packaging, fragrance)
+// to current enum values (HOA_PHAM, HUONG_LIEU, BAO_BI)
+const VALID_TYPES = new Set(['HOA_PHAM', 'HUONG_LIEU', 'BAO_BI']);
+function normalizeMaterialType(t?: string | null): string {
+    if (!t) return 'HOA_PHAM';
+    if (VALID_TYPES.has(t)) return t;
+    // legacy mapping
+    const up = t.toUpperCase();
+    if (up.includes('FRAGRANCE') || up.includes('HUONG')) return 'HUONG_LIEU';
+    if (up.includes('PACK') || up.includes('BAO')) return 'BAO_BI';
+    return 'HOA_PHAM'; // default for raw_material and anything else
+}
+
 const emptySupplier = (): MaterialSupplierInput => ({
     supplier_id: 0,
     priority: 1,
@@ -32,7 +45,7 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
         code: material?.code || '',
         trading_name: material?.trading_name || '',
         inci_name: material?.inci_name || '',
-        material_type: material?.material_type || 'RAW_MATERIAL',
+        material_type: normalizeMaterialType(material?.material_type),
         category: material?.category || '',
         sub_category: material?.sub_category || '',
         unit: material?.unit || 'KG',

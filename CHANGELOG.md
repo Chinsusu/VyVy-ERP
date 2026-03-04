@@ -7,6 +7,20 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc18] - 2026-03-04
+
+### Fixed
+- **Material Type Display (legacy data)**: NVL có `material_type = 'raw_material'` (seed data cũ lowercase) hiển thị sai trong form — select dropdown render "Hóa phẩm" về mặt visual nhưng React state vẫn giữ `'raw_material'`, khiến khi save không thực sự thay đổi giá trị.
+  - `MaterialForm.tsx`: Thêm hàm `normalizeMaterialType()` — map `raw_material` → `HOA_PHAM`, `fragrance` → `HUONG_LIEU`, `packaging` → `BAO_BI` khi khởi tạo form state.
+  - `SupplierDetailPage.tsx`: Bổ sung fallback mapping `raw_material`/`fragrance`/`packaging` khi hiển thị loại NVL trong danh sách materials của NCC.
+- **Audit Log noise rows**: Ẩn các row có old/new values thực chất giống nhau sau khi normalize (null, undefined, empty string đều được coi là tương đương).
+
+### Changed
+- **MaterialDetailPage — Priority Badge**: Vòng tròn số thứ tự bên trái đổi từ `bg-primary text-white` (xanh/trắng) sang `bg-gray-200 text-gray-900` (xám/đen) để dễ đọc hơn.
+- **MaterialDetailPage — Priority Badge (#2, #3...)**: Đổi từ `text-gray-500 bg-gray-100` sang `text-gray-900 bg-gray-200 font-semibold` cho độ tương phản cao hơn.
+
+---
+
 ## [1.0.0-rc17] - 2026-03-04
 
 ### Added

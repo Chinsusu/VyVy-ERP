@@ -181,6 +181,9 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                                             const oldVal = log.old_values?.[field];
                                             const newVal = log.new_values?.[field];
                                             if (oldVal === undefined && newVal === undefined) return null;
+                                            // Normalize: treat null, undefined, "" as equivalent → skip if no real change
+                                            const norm = (v: unknown) => (v === null || v === undefined || v === '') ? '__EMPTY__' : String(v);
+                                            if (!ARRAY_FIELDS.has(field) && norm(oldVal) === norm(newVal)) return null;
                                             if (ARRAY_FIELDS.has(field)) {
                                                 return (
                                                     <div key={field} className="flex items-start gap-2 text-xs">

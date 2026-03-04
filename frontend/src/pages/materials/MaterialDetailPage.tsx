@@ -164,7 +164,7 @@ export default function MaterialDetailPage() {
                                     {material.suppliers.map((ms) => (
                                         <div key={ms.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
                                             <div className="flex items-start gap-3">
-                                                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-white text-xs font-bold shrink-0">
+                                                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-200 text-gray-900 text-xs font-bold shrink-0">
                                                     {ms.priority}
                                                 </div>
                                                 <div>
@@ -186,7 +186,7 @@ export default function MaterialDetailPage() {
                                                     ưu tiên
                                                 </span>
                                             ) : (
-                                                <span className="text-xs text-gray-500 bg-gray-100 px-2.5 py-0.5 rounded-full font-medium">#{ms.priority}</span>
+                                                <span className="text-xs text-gray-900 bg-gray-200 px-2.5 py-0.5 rounded-full font-semibold">#{ms.priority}</span>
                                             )}
                                         </div>
                                     ))}
