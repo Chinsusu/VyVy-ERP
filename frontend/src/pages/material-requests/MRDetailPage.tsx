@@ -23,6 +23,7 @@ import {
 } from '../../hooks/useMaterialRequests';
 import type { MaterialRequestItem } from '../../types/materialRequest';
 import AuditLogPanel from '../../components/common/AuditLogPanel';
+import SystemAuditCard from '../../components/common/SystemAuditCard';
 import ProductionTaskPanel from '../../components/production/ProductionTaskPanel';
 import ProductionTimeline from '../../components/production/ProductionTimeline';
 import ProductionProgressChart from '../../components/production/ProductionProgressChart';
@@ -364,6 +365,16 @@ export default function MRDetailPage() {
                                 )}
                             </div>
                         </div>
+
+                        {/* System Audit Card */}
+                        <SystemAuditCard
+                            createdByUser={(mr as any).created_by_user}
+                            createdAt={mr.created_at}
+                            updatedByUser={(mr as any).updated_by_user}
+                            updatedAt={mr.updated_at}
+                            approvedByUser={(mr as any).approved_by_user}
+                            approvedAt={mr.approved_at}
+                        />
                     </div>
                 </div>
             </div>

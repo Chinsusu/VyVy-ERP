@@ -21,6 +21,7 @@ import {
 } from '../../hooks/usePurchaseOrders';
 import type { PurchaseOrderItem } from '../../types/purchaseOrder';
 import AuditLogPanel from '../../components/common/AuditLogPanel';
+import SystemAuditCard from '../../components/common/SystemAuditCard';
 
 export default function PurchaseOrderDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -305,45 +306,30 @@ export default function PurchaseOrderDetailPage() {
                             </div>
                         </div>
 
-                        <div className="card space-y-6 bg-white">
-                            <div className="space-y-4">
-                                <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2">
-                                    <User className="w-3 h-3" /> Kiểm Soát Hệ Thống
-                                </h4>
-                                <div className="text-xs space-y-3">
-                                    <div className="space-y-1 border-b pb-3">
-                                        <span className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Người tạo đơn</span>
-                                        <p className="font-semibold text-gray-800">{po.created_by_user?.full_name || po.created_by_user?.username || <span className="text-gray-400 italic">—</span>}</p>
-                                        <p className="text-gray-500">{new Date(po.created_at).toLocaleString('vi-VN')}</p>
-                                    </div>
-                                    <div className="space-y-1 border-b pb-3">
-                                        <span className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Chỉnh sửa gần nhất</span>
-                                        <p className="font-semibold text-gray-800">{po.updated_by_user?.full_name || po.updated_by_user?.username || <span className="text-gray-400 italic">—</span>}</p>
-                                        <p className="text-gray-500">{new Date(po.updated_at).toLocaleString('vi-VN')}</p>
-                                    </div>
-                                    {po.approved_at && (
+                        <SystemAuditCard
+                            createdByUser={po.created_by_user}
+                            createdAt={po.created_at}
+                            updatedByUser={po.updated_by_user}
+                            updatedAt={po.updated_at}
+                            approvedByUser={po.approved_by_user}
+                            approvedAt={po.approved_at}
+                            extra={
+                                <>
+                                    {po.payment_terms && (
                                         <div className="space-y-1">
-                                            <span className="text-gray-400 uppercase font-semibold tracking-wider text-[10px]">Người duyệt đơn</span>
-                                            <p className="font-bold text-green-700">{po.approved_by_user?.full_name || po.approved_by_user?.username || <span className="text-gray-400 italic">—</span>}</p>
-                                            <p className="text-gray-500">{new Date(po.approved_at).toLocaleString('vi-VN')}</p>
+                                            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Điều khoản thanh toán</span>
+                                            <p className="text-sm font-medium text-gray-700">{po.payment_terms}</p>
                                         </div>
                                     )}
-                                </div>
-                            </div>
-
-                            {po.payment_terms && (
-                                <div className="space-y-2 pt-2 border-t">
-                                    <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest">Payment Terms</h4>
-                                    <p className="text-sm font-medium text-gray-700">{po.payment_terms}</p>
-                                </div>
-                            )}
-                            {po.shipping_method && (
-                                <div className="space-y-2 pt-2 border-t">
-                                    <h4 className="text-[length:var(--font-size-3xs)] font-black uppercase text-gray-400 tracking-widest">Shipping Method</h4>
-                                    <p className="text-sm font-medium text-gray-700">{po.shipping_method}</p>
-                                </div>
-                            )}
-                        </div>
+                                    {po.shipping_method && (
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Phương thức vận chuyển</span>
+                                            <p className="text-sm font-medium text-gray-700">{po.shipping_method}</p>
+                                        </div>
+                                    )}
+                                </>
+                            }
+                        />
                     </div>
                 </div>
             </div>
