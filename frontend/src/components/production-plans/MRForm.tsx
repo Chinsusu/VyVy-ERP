@@ -3,17 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, Save, X, ClipboardList } from 'lucide-react';
 import { useFinishedProducts } from '../../hooks/useFinishedProducts';
 import { useWarehouses } from '../../hooks/useWarehouses';
-import { useCreateMaterialRequest, useUpdateMaterialRequest } from '../../hooks/useMaterialRequests';
+import { useCreateProductionPlan, useUpdateProductionPlan } from '../../hooks/useProductionPlans';
 import type { FinishedProduct } from '../../types/finishedProduct';
 import type { Warehouse } from '../../types/warehouse';
 import type {
-    MaterialRequest,
-    CreateMaterialRequestInput,
-    CreateMaterialRequestItemInput
-} from '../../types/materialRequest';
+    ProductionPlan,
+    CreateProductionPlanInput,
+    CreateProductionPlanItemInput
+} from '../../types/productionPlan';
 
 interface MRFormProps {
-    initialData?: MaterialRequest;
+    initialData?: ProductionPlan;
     isEdit?: boolean;
 }
 
@@ -28,12 +28,12 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
     const warehouses = warehousesData?.data || [];
 
     // Mutations
-    const createMutation = useCreateMaterialRequest();
-    const updateMutation = useUpdateMaterialRequest();
+    const createMutation = useCreateProductionPlan();
+    const updateMutation = useUpdateProductionPlan();
 
     // Form State
-    const [formData, setFormData] = useState<Omit<CreateMaterialRequestInput, 'items'>>({
-        mr_number: '',
+    const [formData, setFormData] = useState<Omit<CreateProductionPlanInput, 'items'>>({
+        plan_number: '',
         warehouse_id: 0,
         department: '',
         request_date: new Date().toISOString().split('T')[0],
@@ -42,7 +42,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
         notes: '',
     });
 
-    const [items, setItems] = useState<CreateMaterialRequestItemInput[]>([
+    const [items, setItems] = useState<CreateProductionPlanItemInput[]>([
         { material_id: 0, requested_quantity: 1, notes: '' }
     ]);
 
@@ -50,7 +50,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
     useEffect(() => {
         if (initialData) {
             setFormData({
-                mr_number: initialData.mr_number,
+                plan_number: initialData.plan_number,
                 warehouse_id: initialData.warehouse_id,
                 department: initialData.department,
                 request_date: initialData.request_date.split('T')[0],
@@ -70,7 +70,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
             // Generate a temporary MR number if new
             const now = new Date();
             const genMR = `MR-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
-            setFormData(prev => ({ ...prev, mr_number: genMR }));
+            setFormData(prev => ({ ...prev, plan_number: genMR }));
         }
     }, [initialData]);
 
@@ -86,7 +86,7 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
         setItems(newItems);
     };
 
-    const updateItem = (index: number, field: keyof CreateMaterialRequestItemInput, value: any) => {
+    const updateItem = (index: number, field: keyof CreateProductionPlanItemInput, value: any) => {
         const newItems = [...items];
         newItems[index] = { ...newItems[index], [field]: value };
         setItems(newItems);
@@ -114,10 +114,10 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
         try {
             if (isEdit && initialData) {
                 await updateMutation.mutateAsync({ id: initialData.id, input: payload });
-                navigate(`/material-requests/${initialData.id}`);
+                navigate(`/production-plans/${initialData.id}`);
             } else {
                 const result = await createMutation.mutateAsync(payload);
-                navigate(`/material-requests/${result.id}`);
+                navigate(`/production-plans/${result.id}`);
             }
         } catch (err) {
             console.error('Failed to save MR:', err);
@@ -134,8 +134,8 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                     <input
                         type="text"
                         className="input w-full"
-                        value={formData.mr_number}
-                        onChange={(e) => setFormData({ ...formData, mr_number: e.target.value })}
+                        value={formData.plan_number}
+                        onChange={(e) => setFormData({ ...formData, plan_number: e.target.value })}
                         disabled={isEdit}
                         required
                     />

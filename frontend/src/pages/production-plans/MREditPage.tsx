@@ -1,13 +1,13 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { useMaterialRequest } from '../../hooks/useMaterialRequests';
-import MRForm from '../../components/material-requests/MRForm';
+import { useProductionPlan } from '../../hooks/useProductionPlans';
+import MRForm from '../../components/production-plans/MRForm';
 
 export default function MREditPage() {
     const { id } = useParams<{ id: string }>();
     const mrId = parseInt(id || '0', 10);
 
-    const { data: mr, isLoading, error } = useMaterialRequest(mrId);
+    const { data: mr, isLoading, error } = useProductionPlan(mrId);
 
     if (isLoading) {
         return (
@@ -34,14 +34,14 @@ export default function MREditPage() {
             <div>
                 <div className="mb-6">
                     <Link
-                        to={`/material-requests/${mrId}`}
+                        to={`/production-plans/${mrId}`}
                         className="text-gray-600 hover:text-primary flex items-center gap-2 mb-4 w-fit"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Quay lại chi tiết
                     </Link>
                     <h1 className="text-3xl font-bold text-gray-900">Chỉnh Sửa Kế Hoạch Sản Xuất</h1>
-                    <p className="text-gray-600 mt-1">Đang sửa {mr.mr_number}</p>
+                    <p className="text-gray-600 mt-1">Đang sửa {mr.plan_number}</p>
                 </div>
 
                 <MRForm initialData={mr} isEdit />

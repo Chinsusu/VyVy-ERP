@@ -31,7 +31,7 @@ func (s *dashboardService) GetDashboardStats() (*dto.DashboardStats, error) {
 	s.db.Model(&models.GoodsReceiptNote{}).Where("status IN ?", []string{"draft", "pending_qc"}).Count(&stats.PendingGRNs)
 
 	// 3. Total Material Requests
-	s.db.Model(&models.MaterialRequest{}).Count(&stats.TotalMaterialRequests)
+	s.db.Model(&models.ProductionPlan{}).Count(&stats.TotalProductionPlans)
 
 	// 4. Total Delivery Orders
 	s.db.Model(&models.DeliveryOrder{}).Count(&stats.TotalDeliveryOrders)

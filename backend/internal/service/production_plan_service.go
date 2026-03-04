@@ -11,22 +11,22 @@ import (
 	"gorm.io/gorm"
 )
 
-// MaterialRequestService defines the interface for material request business logic
-type MaterialRequestService interface {
-	CreateMaterialRequest(req *dto.CreateMaterialRequestRequest, userID uint, username string) (*models.SafeMaterialRequest, error)
-	GetMaterialRequestByID(id uint) (*models.SafeMaterialRequest, error)
-	ListMaterialRequests(filter *dto.MaterialRequestFilterRequest) ([]*models.SafeMaterialRequest, int64, error)
-	UpdateMaterialRequest(id uint, req *dto.UpdateMaterialRequestRequest, userID uint, username string) (*models.SafeMaterialRequest, error)
-	DeleteMaterialRequest(id uint, userID uint, username string) error
-	ApproveMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error)
-	CancelMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error)
+// ProductionPlanService defines the interface for material request business logic
+type ProductionPlanService interface {
+	CreateProductionPlan(req *dto.CreateProductionPlanRequest, userID uint, username string) (*models.SafeProductionPlan, error)
+	GetProductionPlanByID(id uint) (*models.SafeProductionPlan, error)
+	ListProductionPlans(filter *dto.ProductionPlanFilterRequest) ([]*models.SafeProductionPlan, int64, error)
+	UpdateProductionPlan(id uint, req *dto.UpdateProductionPlanRequest, userID uint, username string) (*models.SafeProductionPlan, error)
+	DeleteProductionPlan(id uint, userID uint, username string) error
+	ApproveProductionPlan(id uint, userID uint, username string) (*models.SafeProductionPlan, error)
+	CancelProductionPlan(id uint, userID uint, username string) (*models.SafeProductionPlan, error)
 	GetRelatedPurchaseOrders(id uint) ([]*models.SafePurchaseOrder, error)
 }
 
-type materialRequestService struct {
+type productionPlanService struct {
 	db             *gorm.DB
-	mrRepo         repository.MaterialRequestRepository
-	mrItemRepo     repository.MaterialRequestItemRepository
+	ppRepo         repository.ProductionPlanRepository
+	ppItemRepo     repository.ProductionPlanItemRepository
 	warehouseRepo  repository.WarehouseRepository
 	materialRepo   repository.MaterialRepository
 	stockRepo      repository.StockBalanceRepository
@@ -34,21 +34,21 @@ type materialRequestService struct {
 	auditSvc       AuditLogService
 }
 
-// NewMaterialRequestService creates a new MaterialRequestService
-func NewMaterialRequestService(
+// NewProductionPlanService creates a new ProductionPlanService
+func NewProductionPlanService(
 	db *gorm.DB,
-	mrRepo repository.MaterialRequestRepository,
-	mrItemRepo repository.MaterialRequestItemRepository,
+	ppRepo repository.ProductionPlanRepository,
+	ppItemRepo repository.ProductionPlanItemRepository,
 	warehouseRepo repository.WarehouseRepository,
 	materialRepo repository.MaterialRepository,
 	stockRepo repository.StockBalanceRepository,
 	reservationRepo repository.StockReservationRepository,
 	auditSvc AuditLogService,
-) MaterialRequestService {
-	return &materialRequestService{
+) ProductionPlanService {
+	return &productionPlanService{
 		db:             db,
-		mrRepo:         mrRepo,
-		mrItemRepo:     mrItemRepo,
+		ppRepo:         ppRepo,
+		ppItemRepo:     ppItemRepo,
 		warehouseRepo:  warehouseRepo,
 		materialRepo:   materialRepo,
 		stockRepo:      stockRepo,
@@ -57,10 +57,10 @@ func NewMaterialRequestService(
 	}
 }
 
-// CreateMaterialRequest creates a new material request with items
-func (s *materialRequestService) CreateMaterialRequest(req *dto.CreateMaterialRequestRequest, userID uint, username string) (*models.SafeMaterialRequest, error) {
+// CreateProductionPlan creates a new material request with items
+func (s *productionPlanService) CreateProductionPlan(req *dto.CreateProductionPlanRequest, userID uint, username string) (*models.SafeProductionPlan, error) {
 	// Validate MR number uniqueness
-	existing, err := s.mrRepo.GetByMRNumber(req.MRNumber)
+	existing, err := s.ppRepo.GetByPlanNumber(req.PlanNumber)
 	if err == nil && existing.ID > 0 {
 		return nil, errors.New("material request number already exists")
 	}
@@ -78,8 +78,8 @@ func (s *materialRequestService) CreateMaterialRequest(req *dto.CreateMaterialRe
 	}
 
 	// Create material request
-	mr := &models.MaterialRequest{
-		MRNumber:     req.MRNumber,
+	mr := &models.ProductionPlan{
+		PlanNumber:     req.PlanNumber,
 		WarehouseID:  req.WarehouseID,
 		Department:   req.Department,
 		RequestDate:  req.RequestDate,
@@ -95,12 +95,12 @@ func (s *materialRequestService) CreateMaterialRequest(req *dto.CreateMaterialRe
 	}
 
 	// Create MR
-	if err := s.mrRepo.Create(mr); err != nil {
+	if err := s.ppRepo.Create(mr); err != nil {
 		return nil, err
 	}
 
 	// Create items
-	items := make([]*models.MaterialRequestItem, len(req.Items))
+	items := make([]*models.ProductionPlanItem, len(req.Items))
 	for i, itemReq := range req.Items {
 		// Validate material exists
 		_, err := s.materialRepo.GetByID(int64(itemReq.MaterialID))
@@ -108,8 +108,8 @@ func (s *materialRequestService) CreateMaterialRequest(req *dto.CreateMaterialRe
 			return nil, errors.New("material not found")
 		}
 
-		item := &models.MaterialRequestItem{
-			MaterialRequestID: mr.ID,
+		item := &models.ProductionPlanItem{
+			ProductionPlanID: mr.ID,
 			MaterialID:        itemReq.MaterialID,
 			RequestedQuantity: itemReq.RequestedQuantity,
 			Notes:             itemReq.Notes,
@@ -120,27 +120,27 @@ func (s *materialRequestService) CreateMaterialRequest(req *dto.CreateMaterialRe
 	}
 
 	// Bulk create items
-	if err := s.mrItemRepo.CreateBulk(items); err != nil {
+	if err := s.ppItemRepo.CreateBulk(items); err != nil {
 		return nil, err
 	}
 
 	// Fetch complete MR
-	mr, err = s.mrRepo.GetByID(mr.ID)
+	mr, err = s.ppRepo.GetByID(mr.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Log audit
 	if s.auditSvc != nil {
-		_ = s.auditSvc.Log("material_requests", "CREATE", int64(mr.ID), int64(userID), username, nil, mr)
+		_ = s.auditSvc.Log("production_plans", "CREATE", int64(mr.ID), int64(userID), username, nil, mr)
 	}
 
 	return mr.ToSafe(), nil
 }
 
-// GetMaterialRequestByID retrieves a material request by ID
-func (s *materialRequestService) GetMaterialRequestByID(id uint) (*models.SafeMaterialRequest, error) {
-	mr, err := s.mrRepo.GetByID(id)
+// GetProductionPlanByID retrieves a material request by ID
+func (s *productionPlanService) GetProductionPlanByID(id uint) (*models.SafeProductionPlan, error) {
+	mr, err := s.ppRepo.GetByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.New("material request not found")
@@ -150,14 +150,14 @@ func (s *materialRequestService) GetMaterialRequestByID(id uint) (*models.SafeMa
 	return mr.ToSafe(), nil
 }
 
-// ListMaterialRequests retrieves material requests with filtering
-func (s *materialRequestService) ListMaterialRequests(filter *dto.MaterialRequestFilterRequest) ([]*models.SafeMaterialRequest, int64, error) {
-	mrs, total, err := s.mrRepo.List(filter)
+// ListProductionPlans retrieves material requests with filtering
+func (s *productionPlanService) ListProductionPlans(filter *dto.ProductionPlanFilterRequest) ([]*models.SafeProductionPlan, int64, error) {
+	mrs, total, err := s.ppRepo.List(filter)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	safeMRs := make([]*models.SafeMaterialRequest, len(mrs))
+	safeMRs := make([]*models.SafeProductionPlan, len(mrs))
 	for i, mr := range mrs {
 		safeMRs[i] = mr.ToSafe()
 	}
@@ -165,10 +165,10 @@ func (s *materialRequestService) ListMaterialRequests(filter *dto.MaterialReques
 	return safeMRs, total, nil
 }
 
-// UpdateMaterialRequest updates a material request
-func (s *materialRequestService) UpdateMaterialRequest(id uint, req *dto.UpdateMaterialRequestRequest, userID uint, username string) (*models.SafeMaterialRequest, error) {
+// UpdateProductionPlan updates a material request
+func (s *productionPlanService) UpdateProductionPlan(id uint, req *dto.UpdateProductionPlanRequest, userID uint, username string) (*models.SafeProductionPlan, error) {
 	// Get existing MR (save old value for audit)
-	mr, err := s.mrRepo.GetByID(id)
+	mr, err := s.ppRepo.GetByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.New("material request not found")
@@ -183,12 +183,12 @@ func (s *materialRequestService) UpdateMaterialRequest(id uint, req *dto.UpdateM
 	}
 
 	// Update fields if provided
-	if req.MRNumber != "" && req.MRNumber != mr.MRNumber {
-		existing, err := s.mrRepo.GetByMRNumber(req.MRNumber)
+	if req.PlanNumber != "" && req.PlanNumber != mr.PlanNumber {
+		existing, err := s.ppRepo.GetByPlanNumber(req.PlanNumber)
 		if err == nil && existing.ID > 0 {
 			return nil, errors.New("material request number already exists")
 		}
-		mr.MRNumber = req.MRNumber
+		mr.PlanNumber = req.PlanNumber
 	}
 
 	if req.WarehouseID > 0 {
@@ -213,27 +213,27 @@ func (s *materialRequestService) UpdateMaterialRequest(id uint, req *dto.UpdateM
 	mr.UpdatedBy = &userID
 
 	// Update MR
-	if err := s.mrRepo.Update(mr); err != nil {
+	if err := s.ppRepo.Update(mr); err != nil {
 		return nil, err
 	}
 
 	// Update items if provided
 	if len(req.Items) > 0 {
 		// Delete old items
-		if err := s.mrItemRepo.DeleteByMRID(id); err != nil {
+		if err := s.ppItemRepo.DeleteByMRID(id); err != nil {
 			return nil, err
 		}
 
 		// Create new items
-		items := make([]*models.MaterialRequestItem, len(req.Items))
+		items := make([]*models.ProductionPlanItem, len(req.Items))
 		for i, itemReq := range req.Items {
 			_, err := s.materialRepo.GetByID(int64(itemReq.MaterialID))
 			if err != nil {
 				return nil, errors.New("material not found")
 			}
 
-			item := &models.MaterialRequestItem{
-				MaterialRequestID: mr.ID,
+			item := &models.ProductionPlanItem{
+				ProductionPlanID: mr.ID,
 				MaterialID:        itemReq.MaterialID,
 				RequestedQuantity: itemReq.RequestedQuantity,
 				Notes:             itemReq.Notes,
@@ -244,28 +244,28 @@ func (s *materialRequestService) UpdateMaterialRequest(id uint, req *dto.UpdateM
 		}
 
 		// Bulk create items
-		if err := s.mrItemRepo.CreateBulk(items); err != nil {
+		if err := s.ppItemRepo.CreateBulk(items); err != nil {
 			return nil, err
 		}
 	}
 
 	// Fetch updated MR
-	mr, err = s.mrRepo.GetByID(mr.ID)
+	mr, err = s.ppRepo.GetByID(mr.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Log audit
 	if s.auditSvc != nil {
-		_ = s.auditSvc.Log("material_requests", "UPDATE", int64(mr.ID), int64(userID), username, &oldValues, mr)
+		_ = s.auditSvc.Log("production_plans", "UPDATE", int64(mr.ID), int64(userID), username, &oldValues, mr)
 	}
 
 	return mr.ToSafe(), nil
 }
 
-// DeleteMaterialRequest deletes a material request
-func (s *materialRequestService) DeleteMaterialRequest(id uint, userID uint, username string) error {
-	mr, err := s.mrRepo.GetByID(id)
+// DeleteProductionPlan deletes a material request
+func (s *productionPlanService) DeleteProductionPlan(id uint, userID uint, username string) error {
+	mr, err := s.ppRepo.GetByID(id)
 	if err != nil {
 		return err
 	}
@@ -274,21 +274,21 @@ func (s *materialRequestService) DeleteMaterialRequest(id uint, userID uint, use
 		return errors.New("can only delete material requests in draft status")
 	}
 
-	if err := s.mrRepo.Delete(id); err != nil {
+	if err := s.ppRepo.Delete(id); err != nil {
 		return err
 	}
 
 	// Log audit
 	if s.auditSvc != nil {
-		_ = s.auditSvc.Log("material_requests", "DELETE", int64(id), int64(userID), username, mr, nil)
+		_ = s.auditSvc.Log("production_plans", "DELETE", int64(id), int64(userID), username, mr, nil)
 	}
 
 	return nil
 }
 
-// ApproveMaterialRequest approves a material request
-func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error) {
-	mr, err := s.mrRepo.GetByID(id)
+// ApproveProductionPlan approves a material request
+func (s *productionPlanService) ApproveProductionPlan(id uint, userID uint, username string) (*models.SafeProductionPlan, error) {
+	mr, err := s.ppRepo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +302,7 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint, us
 		now := time.Now()
 
 		// 1. Update MR status
-		if err := s.mrRepo.UpdateStatus(id, "approved", &userID, &now); err != nil {
+		if err := s.ppRepo.UpdateStatus(id, "approved", &userID, &now); err != nil {
 			return err
 		}
 
@@ -339,7 +339,7 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint, us
 					BatchNumber:        balance.BatchNumber,
 					LotNumber:          balance.LotNumber,
 					ReservedQuantity:   reserveQty,
-					ReferenceType:      "material_request",
+					ReferenceType:      "production_plan",
 					ReferenceID:        mr.ID,
 					Status:             "active",
 					CreatedBy:          &userID,
@@ -361,7 +361,7 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint, us
 			// 3. If still missing stock → track for auto-PO creation
 			if remainingToReserve > 0 {
 				type shortfall struct {
-					material *models.MaterialRequestItem
+					material *models.ProductionPlanItem
 					qty      float64
 				}
 				_ = shortfall{}
@@ -453,7 +453,7 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint, us
 				OrderDate:   orderDate,
 				Status:      "draft",
 				Description: description,
-				Notes:       fmt.Sprintf("Liên quan KHSX: %s", mr.MRNumber),
+				Notes:       fmt.Sprintf("Liên quan KHSX: %s", mr.PlanNumber),
 				CreatedBy:   &uid,
 				UpdatedBy:   &uid,
 			}
@@ -500,22 +500,22 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint, us
 		return nil, err
 	}
 
-	result, err := s.GetMaterialRequestByID(id)
+	result, err := s.GetProductionPlanByID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	// Log audit
 	if s.auditSvc != nil {
-		_ = s.auditSvc.Log("material_requests", "APPROVE", int64(id), int64(userID), username, nil, result)
+		_ = s.auditSvc.Log("production_plans", "APPROVE", int64(id), int64(userID), username, nil, result)
 	}
 
 	return result, nil
 }
 
-// CancelMaterialRequest cancels a material request
-func (s *materialRequestService) CancelMaterialRequest(id uint, userID uint, username string) (*models.SafeMaterialRequest, error) {
-	mr, err := s.mrRepo.GetByID(id)
+// CancelProductionPlan cancels a material request
+func (s *productionPlanService) CancelProductionPlan(id uint, userID uint, username string) (*models.SafeProductionPlan, error) {
+	mr, err := s.ppRepo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -524,33 +524,33 @@ func (s *materialRequestService) CancelMaterialRequest(id uint, userID uint, use
 		return nil, errors.New("cannot cancel material request in current status")
 	}
 
-	if err := s.mrRepo.UpdateStatus(id, "cancelled", nil, nil); err != nil {
+	if err := s.ppRepo.UpdateStatus(id, "cancelled", nil, nil); err != nil {
 		return nil, err
 	}
 
-	result, err := s.GetMaterialRequestByID(id)
+	result, err := s.GetProductionPlanByID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	// Log audit
 	if s.auditSvc != nil {
-		_ = s.auditSvc.Log("material_requests", "CANCEL", int64(id), int64(userID), username, nil, result)
+		_ = s.auditSvc.Log("production_plans", "CANCEL", int64(id), int64(userID), username, nil, result)
 	}
 
 	return result, nil
 }
 
 // GetRelatedPurchaseOrders returns POs that were auto-created when this MR was approved
-func (s *materialRequestService) GetRelatedPurchaseOrders(id uint) ([]*models.SafePurchaseOrder, error) {
-	mr, err := s.mrRepo.GetByID(id)
+func (s *productionPlanService) GetRelatedPurchaseOrders(id uint) ([]*models.SafePurchaseOrder, error) {
+	mr, err := s.ppRepo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	var pos []*models.PurchaseOrder
-	// POs created from this MR have notes like "Liên quan KHSX: {mr_number}"
-	pattern := "%" + mr.MRNumber + "%"
+	// POs created from this MR have notes like "Liên quan KHSX: {plan_number}"
+	pattern := "%" + mr.PlanNumber + "%"
 	if err := s.db.
 		Preload("Supplier").
 		Preload("Items").

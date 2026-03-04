@@ -55,7 +55,7 @@ const navGroups: NavGroup[] = [
     {
         titleKey: 'groups.production',
         items: [
-            { labelKey: 'nav.materialRequests', path: '/material-requests', icon: <FileText className="w-5 h-5" /> },
+            { labelKey: 'nav.materialRequests', path: '/production-plans', icon: <FileText className="w-5 h-5" /> },
             { labelKey: 'nav.issueNotes', path: '/material-issue-notes', icon: <Send className="w-5 h-5" /> },
         ],
     },

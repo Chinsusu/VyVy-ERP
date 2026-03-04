@@ -8,7 +8,7 @@ import (
 type MaterialIssueNote struct {
 	ID                uint      `gorm:"primaryKey" json:"id"`
 	MINNumber         string    `gorm:"column:min_number;uniqueIndex;size:50;not null" json:"min_number"`
-	MaterialRequestID *uint     `gorm:"column:material_request_id" json:"material_request_id,omitempty"`
+	ProductionPlanID *uint     `gorm:"column:production_plan_id" json:"production_plan_id,omitempty"`
 	WarehouseID       uint      `gorm:"column:warehouse_id;not null" json:"warehouse_id"`
 
 	// Dates
@@ -32,7 +32,7 @@ type MaterialIssueNote struct {
 	UpdatedBy *uint     `gorm:"column:updated_by" json:"updated_by,omitempty"`
 
 	// Relationships
-	MaterialRequest *MaterialRequest       `gorm:"foreignKey:MaterialRequestID" json:"material_request,omitempty"`
+	ProductionPlan *ProductionPlan       `gorm:"foreignKey:ProductionPlanID" json:"production_plan,omitempty"`
 	Warehouse       *Warehouse             `gorm:"foreignKey:WarehouseID" json:"warehouse,omitempty"`
 	PostedByUser    *User                  `gorm:"foreignKey:PostedBy" json:"posted_by_user,omitempty"`
 	CreatedByUser   *User                  `gorm:"foreignKey:CreatedBy" json:"created_by_user,omitempty"`
@@ -87,8 +87,8 @@ func (MaterialIssueNoteItem) TableName() string {
 type SafeMaterialIssueNote struct {
 	ID                uint                          `json:"id"`
 	MINNumber         string                        `json:"min_number"`
-	MaterialRequestID *uint                         `json:"material_request_id,omitempty"`
-	MaterialRequest   *SafeMaterialRequest          `json:"material_request,omitempty"`
+	ProductionPlanID *uint                         `json:"production_plan_id,omitempty"`
+	ProductionPlan   *SafeProductionPlan          `json:"production_plan,omitempty"`
 	WarehouseID       uint                          `json:"warehouse_id"`
 	Warehouse         *SafeWarehouse                `json:"warehouse,omitempty"`
 	IssueDate         string                        `json:"issue_date"`
@@ -124,7 +124,7 @@ func (min *MaterialIssueNote) ToSafe() *SafeMaterialIssueNote {
 	safe := &SafeMaterialIssueNote{
 		ID:                min.ID,
 		MINNumber:         min.MINNumber,
-		MaterialRequestID: min.MaterialRequestID,
+		ProductionPlanID: min.ProductionPlanID,
 		WarehouseID:       min.WarehouseID,
 		IssueDate:         min.IssueDate,
 		Status:            min.Status,
@@ -136,8 +136,8 @@ func (min *MaterialIssueNote) ToSafe() *SafeMaterialIssueNote {
 		UpdatedAt:         min.UpdatedAt,
 	}
 
-	if min.MaterialRequest != nil {
-		safe.MaterialRequest = min.MaterialRequest.ToSafe()
+	if min.ProductionPlan != nil {
+		safe.ProductionPlan = min.ProductionPlan.ToSafe()
 	}
 
 	if min.Warehouse != nil {

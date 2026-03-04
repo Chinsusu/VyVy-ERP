@@ -25,8 +25,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	purchaseOrderItemRepo := repository.NewPurchaseOrderItemRepository(db)
 	grnRepo := repository.NewGoodsReceiptNoteRepository(db)
 	grnItemRepo := repository.NewGoodsReceiptNoteItemRepository(db)
-	mrRepo := repository.NewMaterialRequestRepository(db)
-	mrItemRepo := repository.NewMaterialRequestItemRepository(db)
+	ppRepo := repository.NewProductionPlanRepository(db)
+	ppItemRepo := repository.NewProductionPlanItemRepository(db)
 	stockLedgerRepo := repository.NewStockLedgerRepository(db)
 	stockBalanceRepo := repository.NewStockBalanceRepository(db)
 	minRepo := repository.NewMaterialIssueNoteRepository(db)
@@ -52,8 +52,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	productFormulaService := service.NewProductFormulaService(productFormulaRepo, finishedProductRepo, materialRepo)
 	purchaseOrderService := service.NewPurchaseOrderService(purchaseOrderRepo, purchaseOrderItemRepo, supplierRepo, warehouseRepo, auditLogService)
 	grnService := service.NewGRNService(db, grnRepo, grnItemRepo, purchaseOrderRepo, purchaseOrderItemRepo, warehouseRepo, stockLedgerRepo, stockBalanceRepo)
-	mrService := service.NewMaterialRequestService(db, mrRepo, mrItemRepo, warehouseRepo, materialRepo, stockBalanceRepo, stockReservationRepo, auditLogService)
-	minService := service.NewMaterialIssueNoteService(minRepo, mrRepo, materialRepo, stockBalanceRepo, stockReservationRepo, db)
+	ppService := service.NewProductionPlanService(db, ppRepo, ppItemRepo, warehouseRepo, materialRepo, stockBalanceRepo, stockReservationRepo, auditLogService)
+	minService := service.NewMaterialIssueNoteService(minRepo, ppRepo, materialRepo, stockBalanceRepo, stockReservationRepo, db)
 	stockService := service.NewStockService(stockBalanceRepo)
 	doService := service.NewDeliveryOrderService(db, doRepo, warehouseRepo, finishedProductRepo, stockBalanceRepo, stockReservationRepo)
 	saService := service.NewStockAdjustmentService(db, saRepo, warehouseRepo, materialRepo, finishedProductRepo, stockBalanceRepo)
@@ -81,7 +81,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	productFormulaHandler := handlers.NewProductFormulaHandler(productFormulaService)
 	purchaseOrderHandler := handlers.NewPurchaseOrderHandler(purchaseOrderService)
 	grnHandler := handlers.NewGRNHandler(grnService)
-	mrHandler := handlers.NewMaterialRequestHandler(mrService)
+	ppHandler := handlers.NewProductionPlanHandler(ppService)
 	minHandler := handlers.NewMaterialIssueNoteHandler(minService)
 	stockHandler := handlers.NewStockHandler(stockService)
 	doHandler := handlers.NewDeliveryOrderHandler(doService)
@@ -229,27 +229,27 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	}
 
 	// Material Request (MR) routes - All protected
-	mrGroup := v1.Group("/material-requests")
-	mrGroup.Use(middleware.AuthMiddleware(authService))
+	ppGroup := v1.Group("/production-plans")
+	ppGroup.Use(middleware.AuthMiddleware(authService))
 	{
-		mrGroup.GET("", mrHandler.List)
-		mrGroup.GET("/:id", mrHandler.GetByID)
-		mrGroup.POST("", mrHandler.Create)
-		mrGroup.PUT("/:id", mrHandler.Update)
-		mrGroup.DELETE("/:id", middleware.RequireRole("admin"), mrHandler.Delete)
+		ppGroup.GET("", ppHandler.List)
+		ppGroup.GET("/:id", ppHandler.GetByID)
+		ppGroup.POST("", ppHandler.Create)
+		ppGroup.PUT("/:id", ppHandler.Update)
+		ppGroup.DELETE("/:id", middleware.RequireRole("admin"), ppHandler.Delete)
 
 		// Workflow endpoints
-		mrGroup.POST("/:id/approve", middleware.RequireRole("warehouse_manager"), mrHandler.Approve)
-		mrGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), mrHandler.Cancel)
+		ppGroup.POST("/:id/approve", middleware.RequireRole("warehouse_manager"), ppHandler.Approve)
+		ppGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), ppHandler.Cancel)
 
 		// Production task endpoints
-		mrGroup.GET("/:id/tasks", productionTaskHandler.List)
-		mrGroup.POST("/:id/tasks", productionTaskHandler.Create)
-		mrGroup.PUT("/:id/tasks/:taskId", productionTaskHandler.Update)
-		mrGroup.DELETE("/:id/tasks/:taskId", productionTaskHandler.Delete)
+		ppGroup.GET("/:id/tasks", productionTaskHandler.List)
+		ppGroup.POST("/:id/tasks", productionTaskHandler.Create)
+		ppGroup.PUT("/:id/tasks/:taskId", productionTaskHandler.Update)
+		ppGroup.DELETE("/:id/tasks/:taskId", productionTaskHandler.Delete)
 
 		// Related purchase orders (auto-created on approve)
-		mrGroup.GET("/:id/purchase-orders", mrHandler.GetRelatedPOs)
+		ppGroup.GET("/:id/purchase-orders", ppHandler.GetRelatedPOs)
 	}
 
 	// Material Issue Note (MIN) routes - All protected

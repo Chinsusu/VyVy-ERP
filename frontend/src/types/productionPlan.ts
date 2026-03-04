@@ -1,9 +1,9 @@
 import type { Material } from './material';
 import type { Warehouse } from './warehouse';
 
-export interface MaterialRequest {
+export interface ProductionPlan {
     id: number;
-    mr_number: string;
+    plan_number: string;
     warehouse_id: number;
     warehouse?: Warehouse;
     department: string;
@@ -14,14 +14,14 @@ export interface MaterialRequest {
     notes?: string | null;
     approved_by?: number | null;
     approved_at?: string | null;
-    items: MaterialRequestItem[];
+    items: ProductionPlanItem[];
     created_at: string;
     updated_at: string;
 }
 
-export interface MaterialRequestItem {
+export interface ProductionPlanItem {
     id: number;
-    material_request_id: number;
+    production_plan_id: number;
     material_id: number;
     material?: Material;
     requested_quantity: number;
@@ -29,41 +29,41 @@ export interface MaterialRequestItem {
     notes?: string | null;
 }
 
-export interface CreateMaterialRequestInput {
-    mr_number: string;
+export interface CreateProductionPlanInput {
+    plan_number: string;
     warehouse_id: number;
     department: string;
     request_date: string;
     required_date?: string;
     purpose?: string;
     notes?: string;
-    items: CreateMaterialRequestItemInput[];
+    items: CreateProductionPlanItemInput[];
 }
 
-export interface CreateMaterialRequestItemInput {
+export interface CreateProductionPlanItemInput {
     material_id: number;
     requested_quantity: number;
     notes?: string;
 }
 
-export interface UpdateMaterialRequestInput {
-    mr_number?: string;
+export interface UpdateProductionPlanInput {
+    plan_number?: string;
     warehouse_id?: number;
     department?: string;
     request_date?: string;
     required_date?: string;
     purpose?: string;
     notes?: string;
-    items?: UpdateMaterialRequestItemInput[];
+    items?: UpdateProductionPlanItemInput[];
 }
 
-export interface UpdateMaterialRequestItemInput {
+export interface UpdateProductionPlanItemInput {
     material_id: number;
     requested_quantity: number;
     notes?: string;
 }
 
-export interface MaterialRequestFilters {
+export interface ProductionPlanFilters {
     search?: string;
     warehouse_id?: number;
     department?: string;
@@ -76,9 +76,9 @@ export interface MaterialRequestFilters {
     sort_order?: 'asc' | 'desc';
 }
 
-export interface MaterialRequestListResponse {
+export interface ProductionPlanListResponse {
     success: boolean;
-    data: MaterialRequest[];
+    data: ProductionPlan[];
     pagination: {
         page: number;
         limit: number;
@@ -90,7 +90,7 @@ export interface MaterialRequestListResponse {
 // Production Tasks
 export interface ProductionTask {
     id: number;
-    material_request_id: number;
+    production_plan_id: number;
     category: string;
     task_name: string;
     description?: string;

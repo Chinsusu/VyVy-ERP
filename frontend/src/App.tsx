@@ -25,10 +25,10 @@ import PurchaseOrderDetailPage from './pages/purchase-orders/PurchaseOrderDetail
 import GrnListPage from './pages/grns/GrnListPage';
 import GrnCreatePage from './pages/grns/GrnCreatePage';
 import GrnDetailPage from './pages/grns/GrnDetailPage';
-import MRListPage from './pages/material-requests/MRListPage';
-import MRCreatePage from './pages/material-requests/MRCreatePage';
-import MREditPage from './pages/material-requests/MREditPage';
-import MRDetailPage from './pages/material-requests/MRDetailPage';
+import MRListPage from './pages/production-plans/MRListPage';
+import MRCreatePage from './pages/production-plans/MRCreatePage';
+import MREditPage from './pages/production-plans/MREditPage';
+import MRDetailPage from './pages/production-plans/MRDetailPage';
 import MINListPage from './pages/material-issue-notes/MINListPage';
 import MINCreatePage from './pages/material-issue-notes/MINCreatePage';
 import MINDetailPage from './pages/material-issue-notes/MINDetailPage';
@@ -118,10 +118,10 @@ function App() {
             <Route path="/grns/:id" element={<GrnDetailPage />} />
 
             {/* Material Requests (MR) Routes */}
-            <Route path="/material-requests" element={<MRListPage />} />
-            <Route path="/material-requests/new" element={<MRCreatePage />} />
-            <Route path="/material-requests/:id" element={<MRDetailPage />} />
-            <Route path="/material-requests/:id/edit" element={<MREditPage />} />
+            <Route path="/production-plans" element={<MRListPage />} />
+            <Route path="/production-plans/new" element={<MRCreatePage />} />
+            <Route path="/production-plans/:id" element={<MRDetailPage />} />
+            <Route path="/production-plans/:id/edit" element={<MREditPage />} />
 
             {/* Material Issue Notes (MIN) Routes */}
             <Route path="/material-issue-notes" element={<MINListPage />} />

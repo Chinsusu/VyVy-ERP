@@ -1,5 +1,5 @@
 import { CalendarRange } from 'lucide-react';
-import type { ProductionTask } from '../../types/materialRequest';
+import type { ProductionTask } from '../../types/productionPlan';
 
 const CATEGORY_COLORS: Record<string, string> = {
     pha_che: '#9333ea',

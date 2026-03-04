@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Save, Package, MapPin, Tag } from 'lucide-react';
-import { useMaterialRequest } from '../../hooks/useMaterialRequests';
+import { useProductionPlan } from '../../hooks/useProductionPlans';
 import { useCreateMaterialIssueNote } from '../../hooks/useMaterialIssueNotes';
 import { useStockBalance } from '../../hooks/useStockBalance';
 import { useWarehouseLocations } from '../../hooks/useWarehouseLocations';
@@ -15,13 +15,13 @@ export default function MINForm() {
     const [searchParams] = useSearchParams();
     const mrId = searchParams.get('mr_id');
 
-    const { data: mr, isLoading: isLoadingMR } = useMaterialRequest(Number(mrId));
+    const { data: mr, isLoading: isLoadingMR } = useProductionPlan(Number(mrId));
     const createMutation = useCreateMaterialIssueNote();
     const { data: locationsData } = useWarehouseLocations({ warehouse_id: mr?.warehouse_id || 0 });
     const locations = locationsData?.data || [];
 
     const [formData, setFormData] = useState<Omit<CreateMaterialIssueNoteInput, 'items'>>({
-        material_request_id: 0,
+        production_plan_id: 0,
         warehouse_id: 0,
         issue_date: new Date().toISOString().split('T')[0],
         notes: '',
@@ -33,9 +33,9 @@ export default function MINForm() {
         if (mr) {
             setFormData(prev => ({
                 ...prev,
-                material_request_id: mr.id,
+                production_plan_id: mr.id,
                 warehouse_id: mr.warehouse_id,
-                notes: `Issued for MR ${mr.mr_number}`,
+                notes: `Issued for MR ${mr.plan_number}`,
             }));
 
             // Initialize items from MR
@@ -108,7 +108,7 @@ export default function MINForm() {
                 <div>
                     <label className="label">Originating Request</label>
                     <div className="p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium">
-                        {mr?.mr_number || 'N/A'}
+                        {mr?.plan_number || 'N/A'}
                     </div>
                 </div>
                 <div>

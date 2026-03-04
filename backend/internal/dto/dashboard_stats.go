@@ -5,7 +5,7 @@ import "time"
 type DashboardStats struct {
 	TotalPurchaseOrders    int64   `json:"total_purchase_orders"`
 	PendingGRNs            int64   `json:"pending_grns"`
-	TotalMaterialRequests int64   `json:"total_material_requests"`
+	TotalProductionPlans int64   `json:"total_production_plans"`
 	TotalDeliveryOrders    int64   `json:"total_delivery_orders"`
 	InventoryValue         float64 `json:"inventory_value"`
 	LowStockCount          int64   `json:"low_stock_count"`

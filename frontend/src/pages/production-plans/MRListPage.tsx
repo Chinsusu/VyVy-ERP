@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, FileText } from 'lucide-react';
-import { useMaterialRequests } from '../../hooks/useMaterialRequests';
-import type { MaterialRequest, MaterialRequestFilters } from '../../types/materialRequest';
+import { useProductionPlans } from '../../hooks/useProductionPlans';
+import type { ProductionPlan, ProductionPlanFilters } from '../../types/productionPlan';
 import PageSizeSelector from '../../components/common/PageSizeSelector';
 
 export default function MRListPage() {
-    const [filters, setFilters] = useState<MaterialRequestFilters>({
+    const [filters, setFilters] = useState<ProductionPlanFilters>({
         page: 1,
         page_size: 10,
     });
 
-    const { data, isLoading, error } = useMaterialRequests(filters);
-    const materialRequests = data?.data || [];
+    const { data, isLoading, error } = useProductionPlans(filters);
+    const productionPlans = data?.data || [];
     const pagination = data?.pagination;
 
     const getStatusBadge = (status: string) => {
@@ -55,7 +55,7 @@ export default function MRListPage() {
                         <h1 className="text-3xl font-bold text-gray-900">Kế Hoạch Sản Xuất</h1>
                         <p className="text-gray-600 mt-1">Quản lý kế hoạch sản xuất</p>
                     </div>
-                    <Link to="/material-requests/new" className="btn btn-primary flex items-center gap-2">
+                    <Link to="/production-plans/new" className="btn btn-primary flex items-center gap-2">
                         <Plus className="w-4 h-4" />
                         Tạo Kế Hoạch Mới
                     </Link>
@@ -127,10 +127,10 @@ export default function MRListPage() {
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                             Lỗi tải kế hoạch sản xuất: {(error as Error).message}
                         </div>
-                    ) : materialRequests.length === 0 ? (
+                    ) : productionPlans.length === 0 ? (
                         <div className="text-center py-12">
                             <p className="text-gray-500 mb-4">Chưa có kế hoạch sản xuất nào</p>
-                            <Link to="/material-requests/new" className="btn btn-primary">
+                            <Link to="/production-plans/new" className="btn btn-primary">
                                 Tạo Kế Hoạch Sản Xuất Đầu Tiên
                             </Link>
                         </div>
@@ -149,12 +149,12 @@ export default function MRListPage() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {materialRequests.map((mr: MaterialRequest) => (
+                                        {productionPlans.map((mr: ProductionPlan) => (
                                             <tr key={mr.id}>
                                                 <td className="font-mono font-semibold text-primary">
                                                     <div className="flex items-center gap-2">
                                                         <FileText className="w-4 h-4 opacity-50" />
-                                                        {mr.mr_number}
+                                                        {mr.plan_number}
                                                     </div>
                                                 </td>
                                                 <td>
@@ -174,14 +174,14 @@ export default function MRListPage() {
                                                 <td>
                                                     <div className="flex justify-end gap-3">
                                                         <Link
-                                                            to={`/material-requests/${mr.id}`}
+                                                            to={`/production-plans/${mr.id}`}
                                                             className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                         >
                                                             Xem
                                                         </Link>
                                                         {mr.status === 'draft' && (
                                                             <Link
-                                                                to={`/material-requests/${mr.id}/edit`}
+                                                                to={`/production-plans/${mr.id}/edit`}
                                                                 className="text-primary hover:text-primary-dark font-medium text-sm transition-colors"
                                                             >
                                                                 Sửa

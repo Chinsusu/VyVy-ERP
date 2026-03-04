@@ -16,12 +16,12 @@ import {
     Plus
 } from 'lucide-react';
 import {
-    useMaterialRequest,
-    useApproveMaterialRequest,
-    useCancelMaterialRequest,
-    useDeleteMaterialRequest
-} from '../../hooks/useMaterialRequests';
-import type { MaterialRequestItem } from '../../types/materialRequest';
+    useProductionPlan,
+    useApproveProductionPlan,
+    useCancelProductionPlan,
+    useDeleteProductionPlan
+} from '../../hooks/useProductionPlans';
+import type { ProductionPlanItem } from '../../types/productionPlan';
 import AuditLogPanel from '../../components/common/AuditLogPanel';
 import ProductionTaskPanel from '../../components/production/ProductionTaskPanel';
 import ProductionTimeline from '../../components/production/ProductionTimeline';
@@ -35,10 +35,10 @@ export default function MRDetailPage() {
     const navigate = useNavigate();
     const { data: productionTasks } = useProductionTasks(mrId);
 
-    const { data: mr, isLoading, error } = useMaterialRequest(mrId);
-    const approveMutation = useApproveMaterialRequest();
-    const cancelMutation = useCancelMaterialRequest();
-    const deleteMutation = useDeleteMaterialRequest();
+    const { data: mr, isLoading, error } = useProductionPlan(mrId);
+    const approveMutation = useApproveProductionPlan();
+    const cancelMutation = useCancelProductionPlan();
+    const deleteMutation = useDeleteProductionPlan();
 
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -104,7 +104,7 @@ export default function MRDetailPage() {
             setIsDeleting(true);
             try {
                 await deleteMutation.mutateAsync(mrId);
-                navigate('/material-requests');
+                navigate('/production-plans');
             } catch (err) {
                 alert('Lỗi khi xóa: ' + (err as Error).message);
                 setIsDeleting(false);
@@ -119,14 +119,14 @@ export default function MRDetailPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div className="flex items-center gap-4">
                         <Link
-                            to="/material-requests"
+                            to="/production-plans"
                             className="p-2 hover:bg-white rounded-full transition-colors text-gray-400 hover:text-primary-600 border border-transparent hover:border-gray-200"
                         >
                             <ArrowLeft className="w-6 h-6" />
                         </Link>
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <h1 className="text-3xl font-bold text-gray-900">{mr.mr_number}</h1>
+                                <h1 className="text-3xl font-bold text-gray-900">{mr.plan_number}</h1>
                                 {getStatusBadge(mr.status)}
                             </div>
                             <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -153,7 +153,7 @@ export default function MRDetailPage() {
                                     Xóa bản nháp
                                 </button>
                                 <Link
-                                    to={`/material-requests/${mr.id}/edit`}
+                                    to={`/production-plans/${mr.id}/edit`}
                                     className="btn btn-secondary"
                                 >
                                     Chỉnh sửa
@@ -248,7 +248,7 @@ export default function MRDetailPage() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {mr.items.map((item: MaterialRequestItem) => {
+                                        {mr.items.map((item: ProductionPlanItem) => {
                                             const remaining = item.requested_quantity - item.issued_quantity;
                                             return (
                                                 <tr key={item.id}>
@@ -403,7 +403,7 @@ export default function MRDetailPage() {
 
             {/* Lịch Sử Thay Đổi */}
             <div className="mt-6">
-                <AuditLogPanel tableName="material_requests" recordId={mrId} />
+                <AuditLogPanel tableName="production_plans" recordId={mrId} />
             </div>
         </div>
     );

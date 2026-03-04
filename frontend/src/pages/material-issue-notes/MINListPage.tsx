@@ -137,11 +137,11 @@ export default function MINListPage() {
                                                 </td>
                                                 <td>
                                                     <Link
-                                                        to={`/material-requests/${min.material_request_id}`}
+                                                        to={`/production-plans/${min.production_plan_id}`}
                                                         className="text-primary hover:text-primary-dark font-medium transition-colors"
                                                     >
-                                                        <div className="max-w-[150px] truncate" title={min.material_request?.mr_number}>
-                                                            {min.material_request?.mr_number || `#${min.material_request_id}`}
+                                                        <div className="max-w-[150px] truncate" title={min.production_plan?.plan_number}>
+                                                            {min.production_plan?.plan_number || `#${min.production_plan_id}`}
                                                         </div>
                                                     </Link>
                                                 </td>

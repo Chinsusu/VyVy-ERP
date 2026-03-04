@@ -1,5 +1,5 @@
 import { PieChart } from 'lucide-react';
-import type { ProductionTask } from '../../types/materialRequest';
+import type { ProductionTask } from '../../types/productionPlan';
 
 const CATEGORY_LABELS: Record<string, string> = {
     pha_che: 'Pha chế',

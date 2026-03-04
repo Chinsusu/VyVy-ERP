@@ -10,25 +10,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// MaterialRequestHandler handles HTTP requests for material requests
-type MaterialRequestHandler struct {
-	service service.MaterialRequestService
+// ProductionPlanHandler handles HTTP requests for material requests
+type ProductionPlanHandler struct {
+	service service.ProductionPlanService
 }
 
-// NewMaterialRequestHandler creates a new MaterialRequestHandler
-func NewMaterialRequestHandler(service service.MaterialRequestService) *MaterialRequestHandler {
-	return &MaterialRequestHandler{service: service}
+// NewProductionPlanHandler creates a new ProductionPlanHandler
+func NewProductionPlanHandler(service service.ProductionPlanService) *ProductionPlanHandler {
+	return &ProductionPlanHandler{service: service}
 }
 
 // List retrieves all material requests with filtering and pagination
-func (h *MaterialRequestHandler) List(c *gin.Context) {
-	var filter dto.MaterialRequestFilterRequest
+func (h *ProductionPlanHandler) List(c *gin.Context) {
+	var filter dto.ProductionPlanFilterRequest
 	if err := c.ShouldBindQuery(&filter); err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_QUERY", err.Error()))
 		return
 	}
 
-	mrs, total, err := h.service.ListMaterialRequests(&filter)
+	mrs, total, err := h.service.ListProductionPlans(&filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("FETCH_ERROR", err.Error()))
 		return
@@ -44,7 +44,7 @@ func (h *MaterialRequestHandler) List(c *gin.Context) {
 }
 
 // GetByID retrieves a material request by ID
-func (h *MaterialRequestHandler) GetByID(c *gin.Context) {
+func (h *ProductionPlanHandler) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
@@ -52,7 +52,7 @@ func (h *MaterialRequestHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	mr, err := h.service.GetMaterialRequestByID(uint(id))
+	mr, err := h.service.GetProductionPlanByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, utils.ErrorResponse("NOT_FOUND", err.Error()))
 		return
@@ -62,8 +62,8 @@ func (h *MaterialRequestHandler) GetByID(c *gin.Context) {
 }
 
 // Create creates a new material request with items
-func (h *MaterialRequestHandler) Create(c *gin.Context) {
-	var req dto.CreateMaterialRequestRequest
+func (h *ProductionPlanHandler) Create(c *gin.Context) {
+	var req dto.CreateProductionPlanRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
 		return
@@ -83,7 +83,7 @@ func (h *MaterialRequestHandler) Create(c *gin.Context) {
 		username, _ = u.(string)
 	}
 
-	mr, err := h.service.CreateMaterialRequest(&req, uint(userID), username)
+	mr, err := h.service.CreateProductionPlan(&req, uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
@@ -93,7 +93,7 @@ func (h *MaterialRequestHandler) Create(c *gin.Context) {
 }
 
 // Update updates a material request
-func (h *MaterialRequestHandler) Update(c *gin.Context) {
+func (h *ProductionPlanHandler) Update(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
@@ -101,7 +101,7 @@ func (h *MaterialRequestHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var req dto.UpdateMaterialRequestRequest
+	var req dto.UpdateProductionPlanRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
 		return
@@ -121,7 +121,7 @@ func (h *MaterialRequestHandler) Update(c *gin.Context) {
 		username, _ = u.(string)
 	}
 
-	mr, err := h.service.UpdateMaterialRequest(uint(id), &req, uint(userID), username)
+	mr, err := h.service.UpdateProductionPlan(uint(id), &req, uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return
@@ -131,7 +131,7 @@ func (h *MaterialRequestHandler) Update(c *gin.Context) {
 }
 
 // Delete deletes a material request
-func (h *MaterialRequestHandler) Delete(c *gin.Context) {
+func (h *ProductionPlanHandler) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
@@ -149,7 +149,7 @@ func (h *MaterialRequestHandler) Delete(c *gin.Context) {
 		username, _ = u.(string)
 	}
 
-	err = h.service.DeleteMaterialRequest(uint(id), uint(userID), username)
+	err = h.service.DeleteProductionPlan(uint(id), uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("DELETE_ERROR", err.Error()))
 		return
@@ -159,7 +159,7 @@ func (h *MaterialRequestHandler) Delete(c *gin.Context) {
 }
 
 // Approve approves a material request
-func (h *MaterialRequestHandler) Approve(c *gin.Context) {
+func (h *ProductionPlanHandler) Approve(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
@@ -181,7 +181,7 @@ func (h *MaterialRequestHandler) Approve(c *gin.Context) {
 		username, _ = u.(string)
 	}
 
-	mr, err := h.service.ApproveMaterialRequest(uint(id), uint(userID), username)
+	mr, err := h.service.ApproveProductionPlan(uint(id), uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("APPROVE_ERROR", err.Error()))
 		return
@@ -191,7 +191,7 @@ func (h *MaterialRequestHandler) Approve(c *gin.Context) {
 }
 
 // Cancel cancels a material request
-func (h *MaterialRequestHandler) Cancel(c *gin.Context) {
+func (h *ProductionPlanHandler) Cancel(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
@@ -209,7 +209,7 @@ func (h *MaterialRequestHandler) Cancel(c *gin.Context) {
 		username, _ = u.(string)
 	}
 
-	mr, err := h.service.CancelMaterialRequest(uint(id), uint(userID), username)
+	mr, err := h.service.CancelProductionPlan(uint(id), uint(userID), username)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CANCEL_ERROR", err.Error()))
 		return
@@ -219,7 +219,7 @@ func (h *MaterialRequestHandler) Cancel(c *gin.Context) {
 }
 
 // GetRelatedPOs returns purchase orders auto-created from this material request
-func (h *MaterialRequestHandler) GetRelatedPOs(c *gin.Context) {
+func (h *ProductionPlanHandler) GetRelatedPOs(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {

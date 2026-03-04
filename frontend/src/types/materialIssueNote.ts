@@ -1,13 +1,13 @@
 import type { Material } from './material';
 import type { Warehouse } from './warehouse';
 import type { WarehouseLocation } from './warehouseLocation';
-import type { MaterialRequest } from './materialRequest';
+import type { ProductionPlan } from './productionPlan';
 
 export interface MaterialIssueNote {
     id: number;
     min_number: string;
-    material_request_id: number;
-    material_request?: MaterialRequest;
+    production_plan_id: number;
+    production_plan?: ProductionPlan;
     warehouse_id: number;
     warehouse?: Warehouse;
     issue_date: string;
@@ -38,7 +38,7 @@ export interface MaterialIssueNoteItem {
 }
 
 export interface CreateMaterialIssueNoteInput {
-    material_request_id: number;
+    production_plan_id: number;
     warehouse_id: number;
     issue_date: string;
     notes?: string;
@@ -60,7 +60,7 @@ export interface CreateMaterialIssueNoteItemInput {
 export interface MaterialIssueNoteFilters {
     min_number?: string;
     warehouse_id?: number;
-    material_request_id?: number;
+    production_plan_id?: number;
     status?: string;
     page?: number;
     limit?: number;

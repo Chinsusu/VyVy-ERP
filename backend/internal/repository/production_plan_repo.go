@@ -8,35 +8,35 @@ import (
 	"gorm.io/gorm"
 )
 
-// MaterialRequestRepository defines the interface for material request data operations
-type MaterialRequestRepository interface {
-	Create(mr *models.MaterialRequest) error
-	GetByID(id uint) (*models.MaterialRequest, error)
-	GetByMRNumber(mrNumber string) (*models.MaterialRequest, error)
-	List(filter *dto.MaterialRequestFilterRequest) ([]*models.MaterialRequest, int64, error)
-	Update(mr *models.MaterialRequest) error
+// ProductionPlanRepository defines the interface for material request data operations
+type ProductionPlanRepository interface {
+	Create(mr *models.ProductionPlan) error
+	GetByID(id uint) (*models.ProductionPlan, error)
+	GetByPlanNumber(mrNumber string) (*models.ProductionPlan, error)
+	List(filter *dto.ProductionPlanFilterRequest) ([]*models.ProductionPlan, int64, error)
+	Update(mr *models.ProductionPlan) error
 	Delete(id uint) error
 	UpdateStatus(id uint, status string, approvedBy *uint, approvedAt *time.Time) error
 	UpdateIssuedQuantity(itemID uint, issuedQty float64) error
 }
 
-type materialRequestRepository struct {
+type productionPlanRepository struct {
 	db *gorm.DB
 }
 
-// NewMaterialRequestRepository creates a new MaterialRequestRepository
-func NewMaterialRequestRepository(db *gorm.DB) MaterialRequestRepository {
-	return &materialRequestRepository{db: db}
+// NewProductionPlanRepository creates a new ProductionPlanRepository
+func NewProductionPlanRepository(db *gorm.DB) ProductionPlanRepository {
+	return &productionPlanRepository{db: db}
 }
 
 // Create creates a new material request
-func (r *materialRequestRepository) Create(mr *models.MaterialRequest) error {
+func (r *productionPlanRepository) Create(mr *models.ProductionPlan) error {
 	return r.db.Create(mr).Error
 }
 
 // GetByID retrieves a material request by ID with all relationships
-func (r *materialRequestRepository) GetByID(id uint) (*models.MaterialRequest, error) {
-	var mr models.MaterialRequest
+func (r *productionPlanRepository) GetByID(id uint) (*models.ProductionPlan, error) {
+	var mr models.ProductionPlan
 	err := r.db.
 		Preload("Warehouse").
 		Preload("Items").
@@ -69,24 +69,24 @@ func (r *materialRequestRepository) GetByID(id uint) (*models.MaterialRequest, e
 	return &mr, nil
 }
 
-// GetByMRNumber retrieves a material request by MR number
-func (r *materialRequestRepository) GetByMRNumber(mrNumber string) (*models.MaterialRequest, error) {
-	var mr models.MaterialRequest
-	err := r.db.Where("mr_number = ?", mrNumber).First(&mr).Error
+// GetByPlanNumber retrieves a material request by MR number
+func (r *productionPlanRepository) GetByPlanNumber(mrNumber string) (*models.ProductionPlan, error) {
+	var mr models.ProductionPlan
+	err := r.db.Where("plan_number = ?", mrNumber).First(&mr).Error
 	return &mr, err
 }
 
 // List retrieves material requests with filtering and pagination
-func (r *materialRequestRepository) List(filter *dto.MaterialRequestFilterRequest) ([]*models.MaterialRequest, int64, error) {
-	var mrs []*models.MaterialRequest
+func (r *productionPlanRepository) List(filter *dto.ProductionPlanFilterRequest) ([]*models.ProductionPlan, int64, error) {
+	var mrs []*models.ProductionPlan
 	var total int64
 
-	query := r.db.Model(&models.MaterialRequest{})
+	query := r.db.Model(&models.ProductionPlan{})
 
 	// Apply search filter
 	if filter.Search != "" {
 		searchPattern := "%" + filter.Search + "%"
-		query = query.Where("mr_number ILIKE ? OR department ILIKE ? OR purpose ILIKE ?", searchPattern, searchPattern, searchPattern)
+		query = query.Where("plan_number ILIKE ? OR department ILIKE ? OR purpose ILIKE ?", searchPattern, searchPattern, searchPattern)
 	}
 
 	// Apply warehouse filter
@@ -150,17 +150,17 @@ func (r *materialRequestRepository) List(filter *dto.MaterialRequestFilterReques
 }
 
 // Update updates a material request
-func (r *materialRequestRepository) Update(mr *models.MaterialRequest) error {
+func (r *productionPlanRepository) Update(mr *models.ProductionPlan) error {
 	return r.db.Save(mr).Error
 }
 
 // Delete deletes a material request
-func (r *materialRequestRepository) Delete(id uint) error {
-	return r.db.Delete(&models.MaterialRequest{}, id).Error
+func (r *productionPlanRepository) Delete(id uint) error {
+	return r.db.Delete(&models.ProductionPlan{}, id).Error
 }
 
 // UpdateStatus updates the status and approval fields of a material request
-func (r *materialRequestRepository) UpdateStatus(id uint, status string, approvedBy *uint, approvedAt *time.Time) error {
+func (r *productionPlanRepository) UpdateStatus(id uint, status string, approvedBy *uint, approvedAt *time.Time) error {
 	updates := map[string]interface{}{
 		"status": status,
 	}
@@ -170,12 +170,12 @@ func (r *materialRequestRepository) UpdateStatus(id uint, status string, approve
 	if approvedAt != nil {
 		updates["approved_at"] = approvedAt
 	}
-	return r.db.Model(&models.MaterialRequest{}).Where("id = ?", id).Updates(updates).Error
+	return r.db.Model(&models.ProductionPlan{}).Where("id = ?", id).Updates(updates).Error
 }
 
 // UpdateIssuedQuantity updates the issued quantity of an MR item
-func (r *materialRequestRepository) UpdateIssuedQuantity(itemID uint, issuedQty float64) error {
-	return r.db.Model(&models.MaterialRequestItem{}).
+func (r *productionPlanRepository) UpdateIssuedQuantity(itemID uint, issuedQty float64) error {
+	return r.db.Model(&models.ProductionPlanItem{}).
 		Where("id = ?", itemID).
 		UpdateColumn("issued_quantity", gorm.Expr("issued_quantity + ?", issuedQty)).
 		Error

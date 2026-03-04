@@ -12,7 +12,7 @@ import suppliersEn from '../locales/en/suppliers.json';
 import warehousesEn from '../locales/en/warehouses.json';
 import purchaseOrdersEn from '../locales/en/purchaseOrders.json';
 import grnsEn from '../locales/en/grns.json';
-import materialRequestsEn from '../locales/en/materialRequests.json';
+import productionPlansEn from '../locales/en/productionPlans.json';
 import minsEn from '../locales/en/mins.json';
 import deliveryOrdersEn from '../locales/en/deliveryOrders.json';
 import inventoryEn from '../locales/en/inventory.json';
@@ -30,7 +30,7 @@ import suppliersVi from '../locales/vi/suppliers.json';
 import warehousesVi from '../locales/vi/warehouses.json';
 import purchaseOrdersVi from '../locales/vi/purchaseOrders.json';
 import grnsVi from '../locales/vi/grns.json';
-import materialRequestsVi from '../locales/vi/materialRequests.json';
+import productionPlansVi from '../locales/vi/productionPlans.json';
 import minsVi from '../locales/vi/mins.json';
 import deliveryOrdersVi from '../locales/vi/deliveryOrders.json';
 import inventoryVi from '../locales/vi/inventory.json';
@@ -58,7 +58,7 @@ i18n
                 warehouses: warehousesEn,
                 purchaseOrders: purchaseOrdersEn,
                 grns: grnsEn,
-                materialRequests: materialRequestsEn,
+                productionPlans: productionPlansEn,
                 mins: minsEn,
                 deliveryOrders: deliveryOrdersEn,
                 inventory: inventoryEn,
@@ -76,7 +76,7 @@ i18n
                 warehouses: warehousesVi,
                 purchaseOrders: purchaseOrdersVi,
                 grns: grnsVi,
-                materialRequests: materialRequestsVi,
+                productionPlans: productionPlansVi,
                 mins: minsVi,
                 deliveryOrders: deliveryOrdersVi,
                 inventory: inventoryVi,
@@ -90,7 +90,7 @@ i18n
         ns: [
             'common', 'sidebar', 'login', 'dashboard',
             'materials', 'suppliers', 'warehouses', 'purchaseOrders',
-            'grns', 'materialRequests', 'mins', 'deliveryOrders',
+            'grns', 'productionPlans', 'mins', 'deliveryOrders',
             'inventory', 'reports', 'finishedProducts', 'salesChannels',
         ],
         detection: {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Edit2, Save, X, ClipboardList, UserCheck, Calendar } from 'lucide-react';
 import { useProductionTasks, useCreateProductionTask, useUpdateProductionTask, useDeleteProductionTask } from '../../hooks/useProductionTasks';
-import type { ProductionTask, CreateProductionTaskInput, UpdateProductionTaskInput } from '../../types/materialRequest';
+import type { ProductionTask, CreateProductionTaskInput, UpdateProductionTaskInput } from '../../types/productionPlan';
 
 const CATEGORIES: Record<string, { label: string; color: string }> = {
     pha_che: { label: 'Pha chế', color: 'bg-purple-100 text-purple-700' },

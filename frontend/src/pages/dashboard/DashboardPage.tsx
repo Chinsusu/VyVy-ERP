@@ -135,7 +135,7 @@ export default function DashboardPage() {
                     </h3>
                     <div className="space-y-2">
                         <QuickLink to="/purchase-orders" label={t('purchaseOrders')} icon={<ShoppingCart className="w-4 h-4" />} count={stats?.total_purchase_orders} />
-                        <QuickLink to="/material-requests" label={t('materialRequests')} icon={<FileText className="w-4 h-4" />} count={stats?.total_material_requests} />
+                        <QuickLink to="/production-plans" label={t('productionPlans')} icon={<FileText className="w-4 h-4" />} count={stats?.total_production_plans} />
                         <QuickLink to="/delivery-orders" label={t('deliveryOrders')} icon={<Truck className="w-4 h-4" />} count={stats?.total_delivery_orders} />
                         <QuickLink to="/inventory/adjustments" label={t('adjustments')} icon={<BoxesIcon className="w-4 h-4" />} />
                         <QuickLink to="/inventory/transfers" label={t('transfers')} icon={<ArrowLeftRight className="w-4 h-4" />} />

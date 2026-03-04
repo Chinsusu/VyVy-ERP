@@ -1,6 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import MRForm from '../../components/material-requests/MRForm';
+import MRForm from '../../components/production-plans/MRForm';
 
 export default function MRCreatePage() {
     return (
@@ -8,7 +8,7 @@ export default function MRCreatePage() {
             <div>
                 <div className="mb-6">
                     <Link
-                        to="/material-requests"
+                        to="/production-plans"
                         className="text-gray-600 hover:text-primary flex items-center gap-2 mb-4 w-fit"
                     >
                         <ArrowLeft className="w-4 h-4" />
