@@ -54,9 +54,9 @@ type PurchaseOrder struct {
 	// Relationships
 	Supplier       *Supplier           `gorm:"foreignKey:SupplierID" json:"supplier,omitempty"`
 	Warehouse      *Warehouse          `gorm:"foreignKey:WarehouseID" json:"warehouse,omitempty"`
-	ApprovedByUser *User               `gorm:"foreignKey:ApprovedBy" json:"approved_by_user,omitempty"`
-	CreatedByUser  *User               `gorm:"foreignKey:CreatedBy" json:"created_by_user,omitempty"`
-	UpdatedByUser  *User               `gorm:"foreignKey:UpdatedBy" json:"updated_by_user,omitempty"`
+	ApprovedByUser *User               `gorm:"foreignKey:ApprovedBy;references:ID" json:"approved_by_user,omitempty"`
+	CreatedByUser  *User               `gorm:"foreignKey:CreatedBy;references:ID" json:"created_by_user,omitempty"`
+	UpdatedByUser  *User               `gorm:"foreignKey:UpdatedBy;references:ID" json:"updated_by_user,omitempty"`
 	Items          []*PurchaseOrderItem `gorm:"foreignKey:PurchaseOrderID" json:"items,omitempty"`
 }
 

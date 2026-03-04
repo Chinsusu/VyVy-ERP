@@ -201,6 +201,7 @@ export default function PurchaseOrderDetailPage() {
                                             <th className="py-3 px-6 text-right">Số lượng</th>
                                             <th className="py-3 px-6 text-right">Đơn giá</th>
                                             <th className="py-3 px-6 text-right">Thuế (%)</th>
+                                            <th className="py-3 px-6 text-left">Ngày giao DK</th>
                                             <th className="py-3 px-6 text-right">Thành tiền</th>
                                         </tr>
                                     </thead>
@@ -220,10 +221,30 @@ export default function PurchaseOrderDetailPage() {
                                                     <td className="py-4 px-6 text-left">
                                                         <p className="font-medium">{item.material?.trading_name}</p>
                                                         {item.notes && <p className="text-xs text-gray-400 mt-1">Ghi chú: {item.notes}</p>}
+                                                        {(item as any).attachments && (() => {
+                                                            try {
+                                                                const atts = JSON.parse((item as any).attachments);
+                                                                return atts.length > 0 ? (
+                                                                    <div className="flex flex-wrap gap-1 mt-1">
+                                                                        {atts.map((att: any, ai: number) => (
+                                                                            <a key={ai} href={att.url} target="_blank" rel="noopener noreferrer"
+                                                                                className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-50 border border-blue-200 rounded text-[10px] text-blue-700 hover:underline">
+                                                                                📎 {att.name}
+                                                                            </a>
+                                                                        ))}
+                                                                    </div>
+                                                                ) : null;
+                                                            } catch { return null; }
+                                                        })()}
                                                     </td>
                                                     <td className="py-4 px-6 text-right font-medium">{item.quantity}</td>
                                                     <td className="py-4 px-6 text-right">{item.unit_price.toLocaleString('vi-VN')}</td>
                                                     <td className="py-4 px-6 text-right text-gray-500">{item.tax_rate}%</td>
+                                                    <td className="py-4 px-6 text-left text-sm text-gray-600">
+                                                        {(item as any).expected_delivery_date
+                                                            ? new Date((item as any).expected_delivery_date).toLocaleDateString('vi-VN')
+                                                            : <span className="text-gray-300">—</span>}
+                                                    </td>
                                                     <td className="py-4 px-6 text-right font-bold text-primary">
                                                         {item.line_total.toLocaleString('vi-VN')}
                                                     </td>
