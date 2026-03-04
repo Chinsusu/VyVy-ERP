@@ -328,6 +328,20 @@ export default function PurchaseOrderDetailPage() {
                                     )}
                                 </div>
 
+                                {/* Đã chỉnh sửa */}
+                                {po.updated_at && po.updated_at !== po.created_at && (
+                                    <div className="relative pl-8">
+                                        <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-blue-400 rounded-full flex items-center justify-center z-10">
+                                            <Edit className="w-3 h-3 text-blue-400" />
+                                        </div>
+                                        <p className="text-sm font-semibold text-gray-900">Đã chỉnh sửa</p>
+                                        <p className="text-xs text-gray-400">{new Date(po.updated_at).toLocaleString('vi-VN')}</p>
+                                        {po.updated_by_user && (
+                                            <p className="text-xs text-gray-600 mt-0.5">bởi <span className="font-medium text-blue-600">{po.updated_by_user.full_name || po.updated_by_user.username}</span></p>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Đã duyệt */}
                                 {po.approved_at && (
                                     <div className="relative pl-8">
