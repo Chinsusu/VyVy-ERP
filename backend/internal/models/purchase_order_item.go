@@ -21,7 +21,9 @@ type PurchaseOrderItem struct {
 	ReceivedQuantity float64 `gorm:"column:received_quantity;type:decimal(15,3);default:0" json:"received_quantity"`
 
 	// Additional info
-	Notes string `gorm:"column:notes;type:text" json:"notes,omitempty"`
+	Notes                string  `gorm:"column:notes;type:text" json:"notes,omitempty"`
+	ExpectedDeliveryDate *string `gorm:"column:expected_delivery_date;type:date" json:"expected_delivery_date,omitempty"`
+	Attachments          string  `gorm:"column:attachments;type:text" json:"attachments,omitempty"` // JSON array of {name, url, size}
 
 	// Audit fields
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime" json:"created_at"`
@@ -41,36 +43,40 @@ func (PurchaseOrderItem) TableName() string {
 
 // SafePurchaseOrderItem is a DTO that includes safe information
 type SafePurchaseOrderItem struct {
-	ID               uint           `json:"id"`
-	PurchaseOrderID  uint           `json:"purchase_order_id"`
-	MaterialID       uint           `json:"material_id"`
-	Material         *SafeMaterial  `json:"material,omitempty"`
-	Quantity         float64        `json:"quantity"`
-	UnitPrice        float64        `json:"unit_price"`
-	TaxRate          float64        `json:"tax_rate"`
-	DiscountRate     float64        `json:"discount_rate"`
-	LineTotal        float64        `json:"line_total"`
-	ReceivedQuantity float64        `json:"received_quantity"`
-	Notes            string         `json:"notes,omitempty"`
-	CreatedAt        time.Time      `json:"created_at"`
-	UpdatedAt        time.Time      `json:"updated_at"`
+	ID                   uint           `json:"id"`
+	PurchaseOrderID      uint           `json:"purchase_order_id"`
+	MaterialID           uint           `json:"material_id"`
+	Material             *SafeMaterial  `json:"material,omitempty"`
+	Quantity             float64        `json:"quantity"`
+	UnitPrice            float64        `json:"unit_price"`
+	TaxRate              float64        `json:"tax_rate"`
+	DiscountRate         float64        `json:"discount_rate"`
+	LineTotal            float64        `json:"line_total"`
+	ReceivedQuantity     float64        `json:"received_quantity"`
+	Notes                string         `json:"notes,omitempty"`
+	ExpectedDeliveryDate *string        `json:"expected_delivery_date,omitempty"`
+	Attachments          string         `json:"attachments,omitempty"`
+	CreatedAt            time.Time      `json:"created_at"`
+	UpdatedAt            time.Time      `json:"updated_at"`
 }
 
 // ToSafe converts PurchaseOrderItem to SafePurchaseOrderItem
 func (item *PurchaseOrderItem) ToSafe() *SafePurchaseOrderItem {
 	safe := &SafePurchaseOrderItem{
-		ID:               item.ID,
-		PurchaseOrderID:  item.PurchaseOrderID,
-		MaterialID:       item.MaterialID,
-		Quantity:         item.Quantity,
-		UnitPrice:        item.UnitPrice,
-		TaxRate:          item.TaxRate,
-		DiscountRate:     item.DiscountRate,
-		LineTotal:        item.LineTotal,
-		ReceivedQuantity: item.ReceivedQuantity,
-		Notes:            item.Notes,
-		CreatedAt:        item.CreatedAt,
-		UpdatedAt:        item.UpdatedAt,
+		ID:                   item.ID,
+		PurchaseOrderID:      item.PurchaseOrderID,
+		MaterialID:           item.MaterialID,
+		Quantity:             item.Quantity,
+		UnitPrice:            item.UnitPrice,
+		TaxRate:              item.TaxRate,
+		DiscountRate:         item.DiscountRate,
+		LineTotal:            item.LineTotal,
+		ReceivedQuantity:     item.ReceivedQuantity,
+		Notes:                item.Notes,
+		ExpectedDeliveryDate: item.ExpectedDeliveryDate,
+		Attachments:          item.Attachments,
+		CreatedAt:            item.CreatedAt,
+		UpdatedAt:            item.UpdatedAt,
 	}
 
 	if item.Material != nil {

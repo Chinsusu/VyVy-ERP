@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Save, X, ShoppingCart } from 'lucide-react';
+import { Plus, Trash2, Save, X, ShoppingCart, Paperclip, XCircle, Calendar } from 'lucide-react';
 import { useMaterials } from '../../hooks/useMaterials';
 import { useSuppliers } from '../../hooks/useSuppliers';
 import { useWarehouses } from '../../hooks/useWarehouses';
@@ -14,6 +14,18 @@ import type {
 interface PurchaseOrderFormProps {
     initialData?: PurchaseOrder;
     isEdit?: boolean;
+}
+
+interface ItemAttachment {
+    name: string;
+    url: string;
+    size: number;
+}
+
+interface ExtendedItem extends CreatePurchaseOrderItemInput {
+    expected_delivery_date?: string;
+    attachments?: string; // JSON string of ItemAttachment[]
+    _attachmentList?: ItemAttachment[]; // runtime state
 }
 
 const selectCls = 'w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent';
@@ -45,9 +57,11 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
         notes: '',
     });
 
-    const [items, setItems] = useState<CreatePurchaseOrderItemInput[]>([
-        { material_id: 0, quantity: 1, unit_price: 0, tax_rate: 0, discount_rate: 0, notes: '' }
+    const [items, setItems] = useState<ExtendedItem[]>([
+        { material_id: 0, quantity: 1, unit_price: 0, tax_rate: 0, discount_rate: 0, notes: '', expected_delivery_date: '', _attachmentList: [] }
     ]);
+
+    const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     useEffect(() => {
         if (initialData) {
@@ -62,14 +76,23 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                 notes: initialData.notes || '',
             });
             if (initialData.items) {
-                setItems(initialData.items.map(item => ({
-                    material_id: item.material_id,
-                    quantity: item.quantity,
-                    unit_price: item.unit_price,
-                    tax_rate: item.tax_rate,
-                    discount_rate: item.discount_rate,
-                    notes: item.notes || '',
-                })));
+                setItems(initialData.items.map((item: any) => {
+                    let attachmentList: ItemAttachment[] = [];
+                    try {
+                        if (item.attachments) attachmentList = JSON.parse(item.attachments);
+                    } catch { }
+                    return {
+                        material_id: item.material_id,
+                        quantity: item.quantity,
+                        unit_price: item.unit_price,
+                        tax_rate: item.tax_rate,
+                        discount_rate: item.discount_rate,
+                        notes: item.notes || '',
+                        expected_delivery_date: item.expected_delivery_date?.split('T')[0] || '',
+                        attachments: item.attachments || '',
+                        _attachmentList: attachmentList,
+                    };
+                }));
             }
         } else {
             const now = new Date();
@@ -79,19 +102,51 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
     }, [initialData]);
 
     const addItem = () => {
-        setItems([...items, { material_id: 0, quantity: 1, unit_price: 0, tax_rate: 0, discount_rate: 0, notes: '' }]);
+        setItems([...items, { material_id: 0, quantity: 1, unit_price: 0, tax_rate: 0, discount_rate: 0, notes: '', expected_delivery_date: '', _attachmentList: [] }]);
     };
 
     const removeItem = (index: number) => {
         if (items.length <= 1) return;
         const newItems = [...items];
         newItems.splice(index, 1);
+        fileInputRefs.current.splice(index, 1);
         setItems(newItems);
     };
 
-    const updateItem = (index: number, field: keyof CreatePurchaseOrderItemInput, value: any) => {
+    const updateItem = (index: number, field: string, value: any) => {
         const newItems = [...items];
         newItems[index] = { ...newItems[index], [field]: value };
+        setItems(newItems);
+    };
+
+    const handleFileUpload = (index: number, files: FileList | null) => {
+        if (!files || files.length === 0) return;
+        const item = items[index];
+        const existingList = item._attachmentList || [];
+        const newAttachments: ItemAttachment[] = Array.from(files).map(f => ({
+            name: f.name,
+            url: URL.createObjectURL(f),
+            size: f.size,
+        }));
+        const merged = [...existingList, ...newAttachments];
+        const newItems = [...items];
+        newItems[index] = {
+            ...newItems[index],
+            _attachmentList: merged,
+            attachments: JSON.stringify(merged),
+        };
+        setItems(newItems);
+    };
+
+    const removeAttachment = (itemIndex: number, attachIndex: number) => {
+        const item = items[itemIndex];
+        const newList = (item._attachmentList || []).filter((_, i) => i !== attachIndex);
+        const newItems = [...items];
+        newItems[itemIndex] = {
+            ...newItems[itemIndex],
+            _attachmentList: newList,
+            attachments: JSON.stringify(newList),
+        };
         setItems(newItems);
     };
 
@@ -117,12 +172,14 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
             supplier_id: Number(formData.supplier_id),
             warehouse_id: Number(formData.warehouse_id),
             items: items.map(item => ({
-                ...item,
                 material_id: Number(item.material_id),
                 quantity: Number(item.quantity),
                 unit_price: Number(item.unit_price),
                 tax_rate: Number(item.tax_rate || 0),
                 discount_rate: Number(item.discount_rate || 0),
+                notes: item.notes || '',
+                expected_delivery_date: item.expected_delivery_date || '',
+                attachments: item.attachments || '',
             })),
         };
         try {
@@ -192,18 +249,9 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                         required
                     />
                 </div>
-                <div>
-                    <label className="label">Ngày giao hàng dự kiến</label>
-                    <input
-                        type="date"
-                        className={inputCls}
-                        value={formData.expected_delivery_date}
-                        onChange={(e) => setFormData({ ...formData, expected_delivery_date: e.target.value })}
-                    />
-                </div>
             </div>
 
-            {/* Danh sách hàng hóa */}
+            {/* Danh sách hàng hóa — mỗi item có ngày giao DK + đính kèm */}
             <div className="card">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold flex items-center gap-2">
@@ -220,110 +268,115 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                     </button>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="table w-full border-collapse">
-                        <thead>
-                            <tr className="bg-gray-50 border-b text-xs text-gray-500 uppercase">
-                                <th className="py-2 px-3 text-left" style={{ minWidth: 220 }}>Nguyên vật liệu <span className="text-red-500">*</span></th>
-                                <th className="py-2 px-3 text-right" style={{ width: 110 }}>Số lượng</th>
-                                <th className="py-2 px-3 text-right" style={{ width: 130 }}>Đơn giá</th>
-                                <th className="py-2 px-3 text-right" style={{ width: 90 }}>Thuế (%)</th>
-                                <th className="py-2 px-3 text-right" style={{ width: 100 }}>Giảm giá (%)</th>
-                                <th className="py-2 px-3 text-right" style={{ width: 120 }}>Thành tiền</th>
-                                <th className="py-2 px-3 text-left" style={{ minWidth: 160 }}>Ghi chú</th>
-                                <th className="py-2 px-3" style={{ width: 44 }}></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {items.map((item, index) => {
-                                const lineTotal = item.quantity * item.unit_price * (1 + (item.tax_rate || 0) / 100) * (1 - (item.discount_rate || 0) / 100);
-                                return (
-                                    <tr key={index} className="border-b last:border-0 align-top">
-                                        <td className="py-2 px-3">
-                                            <select
-                                                className={selectCls}
-                                                value={item.material_id}
-                                                onChange={(e) => updateItem(index, 'material_id', Number(e.target.value))}
-                                                required
-                                            >
-                                                <option value={0}>-- Chọn NVL --</option>
-                                                {materials.map(m => (
-                                                    <option key={m.id} value={m.id}>{m.trading_name} ({m.code})</option>
-                                                ))}
-                                            </select>
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                step="0.001"
-                                                className={inputRightCls}
-                                                value={item.quantity}
-                                                onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
-                                                min={0.001}
-                                                required
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                step="0.01"
-                                                className={inputRightCls}
-                                                value={item.unit_price}
-                                                onChange={(e) => updateItem(index, 'unit_price', Number(e.target.value))}
-                                                min={0}
-                                                required
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                step="0.1"
-                                                className={inputRightCls}
-                                                value={item.tax_rate}
-                                                onChange={(e) => updateItem(index, 'tax_rate', Number(e.target.value))}
-                                                min={0}
-                                                max={100}
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                step="0.1"
-                                                className={inputRightCls}
-                                                value={item.discount_rate}
-                                                onChange={(e) => updateItem(index, 'discount_rate', Number(e.target.value))}
-                                                min={0}
-                                                max={100}
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3 text-right font-medium align-middle">
-                                            <span className="text-sm">{lineTotal.toLocaleString('vi-VN')}</span>
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <textarea
-                                                className="w-full px-2 py-1.5 text-xs rounded-lg border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                                rows={2}
-                                                placeholder="Ghi chú cho dòng hàng này..."
-                                                value={item.notes}
-                                                onChange={(e) => updateItem(index, 'notes', e.target.value)}
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3 text-center align-middle">
-                                            <button
-                                                type="button"
-                                                onClick={() => removeItem(index)}
-                                                className="p-2 text-red-500 hover:bg-red-50 rounded"
-                                                disabled={items.length <= 1}
-                                                title="Xóa dòng"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                <div className="space-y-4">
+                    {items.map((item, index) => {
+                        const lineTotal = item.quantity * item.unit_price * (1 + (item.tax_rate || 0) / 100) * (1 - (item.discount_rate || 0) / 100);
+                        return (
+                            <div key={index} className="border border-gray-200 rounded-xl p-4 bg-gray-50/50 space-y-3">
+                                {/* Row 1: NVL + số lượng + đơn giá + thuế + giảm giá + thành tiền + xóa */}
+                                <div className="grid grid-cols-12 gap-3 items-end">
+                                    <div className="col-span-12 md:col-span-4">
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Nguyên vật liệu *</label>
+                                        <select
+                                            className={selectCls}
+                                            value={item.material_id}
+                                            onChange={(e) => updateItem(index, 'material_id', Number(e.target.value))}
+                                            required
+                                        >
+                                            <option value={0}>-- Chọn NVL --</option>
+                                            {materials.map(m => (
+                                                <option key={m.id} value={m.id}>{m.trading_name} ({m.code})</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="col-span-4 md:col-span-2">
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</label>
+                                        <input type="number" step="0.001" className={inputRightCls} value={item.quantity} onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))} min={0.001} required />
+                                    </div>
+                                    <div className="col-span-4 md:col-span-2">
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Đơn giá</label>
+                                        <input type="number" step="0.01" className={inputRightCls} value={item.unit_price} onChange={(e) => updateItem(index, 'unit_price', Number(e.target.value))} min={0} required />
+                                    </div>
+                                    <div className="col-span-2 md:col-span-1">
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Thuế%</label>
+                                        <input type="number" step="0.1" className={inputRightCls} value={item.tax_rate} onChange={(e) => updateItem(index, 'tax_rate', Number(e.target.value))} min={0} max={100} />
+                                    </div>
+                                    <div className="col-span-2 md:col-span-1">
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Giảm%</label>
+                                        <input type="number" step="0.1" className={inputRightCls} value={item.discount_rate} onChange={(e) => updateItem(index, 'discount_rate', Number(e.target.value))} min={0} max={100} />
+                                    </div>
+                                    <div className="col-span-10 md:col-span-1 text-right">
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Thành tiền</label>
+                                        <p className="text-sm font-bold text-primary pt-2">{lineTotal.toLocaleString('vi-VN')}đ</p>
+                                    </div>
+                                    <div className="col-span-2 md:col-span-1 flex items-end justify-end">
+                                        <button type="button" onClick={() => removeItem(index)} className="p-2 text-red-500 hover:bg-red-50 rounded" disabled={items.length <= 1} title="Xóa dòng">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Row 2: Ngày giao DK + Ghi chú */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                                            <Calendar className="w-3 h-3" /> Ngày giao hàng dự kiến
+                                        </label>
+                                        <input
+                                            type="date"
+                                            className={inputCls}
+                                            value={item.expected_delivery_date || ''}
+                                            onChange={(e) => updateItem(index, 'expected_delivery_date', e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Ghi chú dòng hàng</label>
+                                        <textarea
+                                            className="w-full px-2 py-1.5 text-sm rounded-lg border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            rows={2}
+                                            placeholder="Ghi chú cho dòng hàng này..."
+                                            value={item.notes}
+                                            onChange={(e) => updateItem(index, 'notes', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Row 3: File đính kèm */}
+                                <div>
+                                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-1 mb-2">
+                                        <Paperclip className="w-3 h-3" /> Chứng từ đính kèm
+                                    </label>
+                                    <div className="flex flex-wrap gap-2 mb-2">
+                                        {(item._attachmentList || []).map((att, ai) => (
+                                            <span key={ai} className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700">
+                                                <Paperclip className="w-3 h-3" />
+                                                <a href={att.url} target="_blank" rel="noopener noreferrer" className="hover:underline max-w-[120px] truncate">{att.name}</a>
+                                                <span className="text-blue-400">({Math.round(att.size / 1024)}KB)</span>
+                                                <button type="button" onClick={() => removeAttachment(index, ai)} className="text-red-400 hover:text-red-600 ml-1">
+                                                    <XCircle className="w-3.5 h-3.5" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRefs.current[index]?.click()}
+                                            className="inline-flex items-center gap-1 px-3 py-1 border border-dashed border-gray-400 rounded-lg text-xs text-gray-600 hover:border-primary hover:text-primary transition-colors"
+                                        >
+                                            <Plus className="w-3 h-3" /> Đính kèm file
+                                        </button>
+                                        <input
+                                            type="file"
+                                            multiple
+                                            ref={(el) => { fileInputRefs.current[index] = el; }}
+                                            className="hidden"
+                                            onChange={(e) => handleFileUpload(index, e.target.files)}
+                                            accept="*/*"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 

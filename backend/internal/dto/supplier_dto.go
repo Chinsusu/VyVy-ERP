@@ -43,7 +43,7 @@ type SupplierFilterRequest struct {
 	City     string `form:"city"`
 	IsActive *bool  `form:"is_active"`
 	Page     int    `form:"page" binding:"omitempty,min=1"`
-	PageSize int    `form:"page_size" binding:"omitempty,min=1,max=100"`
+	PageSize int    `form:"page_size" binding:"omitempty,min=1,max=1000"`
 	SortBy   string `form:"sort_by" binding:"omitempty,oneof=id code name city country created_at updated_at"`
 	SortOrder string `form:"sort_order" binding:"omitempty,oneof=asc desc"`
 }

@@ -4,12 +4,14 @@ import "time"
 
 // CreatePurchaseOrderItemRequest represents the request to create a purchase order item
 type CreatePurchaseOrderItemRequest struct {
-	MaterialID   uint    `json:"material_id" binding:"required"`
-	Quantity     float64 `json:"quantity" binding:"required,gt=0"`
-	UnitPrice    float64 `json:"unit_price" binding:"required,gte=0"`
-	TaxRate      float64 `json:"tax_rate" binding:"gte=0,lte=100"`
-	DiscountRate float64 `json:"discount_rate" binding:"gte=0,lte=100"`
-	Notes        string  `json:"notes"`
+	MaterialID           uint    `json:"material_id" binding:"required"`
+	Quantity             float64 `json:"quantity" binding:"required,gt=0"`
+	UnitPrice            float64 `json:"unit_price" binding:"required,gte=0"`
+	TaxRate              float64 `json:"tax_rate" binding:"gte=0,lte=100"`
+	DiscountRate         float64 `json:"discount_rate" binding:"gte=0,lte=100"`
+	Notes                string  `json:"notes"`
+	ExpectedDeliveryDate string  `json:"expected_delivery_date"` // YYYY-MM-DD
+	Attachments          string  `json:"attachments"`            // JSON array
 }
 
 // CreatePurchaseOrderRequest represents the request to create a purchase order
@@ -27,12 +29,14 @@ type CreatePurchaseOrderRequest struct {
 
 // UpdatePurchaseOrderItemRequest represents the request to update a purchase order item
 type UpdatePurchaseOrderItemRequest struct {
-	MaterialID   uint    `json:"material_id"`
-	Quantity     float64 `json:"quantity" binding:"omitempty,gt=0"`
-	UnitPrice    float64 `json:"unit_price" binding:"omitempty,gte=0"`
-	TaxRate      float64 `json:"tax_rate" binding:"gte=0,lte=100"`
-	DiscountRate float64 `json:"discount_rate" binding:"gte=0,lte=100"`
-	Notes        string  `json:"notes"`
+	MaterialID           uint    `json:"material_id"`
+	Quantity             float64 `json:"quantity" binding:"omitempty,gt=0"`
+	UnitPrice            float64 `json:"unit_price" binding:"omitempty,gte=0"`
+	TaxRate              float64 `json:"tax_rate" binding:"gte=0,lte=100"`
+	DiscountRate         float64 `json:"discount_rate" binding:"gte=0,lte=100"`
+	Notes                string  `json:"notes"`
+	ExpectedDeliveryDate string  `json:"expected_delivery_date"`
+	Attachments          string  `json:"attachments"`
 }
 
 // UpdatePurchaseOrderRequest represents the request to update a purchase order

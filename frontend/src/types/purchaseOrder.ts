@@ -60,6 +60,8 @@ export interface CreatePurchaseOrderItemInput {
     tax_rate?: number;
     discount_rate?: number;
     notes?: string;
+    expected_delivery_date?: string;
+    attachments?: string;
 }
 
 export interface CreatePurchaseOrderInput {

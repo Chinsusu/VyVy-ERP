@@ -107,8 +107,12 @@ func (s *purchaseOrderService) CreatePurchaseOrder(req *dto.CreatePurchaseOrderR
 			TaxRate:         itemReq.TaxRate,
 			DiscountRate:    itemReq.DiscountRate,
 			Notes:           itemReq.Notes,
+			Attachments:     itemReq.Attachments,
 			CreatedBy:       &userID,
 			UpdatedBy:       &userID,
+		}
+		if itemReq.ExpectedDeliveryDate != "" {
+			item.ExpectedDeliveryDate = &itemReq.ExpectedDeliveryDate
 		}
 		// Calculate line total
 		item.CalculateLineTotal()
@@ -248,8 +252,12 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 				TaxRate:         itemReq.TaxRate,
 				DiscountRate:    itemReq.DiscountRate,
 				Notes:           itemReq.Notes,
+				Attachments:     itemReq.Attachments,
 				CreatedBy:       &userID,
 				UpdatedBy:       &userID,
+			}
+			if itemReq.ExpectedDeliveryDate != "" {
+				item.ExpectedDeliveryDate = &itemReq.ExpectedDeliveryDate
 			}
 			// Calculate line total
 			item.CalculateLineTotal()
