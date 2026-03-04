@@ -41,13 +41,34 @@ func (r *purchaseOrderRepository) GetByID(id uint) (*models.PurchaseOrder, error
 	err := r.db.
 		Preload("Supplier").
 		Preload("Warehouse").
-		Preload("CreatedByUser").
-		Preload("UpdatedByUser").
-		Preload("ApprovedByUser").
 		Preload("Items").
 		Preload("Items.Material").
 		First(&po, id).Error
-	return &po, err
+	if err != nil {
+		return &po, err
+	}
+
+	// Manually load user relationships to avoid GORM convention confusion with CreatedBy/UpdatedBy/ApprovedBy
+	if po.CreatedBy != nil {
+		var user models.User
+		if e := r.db.First(&user, *po.CreatedBy).Error; e == nil {
+			po.CreatedByUser = &user
+		}
+	}
+	if po.UpdatedBy != nil {
+		var user models.User
+		if e := r.db.First(&user, *po.UpdatedBy).Error; e == nil {
+			po.UpdatedByUser = &user
+		}
+	}
+	if po.ApprovedBy != nil {
+		var user models.User
+		if e := r.db.First(&user, *po.ApprovedBy).Error; e == nil {
+			po.ApprovedByUser = &user
+		}
+	}
+
+	return &po, nil
 }
 
 // GetByPONumber retrieves a purchase order by PO number
