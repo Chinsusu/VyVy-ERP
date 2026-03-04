@@ -180,17 +180,39 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		return nil, err
 	}
 
-	// Capture old header-only values (exclude items/timestamps to avoid noise)
+	// Capture old header + items before mutation
+	type poItemSnapshot struct {
+		MaterialID           uint     `json:"material_id"`
+		Quantity             float64  `json:"quantity"`
+		UnitPrice            float64  `json:"unit_price"`
+		TaxRate              float64  `json:"tax_rate"`
+		DiscountRate         float64  `json:"discount_rate"`
+		ExpectedDeliveryDate *string  `json:"expected_delivery_date,omitempty"`
+		Notes                string   `json:"notes"`
+	}
 	type poHeaderSnapshot struct {
-		PONumber             string  `json:"po_number"`
-		SupplierID           uint    `json:"supplier_id"`
-		WarehouseID          uint    `json:"warehouse_id"`
-		OrderDate            string  `json:"order_date"`
-		ExpectedDeliveryDate *string `json:"expected_delivery_date,omitempty"`
-		PaymentTerms         string  `json:"payment_terms"`
-		ShippingMethod       string  `json:"shipping_method"`
-		Notes                string  `json:"notes"`
-		Status               string  `json:"status"`
+		PONumber             string           `json:"po_number"`
+		SupplierID           uint             `json:"supplier_id"`
+		WarehouseID          uint             `json:"warehouse_id"`
+		OrderDate            string           `json:"order_date"`
+		ExpectedDeliveryDate *string          `json:"expected_delivery_date,omitempty"`
+		PaymentTerms         string           `json:"payment_terms"`
+		ShippingMethod       string           `json:"shipping_method"`
+		Notes                string           `json:"notes"`
+		Status               string           `json:"status"`
+		Items                []poItemSnapshot `json:"items"`
+	}
+	oldItems := make([]poItemSnapshot, len(po.Items))
+	for i, it := range po.Items {
+		oldItems[i] = poItemSnapshot{
+			MaterialID:           it.MaterialID,
+			Quantity:             it.Quantity,
+			UnitPrice:            it.UnitPrice,
+			TaxRate:              it.TaxRate,
+			DiscountRate:         it.DiscountRate,
+			ExpectedDeliveryDate: it.ExpectedDeliveryDate,
+			Notes:                it.Notes,
+		}
 	}
 	oldSnapshot := poHeaderSnapshot{
 		PONumber:             po.PONumber,
@@ -202,6 +224,7 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		ShippingMethod:       po.ShippingMethod,
 		Notes:                po.Notes,
 		Status:               po.Status,
+		Items:                oldItems,
 	}
 
 
@@ -310,7 +333,28 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		return nil, err
 	}
 
-	// Audit log - UPDATE (compare header fields only)
+	// Audit log - UPDATE (compare header + items)
+	newItems := make([]poItemSnapshot, len(req.Items))
+	for i, it := range req.Items {
+		var delivDate *string
+		if it.ExpectedDeliveryDate != "" {
+			d := it.ExpectedDeliveryDate
+			delivDate = &d
+		}
+		newItems[i] = poItemSnapshot{
+			MaterialID:           it.MaterialID,
+			Quantity:             it.Quantity,
+			UnitPrice:            it.UnitPrice,
+			TaxRate:              it.TaxRate,
+			DiscountRate:         it.DiscountRate,
+			ExpectedDeliveryDate: delivDate,
+			Notes:                it.Notes,
+		}
+	}
+	// If items not sent in request, keep old items snapshot for comparison
+	if len(req.Items) == 0 {
+		newItems = oldItems
+	}
 	newSnapshot := poHeaderSnapshot{
 		PONumber:             po.PONumber,
 		SupplierID:           po.SupplierID,
@@ -321,6 +365,7 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		ShippingMethod:       po.ShippingMethod,
 		Notes:                po.Notes,
 		Status:               po.Status,
+		Items:                newItems,
 	}
 	_ = s.auditSvc.Log("purchase_orders", "UPDATE", int64(po.ID), int64(userID), username, oldSnapshot, newSnapshot)
 

@@ -20,7 +20,78 @@ const PO_FIELD_LABELS: Record<string, string> = {
     shipping_method: 'Phương thức vận chuyển',
     notes: 'Ghi chú',
     po_number: 'Mã PO',
+    items: 'Danh sách sản phẩm',
 };
+
+interface ItemSnapshot {
+    material_id: number;
+    quantity: number;
+    unit_price: number;
+    tax_rate: number;
+    discount_rate: number;
+    expected_delivery_date?: string;
+    notes?: string;
+}
+
+function renderItemDiff(oldItems: ItemSnapshot[], newItems: ItemSnapshot[]) {
+    const ITEM_LABELS: Record<string, string> = {
+        quantity: 'Số lượng',
+        unit_price: 'Đơn giá',
+        tax_rate: 'Thuế (%)',
+        discount_rate: 'Giảm giá (%)',
+        expected_delivery_date: 'Ngày giao',
+        notes: 'Ghi chú',
+    };
+    const diffs: Array<{ materialId: number; field: string; oldVal: unknown; newVal: unknown }> = [];
+    const newMap = new Map(newItems.map(it => [it.material_id, it]));
+    const oldMap = new Map(oldItems.map(it => [it.material_id, it]));
+
+    // Added items
+    newMap.forEach((_newIt, mid) => {
+        if (!oldMap.has(mid)) {
+            diffs.push({ materialId: mid, field: '__added__', oldVal: null, newVal: null });
+        }
+    });
+    // Removed items
+    oldMap.forEach((_oldIt, mid) => {
+        if (!newMap.has(mid)) {
+            diffs.push({ materialId: mid, field: '__removed__', oldVal: null, newVal: null });
+        }
+    });
+    // Changed fields
+    newMap.forEach((newIt, mid) => {
+        const oldIt = oldMap.get(mid);
+        if (!oldIt) return;
+        (['quantity', 'unit_price', 'tax_rate', 'discount_rate', 'expected_delivery_date', 'notes'] as (keyof ItemSnapshot)[]).forEach(f => {
+            if (String(oldIt[f] ?? '') !== String(newIt[f] ?? '')) {
+                diffs.push({ materialId: mid, field: f, oldVal: oldIt[f], newVal: newIt[f] });
+            }
+        });
+    });
+    if (diffs.length === 0) return <span className="text-xs text-gray-400">Không có thay đổi chi tiết</span>;
+    return (
+        <div className="space-y-1">
+            {diffs.map((d, i) => (
+                <div key={i} className="flex items-start gap-2 text-xs">
+                    <span className="text-gray-500 min-w-[160px] pt-0.5">
+                        {d.field === '__added__' ? `Thêm sản phẩm #${d.materialId}` :
+                            d.field === '__removed__' ? `Xóa sản phẩm #${d.materialId}` :
+                                `SP #${d.materialId} – ${ITEM_LABELS[d.field] || d.field}`}:
+                    </span>
+                    {d.field !== '__added__' && d.field !== '__removed__' && (
+                        <div className="flex items-center gap-1 flex-wrap">
+                            <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">{poFormatValue(d.oldVal)}</span>
+                            <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
+                            <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">{poFormatValue(d.newVal)}</span>
+                        </div>
+                    )}
+                    {(d.field === '__added__') && <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">Thêm mới</span>}
+                    {(d.field === '__removed__') && <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">Đã xóa</span>}
+                </div>
+            ))}
+        </div>
+    );
+}
 
 function poFormatValue(value: unknown): string {
     if (value === null || value === undefined) return '—';
@@ -405,6 +476,18 @@ export default function PurchaseOrderDetailPage() {
                                     {log.action === 'UPDATE' && log.changed_fields && log.changed_fields.length > 0 && (
                                         <div className="space-y-1 mt-2">
                                             {log.changed_fields.map((field: string) => {
+                                                if (field === 'items') {
+                                                    const oldItems = (log.old_values?.['items'] as ItemSnapshot[]) || [];
+                                                    const newItems = (log.new_values?.['items'] as ItemSnapshot[]) || [];
+                                                    return (
+                                                        <div key={field} className="text-xs">
+                                                            <span className="text-gray-500 font-medium">Danh sách sản phẩm:</span>
+                                                            <div className="mt-1 pl-2 border-l-2 border-blue-100">
+                                                                {renderItemDiff(oldItems, newItems)}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }
                                                 const label = PO_FIELD_LABELS[field] || field;
                                                 const oldVal = log.old_values?.[field];
                                                 const newVal = log.new_values?.[field];
