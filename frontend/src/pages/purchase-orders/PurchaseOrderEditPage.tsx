@@ -36,14 +36,14 @@ export default function PurchaseOrderEditPage() {
         );
     }
 
-    // Check if editable
-    if (po.status !== 'draft') {
+    // Block editing for cancelled/closed POs only
+    if (po.status === 'cancelled' || po.status === 'closed') {
         return (
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-amber-800">
                         <h2 className="text-xl font-bold mb-2">Order Not Editable</h2>
-                        <p>Only Purchase Orders in <strong>Draft</strong> status can be edited. This order is currently <strong>{po.status}</strong>.</p>
+                        <p>Purchase Orders with status <strong>{po.status}</strong> cannot be edited.</p>
                     </div>
                     <Link
                         to={`/purchase-orders/${poId}`}
