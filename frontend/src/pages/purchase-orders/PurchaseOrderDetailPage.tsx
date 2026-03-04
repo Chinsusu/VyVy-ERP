@@ -1,20 +1,37 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft,
-    Edit,
-    CheckCircle,
-    XCircle,
-    Trash2,
-    Truck,
-    Building2,
-    Calendar,
-    FileText,
-    Package,
-    Plus,
-    History
+    ArrowLeft, Edit, CheckCircle, XCircle, Trash2,
+    Truck, Building2, Calendar, FileText, Package,
+    Plus, History, User, Clock, ArrowRight
 } from 'lucide-react';
 
+const PO_FIELD_LABELS: Record<string, string> = {
+    order_date: 'Ngày đặt hàng',
+    expected_delivery_date: 'Ngày giao dự kiến',
+    status: 'Trạng thái',
+    supplier_id: 'Nhà cung cấp',
+    warehouse_id: 'Kho nhận',
+    subtotal: 'Tạm tính',
+    tax_amount: 'Thuế',
+    discount_amount: 'Giảm giá',
+    total_amount: 'Tổng cộng',
+    payment_terms: 'Điều khoản thanh toán',
+    shipping_method: 'Phương thức vận chuyển',
+    notes: 'Ghi chú',
+    po_number: 'Mã PO',
+};
+
+function poFormatValue(value: unknown): string {
+    if (value === null || value === undefined) return '—';
+    if (typeof value === 'boolean') return value ? 'Có' : 'Không';
+    if (typeof value === 'number') return value.toLocaleString('vi-VN');
+    if (typeof value === 'string') {
+        if (/^\d{4}-\d{2}-\d{2}T/.test(value)) return new Date(value).toLocaleString('vi-VN');
+        return value;
+    }
+    return String(value);
+}
 import {
     usePurchaseOrder,
     useApprovePurchaseOrder,
@@ -22,7 +39,7 @@ import {
     useDeletePurchaseOrder
 } from '../../hooks/usePurchaseOrders';
 import type { PurchaseOrderItem } from '../../types/purchaseOrder';
-import AuditLogPanel from '../../components/common/AuditLogPanel';
+import { useAuditLogs } from '../../hooks/useAuditLogs';
 
 
 export default function PurchaseOrderDetailPage() {
@@ -37,6 +54,8 @@ export default function PurchaseOrderDetailPage() {
     const deleteMutation = useDeletePurchaseOrder();
 
     const [showConfirmModal, setShowConfirmModal] = useState<'approve' | 'cancel' | 'delete' | null>(null);
+    const { data: auditLogs } = useAuditLogs('purchase_orders', poId);
+
 
     if (isLoading) {
         return (
@@ -317,88 +336,141 @@ export default function PurchaseOrderDetailPage() {
                 </div>
             </div>
 
-            {/* Timeline - full width at the bottom */}
+            {/* Timeline - full width at the bottom, dọ kiểu MR */}
             <div className="mt-8 card">
                 <h3 className="text-sm font-bold uppercase text-gray-500 mb-6 tracking-wider flex items-center gap-2">
                     <History className="w-4 h-4" />
                     Timeline
                 </h3>
+                <div className="relative">
+                    {/* Dường dọc */}
+                    <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-200" />
+                    <div className="space-y-4">
 
-                {/* Status events */}
-                <div className="flex flex-wrap gap-8 mb-6">
-
-                    {/* Đã tạo */}
-                    <div className="relative pl-8">
-                        <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-primary-600 rounded-full flex items-center justify-center z-10">
-                            <Plus className="w-3 h-3 text-primary-600" />
+                        {/* Đã tạo */}
+                        <div className="relative pl-10">
+                            <div className="absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white bg-green-500" />
+                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                <div className="flex items-center justify-between flex-wrap gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                                            <Plus className="w-3 h-3" /> Tạo mới
+                                        </span>
+                                        {po.created_by_user && (
+                                            <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                                                <User className="w-3.5 h-3.5 text-gray-400" />
+                                                {po.created_by_user.full_name || po.created_by_user.username}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="flex items-center gap-1 text-xs text-gray-500">
+                                        <Clock className="w-3 h-3" />
+                                        {new Date(po.created_at).toLocaleString('vi-VN')}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">Bản ghi được tạo lần đầu</p>
+                            </div>
                         </div>
-                        <p className="text-sm font-semibold text-gray-900">Đã tạo</p>
-                        <p className="text-xs text-gray-400">{new Date(po.created_at).toLocaleString('vi-VN')}</p>
-                        {po.created_by_user && (
-                            <p className="text-xs text-gray-600 mt-0.5">bởi <span className="font-medium">{po.created_by_user.full_name || po.created_by_user.username}</span></p>
+
+                        {/* Audit log entries (UPDATE, DELETE) */}
+                        {auditLogs && auditLogs.filter((log: { action: string }) => log.action !== 'CREATE').map((log: {
+                            id: number; action: string; username?: string; created_at: string;
+                            changed_fields?: string[]; old_values?: Record<string, unknown>; new_values?: Record<string, unknown>
+                        }) => (
+                            <div key={log.id} className="relative pl-10">
+                                <div className={`absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white ${log.action === 'DELETE' ? 'bg-red-500' : 'bg-blue-500'
+                                    }`} />
+                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                    <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                                        <div className="flex items-center gap-2">
+                                            {log.action === 'UPDATE' ? (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                                                    <Edit className="w-3 h-3" /> Chỉnh sửa
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                                                    <XCircle className="w-3 h-3" /> Xóa
+                                                </span>
+                                            )}
+                                            <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                                                <User className="w-3.5 h-3.5 text-gray-400" />
+                                                {log.username || 'Hệ thống'}
+                                            </span>
+                                        </div>
+                                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                                            <Clock className="w-3 h-3" />
+                                            {new Date(log.created_at).toLocaleString('vi-VN')}
+                                        </span>
+                                    </div>
+                                    {log.action === 'UPDATE' && log.changed_fields && log.changed_fields.length > 0 && (
+                                        <div className="space-y-1 mt-2">
+                                            {log.changed_fields.map((field: string) => {
+                                                const label = PO_FIELD_LABELS[field] || field;
+                                                const oldVal = log.old_values?.[field];
+                                                const newVal = log.new_values?.[field];
+                                                return (
+                                                    <div key={field} className="flex items-start gap-2 text-xs">
+                                                        <span className="text-gray-500 min-w-[140px] pt-0.5">{label}:</span>
+                                                        <div className="flex items-center gap-1 flex-wrap">
+                                                            <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">
+                                                                {poFormatValue(oldVal)}
+                                                            </span>
+                                                            <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
+                                                            <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
+                                                                {poFormatValue(newVal)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* Đã duyệt */}
+                        {po.approved_at && (
+                            <div className="relative pl-10">
+                                <div className="absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white bg-green-500" />
+                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                    <div className="flex items-center justify-between flex-wrap gap-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                                                <CheckCircle className="w-3 h-3" /> Đã duyệt
+                                            </span>
+                                            {po.approved_by_user && (
+                                                <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                                                    <User className="w-3.5 h-3.5 text-gray-400" />
+                                                    {po.approved_by_user.full_name || po.approved_by_user.username}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                                            <Clock className="w-3 h-3" />
+                                            {new Date(po.approved_at).toLocaleString('vi-VN')}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Đã hủy */}
+                        {po.status === 'cancelled' && (
+                            <div className="relative pl-10">
+                                <div className="absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white bg-red-500" />
+                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                                        <XCircle className="w-3 h-3" /> Đã hủy
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {!auditLogs && (
+                            <div className="relative pl-10 text-sm text-gray-400">Đang tải lịch sử...</div>
                         )}
                     </div>
-
-                    {/* Đã chỉnh sửa */}
-                    {po.updated_at && po.updated_at !== po.created_at && (
-                        <div className="relative pl-8">
-                            <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-blue-400 rounded-full flex items-center justify-center z-10">
-                                <Edit className="w-3 h-3 text-blue-400" />
-                            </div>
-                            <p className="text-sm font-semibold text-gray-900">Đã chỉnh sửa</p>
-                            <p className="text-xs text-gray-400">{new Date(po.updated_at).toLocaleString('vi-VN')}</p>
-                            {po.updated_by_user && (
-                                <p className="text-xs text-gray-600 mt-0.5">bởi <span className="font-medium text-blue-600">{po.updated_by_user.full_name || po.updated_by_user.username}</span></p>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Đã duyệt */}
-                    {po.approved_at && (
-                        <div className="relative pl-8">
-                            <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-green-500 rounded-full flex items-center justify-center z-10">
-                                <CheckCircle className="w-3 h-3 text-green-500" />
-                            </div>
-                            <p className="text-sm font-semibold text-gray-900">Đã duyệt</p>
-                            <p className="text-xs text-gray-400">{new Date(po.approved_at).toLocaleString('vi-VN')}</p>
-                            {po.approved_by_user && (
-                                <p className="text-xs text-gray-600 mt-0.5">bởi <span className="font-medium text-green-700">{po.approved_by_user.full_name || po.approved_by_user.username}</span></p>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Đã hủy */}
-                    {po.status === 'cancelled' && (
-                        <div className="relative pl-8">
-                            <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-red-500 rounded-full flex items-center justify-center z-10">
-                                <XCircle className="w-3 h-3 text-red-500" />
-                            </div>
-                            <p className="text-sm font-semibold text-gray-900">Đã hủy</p>
-                        </div>
-                    )}
-
-                    {/* Payment &amp; Shipping info */}
-                    {(po.payment_terms || po.shipping_method) && (
-                        <div className="space-y-1 border-l border-gray-200 pl-6 ml-2">
-                            {po.payment_terms && (
-                                <div className="space-y-0.5">
-                                    <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Điều khoản thanh toán</span>
-                                    <p className="text-sm font-medium text-gray-700">{po.payment_terms}</p>
-                                </div>
-                            )}
-                            {po.shipping_method && (
-                                <div className="space-y-0.5">
-                                    <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Phương thức vận chuyển</span>
-                                    <p className="text-sm font-medium text-gray-700">{po.shipping_method}</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* Chi tiết thay đổi */}
-                <div className="border-t border-gray-100 pt-4">
-                    <AuditLogPanel tableName="purchase_orders" recordId={poId} />
                 </div>
             </div>
 

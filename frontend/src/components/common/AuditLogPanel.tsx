@@ -46,6 +46,23 @@ const FIELD_LABELS: Record<string, string> = {
     credit_limit: 'Hạn mức tín dụng',
     created_at: 'Ngày tạo',
     updated_at: 'Cập nhật lúc',
+    // PO fields
+    order_date: 'Ngày đặt hàng',
+    expected_delivery_date: 'Ngày giao dự kiến',
+    status: 'Trạng thái',
+    warehouse_id: 'Kho nhận',
+    subtotal: 'Tạm tính',
+    tax_amount: 'Thuế',
+    discount_amount: 'Giảm giá',
+    total_amount: 'Tổng cộng',
+    shipping_method: 'Phương thức vận chuyển',
+    // MR fields
+    requested_by_id: 'Người yêu cầu',
+    approved_by_id: 'Người duyệt',
+    approved_at: 'Ngày duyệt',
+    required_date: 'Ngày cần',
+    mr_number: 'Mã MR',
+    po_number: 'Mã PO',
 };
 
 function formatValue(value: unknown): string {
@@ -119,7 +136,7 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                             <div key={log.id} className="relative pl-10">
                                 {/* Timeline dot */}
                                 <div className={`absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white ${log.action === 'CREATE' ? 'bg-green-500' :
-                                        log.action === 'DELETE' ? 'bg-red-500' : 'bg-blue-500'
+                                    log.action === 'DELETE' ? 'bg-red-500' : 'bg-blue-500'
                                     }`} />
 
                                 <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
