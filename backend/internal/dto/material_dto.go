@@ -57,7 +57,7 @@ type MaterialFilterRequest struct {
 	Hazardous    *bool   `form:"hazardous"`
 	IsActive     *bool   `form:"is_active"`
 	Page         int     `form:"page" binding:"omitempty,gte=1"`
-	PageSize     int     `form:"page_size" binding:"omitempty,gte=1,lte=100"`
+	PageSize     int     `form:"page_size" binding:"omitempty,gte=1,lte=1000"`
 	SortBy       string  `form:"sort_by"`
 	SortOrder    string  `form:"sort_order" binding:"omitempty,oneof=asc desc"`
 }
