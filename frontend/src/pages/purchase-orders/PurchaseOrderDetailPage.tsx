@@ -61,11 +61,18 @@ function renderItemDiff(oldItems: ItemSnapshot[], newItems: ItemSnapshot[], mate
     });
     // Changed fields (exclude metadata fields)
     const COMPARABLE_FIELDS = ['quantity', 'unit_price', 'tax_rate', 'discount_rate', 'expected_delivery_date', 'notes'] as (keyof ItemSnapshot)[];
+    // Normalize a field value for comparison (dates: take first 10 chars only)
+    const normalizeForCmp = (f: keyof ItemSnapshot, v: unknown): string => {
+        if (f === 'expected_delivery_date' && typeof v === 'string' && v.length >= 10) {
+            return v.substring(0, 10); // YYYY-MM-DD
+        }
+        return String(v ?? '');
+    };
     newMap.forEach((newIt, mid) => {
         const oldIt = oldMap.get(mid);
         if (!oldIt) return;
         COMPARABLE_FIELDS.forEach(f => {
-            if (String(oldIt[f] ?? '') !== String(newIt[f] ?? '')) {
+            if (normalizeForCmp(f, oldIt[f]) !== normalizeForCmp(f, newIt[f])) {
                 diffs.push({ materialId: mid, field: f, oldVal: oldIt[f], newVal: newIt[f] });
             }
         });
@@ -452,84 +459,89 @@ export default function PurchaseOrderDetailPage() {
                             </div>
                         </div>
 
-                        {/* Audit log entries (UPDATE, DELETE) */}
-                        {auditLogs && auditLogs.filter((log: { action: string }) => log.action !== 'CREATE').map((log: {
-                            id: number; action: string; username?: string; created_at: string;
-                            changed_fields?: string[]; old_values?: Record<string, unknown>; new_values?: Record<string, unknown>
-                        }) => (
-                            <div key={log.id} className="relative pl-10">
-                                <div className={`absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white ${log.action === 'DELETE' ? 'bg-red-500' : 'bg-blue-500'
-                                    }`} />
-                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                                    <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-                                        <div className="flex items-center gap-2">
-                                            {log.action === 'UPDATE' ? (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
-                                                    <Edit className="w-3 h-3" /> Chỉnh sửa
+                        {/* Audit log entries (UPDATE, DELETE) — sorted ASC by time */}
+                        {auditLogs && [...auditLogs]
+                            .filter((log: { action: string }) => log.action !== 'CREATE')
+                            .sort((a: { created_at: string }, b: { created_at: string }) =>
+                                new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                            )
+                            .map((log: {
+                                id: number; action: string; username?: string; created_at: string;
+                                changed_fields?: string[]; old_values?: Record<string, unknown>; new_values?: Record<string, unknown>
+                            }) => (
+                                <div key={log.id} className="relative pl-10">
+                                    <div className={`absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white ${log.action === 'DELETE' ? 'bg-red-500' : 'bg-blue-500'
+                                        }`} />
+                                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                        <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                                            <div className="flex items-center gap-2">
+                                                {log.action === 'UPDATE' ? (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                                                        <Edit className="w-3 h-3" /> Chỉnh sửa
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                                                        <XCircle className="w-3 h-3" /> Xóa
+                                                    </span>
+                                                )}
+                                                <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                                                    <User className="w-3.5 h-3.5 text-gray-400" />
+                                                    {log.username || 'Hệ thống'}
                                                 </span>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
-                                                    <XCircle className="w-3 h-3" /> Xóa
-                                                </span>
-                                            )}
-                                            <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
-                                                <User className="w-3.5 h-3.5 text-gray-400" />
-                                                {log.username || 'Hệ thống'}
+                                            </div>
+                                            <span className="flex items-center gap-1 text-xs text-gray-500">
+                                                <Clock className="w-3 h-3" />
+                                                {new Date(log.created_at).toLocaleString('vi-VN')}
                                             </span>
                                         </div>
-                                        <span className="flex items-center gap-1 text-xs text-gray-500">
-                                            <Clock className="w-3 h-3" />
-                                            {new Date(log.created_at).toLocaleString('vi-VN')}
-                                        </span>
-                                    </div>
-                                    {log.action === 'UPDATE' && log.changed_fields && log.changed_fields.length > 0 && (() => {
-                                        const NOISE_FIELDS = new Set(['updated_at', 'created_at', 'deleted_at', 'updated_by', 'created_by']);
-                                        const visibleFields = log.changed_fields.filter((f: string) => !NOISE_FIELDS.has(f));
-                                        if (visibleFields.length === 0) return null;
-                                        return (
-                                            <div className="space-y-1 mt-2">
-                                                {visibleFields.map((field: string) => {
-                                                    if (field === 'items') {
-                                                        const oldItems = (log.old_values?.['items'] as ItemSnapshot[]) || [];
-                                                        const newItems = (log.new_values?.['items'] as ItemSnapshot[]) || [];
+                                        {log.action === 'UPDATE' && log.changed_fields && log.changed_fields.length > 0 && (() => {
+                                            const NOISE_FIELDS = new Set(['updated_at', 'created_at', 'deleted_at', 'updated_by', 'created_by']);
+                                            const visibleFields = log.changed_fields.filter((f: string) => !NOISE_FIELDS.has(f));
+                                            if (visibleFields.length === 0) return null;
+                                            return (
+                                                <div className="space-y-1 mt-2">
+                                                    {visibleFields.map((field: string) => {
+                                                        if (field === 'items') {
+                                                            const oldItems = (log.old_values?.['items'] as ItemSnapshot[]) || [];
+                                                            const newItems = (log.new_values?.['items'] as ItemSnapshot[]) || [];
+                                                            return (
+                                                                <div key={field} className="text-xs">
+                                                                    <span className="text-gray-500 font-medium">Danh sách sản phẩm:</span>
+                                                                    <div className="mt-1 pl-2 border-l-2 border-blue-100">
+                                                                        {renderItemDiff(oldItems, newItems, new Map(
+                                                                            (po.items || []).map((it: { material_id: number; material?: { trading_name?: string }; trade?: string }) => [
+                                                                                it.material_id,
+                                                                                it.material?.trading_name || `#${it.material_id}`
+                                                                            ])
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        }
+                                                        const label = PO_FIELD_LABELS[field] || field;
+                                                        const oldVal = log.old_values?.[field];
+                                                        const newVal = log.new_values?.[field];
                                                         return (
-                                                            <div key={field} className="text-xs">
-                                                                <span className="text-gray-500 font-medium">Danh sách sản phẩm:</span>
-                                                                <div className="mt-1 pl-2 border-l-2 border-blue-100">
-                                                                    {renderItemDiff(oldItems, newItems, new Map(
-                                                                        (po.items || []).map((it: { material_id: number; material?: { trading_name?: string }; trade?: string }) => [
-                                                                            it.material_id,
-                                                                            it.material?.trading_name || `#${it.material_id}`
-                                                                        ])
-                                                                    ))}
+                                                            <div key={field} className="flex items-start gap-2 text-xs">
+                                                                <span className="text-gray-500 min-w-[140px] pt-0.5">{label}:</span>
+                                                                <div className="flex items-center gap-1 flex-wrap">
+                                                                    <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">
+                                                                        {poFormatValue(oldVal)}
+                                                                    </span>
+                                                                    <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
+                                                                    <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
+                                                                        {poFormatValue(newVal)}
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                         );
-                                                    }
-                                                    const label = PO_FIELD_LABELS[field] || field;
-                                                    const oldVal = log.old_values?.[field];
-                                                    const newVal = log.new_values?.[field];
-                                                    return (
-                                                        <div key={field} className="flex items-start gap-2 text-xs">
-                                                            <span className="text-gray-500 min-w-[140px] pt-0.5">{label}:</span>
-                                                            <div className="flex items-center gap-1 flex-wrap">
-                                                                <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">
-                                                                    {poFormatValue(oldVal)}
-                                                                </span>
-                                                                <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
-                                                                <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
-                                                                    {poFormatValue(newVal)}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        )
-                                    })()}
+                                                    })}
+                                                </div>
+                                            )
+                                        })()}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
 
                         {/* Đã duyệt */}
                         {po.approved_at && (
