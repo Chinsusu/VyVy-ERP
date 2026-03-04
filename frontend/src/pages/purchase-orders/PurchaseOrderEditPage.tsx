@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { usePurchaseOrder } from '../../hooks/usePurchaseOrders';
 import PurchaseOrderForm from '../../components/purchase-orders/PurchaseOrderForm';
+import PODocuments from '../../components/purchase-orders/PODocuments';
 
 export default function PurchaseOrderEditPage() {
     const { id } = useParams<{ id: string }>();
@@ -75,6 +76,11 @@ export default function PurchaseOrderEditPage() {
 
                 {/* Form */}
                 <PurchaseOrderForm initialData={po} isEdit />
+
+                {/* Chứng từ đơn hàng */}
+                <div className="mt-8">
+                    <PODocuments poId={poId} />
+                </div>
             </div>
         </div>
     );

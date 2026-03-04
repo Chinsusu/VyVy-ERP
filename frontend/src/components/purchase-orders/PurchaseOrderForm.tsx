@@ -5,7 +5,7 @@ import { useMaterials } from '../../hooks/useMaterials';
 import { useSuppliers } from '../../hooks/useSuppliers';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import { useCreatePurchaseOrder, useUpdatePurchaseOrder } from '../../hooks/usePurchaseOrders';
-import PODocuments from './PODocuments';
+
 import type {
     PurchaseOrder,
     CreatePurchaseOrderInput,
@@ -331,11 +331,6 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                     })}
                 </div>
             </div>
-
-            {/* Chứng từ đơn hàng (chỉ khi edit) */}
-            {isEdit && initialData && (
-                <PODocuments poId={initialData.id} />
-            )}
 
             {/* Thông tin thêm + Tổng kết */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
