@@ -196,17 +196,18 @@ export default function PurchaseOrderDetailPage() {
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-gray-100 text-gray-600 border-b">
-                                            <th className="py-3 px-6 text-left">Material</th>
-                                            <th className="py-3 px-6 text-right">Quantity</th>
-                                            <th className="py-3 px-6 text-right">Unit Price</th>
-                                            <th className="py-3 px-6 text-right">Tax (%)</th>
-                                            <th className="py-3 px-6 text-right">Line Total</th>
+                                            <th className="py-3 px-6 text-left">Mã NVL</th>
+                                            <th className="py-3 px-6 text-left">Tên nguyên vật liệu</th>
+                                            <th className="py-3 px-6 text-right">Số lượng</th>
+                                            <th className="py-3 px-6 text-right">Đơn giá</th>
+                                            <th className="py-3 px-6 text-right">Thuế (%)</th>
+                                            <th className="py-3 px-6 text-right">Thành tiền</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {(po.items || []).length === 0 ? (
                                             <tr>
-                                                <td colSpan={5} className="text-center py-8 text-gray-500 italic">
+                                                <td colSpan={6} className="text-center py-8 text-gray-500 italic">
                                                     No items found in this order.
                                                 </td>
                                             </tr>
@@ -214,9 +215,11 @@ export default function PurchaseOrderDetailPage() {
                                             po.items.map((item: PurchaseOrderItem) => (
                                                 <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors">
                                                     <td className="py-4 px-6 text-left">
-                                                        <p className="font-bold">{item.material?.trading_name}</p>
-                                                        <p className="text-xs text-gray-500">{item.material?.code}</p>
-                                                        {item.notes && <p className="text-xs text-gray-400 mt-1">Note: {item.notes}</p>}
+                                                        <span className="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-700">{item.material?.code}</span>
+                                                    </td>
+                                                    <td className="py-4 px-6 text-left">
+                                                        <p className="font-medium">{item.material?.trading_name}</p>
+                                                        {item.notes && <p className="text-xs text-gray-400 mt-1">Ghi chú: {item.notes}</p>}
                                                     </td>
                                                     <td className="py-4 px-6 text-right font-medium">{item.quantity}</td>
                                                     <td className="py-4 px-6 text-right">{item.unit_price.toLocaleString('vi-VN')}</td>
