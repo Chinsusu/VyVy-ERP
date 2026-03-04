@@ -10,7 +10,9 @@ import {
     Building2,
     Calendar,
     FileText,
-    Package
+    Package,
+    Plus,
+    History
 } from 'lucide-react';
 
 import {
@@ -21,7 +23,7 @@ import {
 } from '../../hooks/usePurchaseOrders';
 import type { PurchaseOrderItem } from '../../types/purchaseOrder';
 import AuditLogPanel from '../../components/common/AuditLogPanel';
-import SystemAuditCard from '../../components/common/SystemAuditCard';
+
 
 export default function PurchaseOrderDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -306,30 +308,69 @@ export default function PurchaseOrderDetailPage() {
                             </div>
                         </div>
 
-                        <SystemAuditCard
-                            createdByUser={po.created_by_user}
-                            createdAt={po.created_at}
-                            updatedByUser={po.updated_by_user}
-                            updatedAt={po.updated_at}
-                            approvedByUser={po.approved_by_user}
-                            approvedAt={po.approved_at}
-                            extra={
-                                <>
+                        {/* Timeline Card */}
+                        <div className="card">
+                            <h3 className="text-sm font-bold uppercase text-gray-500 mb-4 tracking-wider flex items-center gap-2">
+                                <History className="w-4 h-4" />
+                                Timeline
+                            </h3>
+                            <div className="space-y-4 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-100">
+
+                                {/* Đã tạo */}
+                                <div className="relative pl-8">
+                                    <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-primary-600 rounded-full flex items-center justify-center z-10">
+                                        <Plus className="w-3 h-3 text-primary-600" />
+                                    </div>
+                                    <p className="text-sm font-semibold text-gray-900">Đã tạo</p>
+                                    <p className="text-xs text-gray-400">{new Date(po.created_at).toLocaleString('vi-VN')}</p>
+                                    {po.created_by_user && (
+                                        <p className="text-xs text-gray-600 mt-0.5">bởi <span className="font-medium">{po.created_by_user.full_name || po.created_by_user.username}</span></p>
+                                    )}
+                                </div>
+
+                                {/* Đã duyệt */}
+                                {po.approved_at && (
+                                    <div className="relative pl-8">
+                                        <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-green-500 rounded-full flex items-center justify-center z-10">
+                                            <CheckCircle className="w-3 h-3 text-green-500" />
+                                        </div>
+                                        <p className="text-sm font-semibold text-gray-900">Đã duyệt</p>
+                                        <p className="text-xs text-gray-400">{new Date(po.approved_at).toLocaleString('vi-VN')}</p>
+                                        {po.approved_by_user && (
+                                            <p className="text-xs text-gray-600 mt-0.5">bởi <span className="font-medium text-green-700">{po.approved_by_user.full_name || po.approved_by_user.username}</span></p>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Đã hủy */}
+                                {po.status === 'cancelled' && (
+                                    <div className="relative pl-8">
+                                        <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-red-500 rounded-full flex items-center justify-center z-10">
+                                            <XCircle className="w-3 h-3 text-red-500" />
+                                        </div>
+                                        <p className="text-sm font-semibold text-gray-900">Đã hủy</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Payment & Shipping info */}
+                            {(po.payment_terms || po.shipping_method) && (
+                                <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
                                     {po.payment_terms && (
-                                        <div className="space-y-1">
+                                        <div className="space-y-0.5">
                                             <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Điều khoản thanh toán</span>
                                             <p className="text-sm font-medium text-gray-700">{po.payment_terms}</p>
                                         </div>
                                     )}
                                     {po.shipping_method && (
-                                        <div className="space-y-1">
+                                        <div className="space-y-0.5">
                                             <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Phương thức vận chuyển</span>
                                             <p className="text-sm font-medium text-gray-700">{po.shipping_method}</p>
                                         </div>
                                     )}
-                                </>
-                            }
-                        />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
