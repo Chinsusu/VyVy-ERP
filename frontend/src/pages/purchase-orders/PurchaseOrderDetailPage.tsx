@@ -34,7 +34,7 @@ interface ItemSnapshot {
     notes?: string;
 }
 
-function renderItemDiff(oldItems: ItemSnapshot[], newItems: ItemSnapshot[]) {
+function renderItemDiff(oldItems: ItemSnapshot[], newItems: ItemSnapshot[], materialLookup?: Map<number, string>) {
     const ITEM_LABELS: Record<string, string> = {
         quantity: 'Số lượng',
         unit_price: 'Đơn giá',
@@ -73,7 +73,10 @@ function renderItemDiff(oldItems: ItemSnapshot[], newItems: ItemSnapshot[]) {
     if (diffs.length === 0) return <span className="text-xs text-gray-400">Không có thay đổi chi tiết</span>;
     const getMaterialLabel = (mid: number) => {
         const item = newMap.get(mid) || oldMap.get(mid);
-        return item?.material_name ? item.material_name : `#${mid}`;
+        // Priority: snapshot name > current PO items lookup > raw ID
+        if (item?.material_name) return item.material_name;
+        if (materialLookup?.has(mid)) return materialLookup.get(mid)!;
+        return `#${mid}`;
     };
     return (
         <div className="space-y-1">
@@ -493,7 +496,12 @@ export default function PurchaseOrderDetailPage() {
                                                             <div key={field} className="text-xs">
                                                                 <span className="text-gray-500 font-medium">Danh sách sản phẩm:</span>
                                                                 <div className="mt-1 pl-2 border-l-2 border-blue-100">
-                                                                    {renderItemDiff(oldItems, newItems)}
+                                                                    {renderItemDiff(oldItems, newItems, new Map(
+                                                                        (po.items || []).map((it: { material_id: number; material?: { trading_name?: string }; trade?: string }) => [
+                                                                            it.material_id,
+                                                                            it.material?.trading_name || `#${it.material_id}`
+                                                                        ])
+                                                                    ))}
                                                                 </div>
                                                             </div>
                                                         );
