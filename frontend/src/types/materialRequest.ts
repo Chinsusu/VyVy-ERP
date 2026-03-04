@@ -86,3 +86,52 @@ export interface MaterialRequestListResponse {
         total_pages: number;
     };
 }
+
+// Production Tasks
+export interface ProductionTask {
+    id: number;
+    material_request_id: number;
+    category: string;
+    task_name: string;
+    description?: string;
+    assigned_to?: number | null;
+    assigned_user_name?: string;
+    planned_start?: string | null;
+    planned_end?: string | null;
+    actual_start?: string | null;
+    actual_end?: string | null;
+    status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+    progress_percent: number;
+    sort_order: number;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface CreateProductionTaskInput {
+    category: string;
+    task_name: string;
+    description?: string;
+    assigned_to?: number | null;
+    planned_start?: string;
+    planned_end?: string;
+    status?: string;
+    progress_percent?: number;
+    sort_order?: number;
+    notes?: string;
+}
+
+export interface UpdateProductionTaskInput {
+    category?: string;
+    task_name?: string;
+    description?: string;
+    assigned_to?: number | null;
+    planned_start?: string;
+    planned_end?: string;
+    actual_start?: string;
+    actual_end?: string;
+    status?: string;
+    progress_percent?: number;
+    sort_order?: number;
+    notes?: string;
+}

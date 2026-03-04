@@ -38,6 +38,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	reconRepo := repository.NewReconciliationRepository(db)
 	roRepo := repository.NewReturnOrderRepository(db)
 	auditLogRepo := repository.NewAuditLogRepository(db)
+	productionTaskRepo := repository.NewProductionTaskRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -63,6 +64,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	carrierService := service.NewCarrierService(carrierRepo)
 	reconService := service.NewReconciliationService(reconRepo, carrierRepo)
 	roService := service.NewReturnOrderService(db, roRepo, doRepo)
+	productionTaskService := service.NewProductionTaskService(productionTaskRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -87,6 +89,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	carrierHandler := handlers.NewCarrierHandler(carrierService)
 	reconHandler := handlers.NewReconciliationHandler(reconService)
 	roHandler := handlers.NewReturnOrderHandler(roService)
+	productionTaskHandler := handlers.NewProductionTaskHandler(productionTaskService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -226,6 +229,12 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		// Workflow endpoints
 		mrGroup.POST("/:id/approve", middleware.RequireRole("warehouse_manager"), mrHandler.Approve)
 		mrGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), mrHandler.Cancel)
+
+		// Production task endpoints
+		mrGroup.GET("/:id/tasks", productionTaskHandler.List)
+		mrGroup.POST("/:id/tasks", productionTaskHandler.Create)
+		mrGroup.PUT("/:id/tasks/:taskId", productionTaskHandler.Update)
+		mrGroup.DELETE("/:id/tasks/:taskId", productionTaskHandler.Delete)
 	}
 
 	// Material Issue Note (MIN) routes - All protected

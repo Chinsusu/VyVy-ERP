@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
 	"github.com/VyVy-ERP/warehouse-backend/internal/models"
 	"github.com/VyVy-ERP/warehouse-backend/internal/repository"
@@ -356,9 +357,138 @@ func (s *materialRequestService) ApproveMaterialRequest(id uint, userID uint, us
 
 				remainingToReserve -= reserveQty
 			}
-
+			// 3. If still missing stock → track for auto-PO creation
 			if remainingToReserve > 0 {
-				return errors.New("insufficient stock to fulfill request for material: " + item.Material.TradingName)
+				type shortfall struct {
+					material *models.MaterialRequestItem
+					qty      float64
+				}
+				_ = shortfall{}
+				// collect shortfall onto a per-supplier map (done below in outer scope)
+				// We use a closure variable declared before the loop
+				_ = remainingToReserve
+			}
+		}
+
+		// 3. Auto-create POs for items with insufficient stock (grouped by supplier)
+		// Re-iterate to collect shortfalls
+		type poItem struct {
+			materialID uint
+			name       string
+			qty        float64
+			unit       string
+			unitPrice  float64
+		}
+		supplierItems := map[int64][]poItem{} // supplierID → items (use -1 for no supplier)
+
+		for _, item := range mr.Items {
+			balances, _ := s.stockRepo.List("material", item.MaterialID, mr.WarehouseID)
+			available := 0.0
+			for _, b := range balances {
+				if b.AvailableQuantity > 0 {
+					available += b.AvailableQuantity
+				}
+			}
+			missing := item.RequestedQuantity - available
+			if missing <= 0 {
+				continue
+			}
+
+			// Load material with supplier info via raw DB query
+			var mat models.Material
+			if err2 := s.db.First(&mat, item.MaterialID).Error; err2 == nil {
+				supplierKey := int64(-1)
+				if mat.SupplierID != nil {
+					supplierKey = *mat.SupplierID
+				}
+				unitPrice := 0.0
+				if mat.LastPurchasePrice != nil {
+					unitPrice = *mat.LastPurchasePrice
+				} else if mat.StandardCost != nil {
+					unitPrice = *mat.StandardCost
+				}
+				supplierItems[supplierKey] = append(supplierItems[supplierKey], poItem{
+					materialID: uint(mat.ID),
+					name:       mat.TradingName,
+					qty:        missing,
+					unit:       mat.Unit,
+					unitPrice:  unitPrice,
+				})
+			}
+		}
+
+		// Create one PO per supplier group
+		orderDate := now.Format("2006-01-02")
+		uid := userID
+		for supplierKey, items := range supplierItems {
+			poNumber := "AUTO-" + now.Format("060102") + "-MR" + fmt.Sprintf("%d", id)
+			if len(supplierItems) > 1 {
+				poNumber += fmt.Sprintf("-S%d", supplierKey)
+			}
+
+			description := fmt.Sprintf("Tự động tạo từ KHSX #%d - thiếu tồn kho", id)
+
+			var supplierIDUint uint
+			if supplierKey > 0 {
+				supplierIDUint = uint(supplierKey)
+			} else {
+				// Find first supplier as placeholder - or use 0 to indicate TBD
+				// We need a valid supplier. If none assigned, skip PO creation for those items.
+				// Instead, we'll create PO with the first available supplier
+				var firstSupplier models.Supplier
+				if err2 := tx.First(&firstSupplier).Error; err2 != nil {
+					// No suppliers at all - skip
+					continue
+				}
+				supplierIDUint = firstSupplier.ID
+				description += " (nhà cung cấp chưa xác định - vui lòng cập nhật)"
+			}
+
+			po := &models.PurchaseOrder{
+				PONumber:    poNumber,
+				SupplierID:  supplierIDUint,
+				WarehouseID: mr.WarehouseID,
+				POType:      "material",
+				OrderDate:   orderDate,
+				Status:      "draft",
+				Description: description,
+				Notes:       fmt.Sprintf("Liên quan KHSX: %s", mr.MRNumber),
+				CreatedBy:   &uid,
+				UpdatedBy:   &uid,
+			}
+
+			if err2 := tx.Create(po).Error; err2 != nil {
+				return err2
+			}
+
+			// Create PO items
+			var subtotal float64
+			for _, pi := range items {
+				lineTotal := pi.qty * pi.unitPrice
+				subtotal += lineTotal
+				poItemNote := fmt.Sprintf("%s (%s)", pi.name, pi.unit)
+				poItemRecord := &models.PurchaseOrderItem{
+					PurchaseOrderID:  po.ID,
+					MaterialID:       uint(pi.materialID),
+					Quantity:         pi.qty,
+					UnitPrice:        pi.unitPrice,
+					TaxRate:          0,
+					DiscountRate:     0,
+					LineTotal:        lineTotal,
+					ReceivedQuantity: 0,
+					Notes:            poItemNote,
+				}
+				if err2 := tx.Create(poItemRecord).Error; err2 != nil {
+					return err2
+				}
+			}
+
+			// Update PO totals
+			if err2 := tx.Model(po).Updates(map[string]interface{}{
+				"subtotal":     subtotal,
+				"total_amount": subtotal,
+			}).Error; err2 != nil {
+				return err2
 			}
 		}
 

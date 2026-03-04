@@ -23,11 +23,16 @@ import {
 } from '../../hooks/useMaterialRequests';
 import type { MaterialRequestItem } from '../../types/materialRequest';
 import AuditLogPanel from '../../components/common/AuditLogPanel';
+import ProductionTaskPanel from '../../components/production/ProductionTaskPanel';
+import ProductionTimeline from '../../components/production/ProductionTimeline';
+import ProductionProgressChart from '../../components/production/ProductionProgressChart';
+import { useProductionTasks } from '../../hooks/useProductionTasks';
 
 export default function MRDetailPage() {
     const { id } = useParams<{ id: string }>();
     const mrId = parseInt(id || '0', 10);
     const navigate = useNavigate();
+    const { data: productionTasks } = useProductionTasks(mrId);
 
     const { data: mr, isLoading, error } = useMaterialRequest(mrId);
     const approveMutation = useApproveMaterialRequest();
@@ -361,6 +366,23 @@ export default function MRDetailPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Production Task Section */}
+            <div className="mt-6">
+                <ProductionTaskPanel mrId={mrId} editable={mr.status !== 'cancelled' && mr.status !== 'closed'} />
+            </div>
+
+            {/* Timeline + Progress */}
+            {productionTasks && productionTasks.length > 0 && (
+                <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2">
+                        <ProductionTimeline tasks={productionTasks} />
+                    </div>
+                    <div>
+                        <ProductionProgressChart tasks={productionTasks} />
+                    </div>
+                </div>
+            )}
 
             {/* Lịch Sử Thay Đổi */}
             <div className="mt-6">
