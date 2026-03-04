@@ -68,6 +68,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	productionTaskService := service.NewProductionTaskService(productionTaskRepo)
 
 	supplierDocHandler := handlers.NewSupplierDocumentHandler(db)
+	poDocHandler := handlers.NewPODocumentHandler(db)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -189,6 +190,10 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		// Workflow endpoints
 		poGroup.POST("/:id/approve", middleware.RequireRole("procurement_manager"), purchaseOrderHandler.Approve)
 		poGroup.POST("/:id/cancel", middleware.RequireRole("procurement_manager"), purchaseOrderHandler.Cancel)
+		// Documents
+		poGroup.GET("/:id/documents", poDocHandler.List)
+		poGroup.POST("/:id/documents", poDocHandler.Upload)
+		poGroup.DELETE("/:id/documents/:docId", poDocHandler.Delete)
 	}
 
 	// Stock / Inventory routes - All protected
@@ -358,5 +363,6 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	uploadsGroup.Use(middleware.AuthMiddleware(authService))
 	{
 		uploadsGroup.GET("/supplier_documents/:supplierId/:filename", supplierDocHandler.ServeFile)
+		uploadsGroup.GET("/po_documents/:poId/:filename", poDocHandler.ServeFile)
 	}
 }

@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Save, X, ShoppingCart, Paperclip, XCircle, Calendar } from 'lucide-react';
+import { Plus, Trash2, Save, X, ShoppingCart, Calendar } from 'lucide-react';
 import { useMaterials } from '../../hooks/useMaterials';
 import { useSuppliers } from '../../hooks/useSuppliers';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import { useCreatePurchaseOrder, useUpdatePurchaseOrder } from '../../hooks/usePurchaseOrders';
+import PODocuments from './PODocuments';
 import type {
     PurchaseOrder,
     CreatePurchaseOrderInput,
@@ -16,16 +17,8 @@ interface PurchaseOrderFormProps {
     isEdit?: boolean;
 }
 
-interface ItemAttachment {
-    name: string;
-    url: string;
-    size: number;
-}
-
 interface ExtendedItem extends CreatePurchaseOrderItemInput {
     expected_delivery_date?: string;
-    attachments?: string; // JSON string of ItemAttachment[]
-    _attachmentList?: ItemAttachment[]; // runtime state
 }
 
 const selectCls = 'w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent';
@@ -35,11 +28,10 @@ const inputRightCls = 'input w-full text-right';
 export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrderFormProps) {
     const navigate = useNavigate();
 
-    const { data: materialsData } = useMaterials({ page: 1, page_size: 1000 });
+    // Fetch tất cả suppliers
     const { data: suppliersData } = useSuppliers({ page: 1, page_size: 1000 });
     const { data: warehousesData } = useWarehouses();
 
-    const materials = materialsData?.data || [];
     const suppliers = suppliersData?.data || [];
     const warehouses = warehousesData?.data || [];
 
@@ -58,10 +50,16 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
     });
 
     const [items, setItems] = useState<ExtendedItem[]>([
-        { material_id: 0, quantity: 1, unit_price: 0, tax_rate: 0, discount_rate: 0, notes: '', expected_delivery_date: '', _attachmentList: [] }
+        { material_id: 0, quantity: 1, unit_price: 0, tax_rate: 0, discount_rate: 0, notes: '', expected_delivery_date: '' }
     ]);
 
-    const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    // Fetch materials filtered by selected supplier
+    const { data: materialsData } = useMaterials({
+        page: 1,
+        page_size: 1000,
+        supplier_id: formData.supplier_id > 0 ? formData.supplier_id : undefined,
+    });
+    const filteredMaterials = useMemo(() => materialsData?.data || [], [materialsData]);
 
     useEffect(() => {
         if (initialData) {
@@ -76,23 +74,15 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                 notes: initialData.notes || '',
             });
             if (initialData.items) {
-                setItems(initialData.items.map((item: any) => {
-                    let attachmentList: ItemAttachment[] = [];
-                    try {
-                        if (item.attachments) attachmentList = JSON.parse(item.attachments);
-                    } catch { }
-                    return {
-                        material_id: item.material_id,
-                        quantity: item.quantity,
-                        unit_price: item.unit_price,
-                        tax_rate: item.tax_rate,
-                        discount_rate: item.discount_rate,
-                        notes: item.notes || '',
-                        expected_delivery_date: item.expected_delivery_date?.split('T')[0] || '',
-                        attachments: item.attachments || '',
-                        _attachmentList: attachmentList,
-                    };
-                }));
+                setItems(initialData.items.map((item: any) => ({
+                    material_id: item.material_id,
+                    quantity: item.quantity,
+                    unit_price: item.unit_price,
+                    tax_rate: item.tax_rate,
+                    discount_rate: item.discount_rate,
+                    notes: item.notes || '',
+                    expected_delivery_date: item.expected_delivery_date?.split('T')[0] || '',
+                })));
             }
         } else {
             const now = new Date();
@@ -101,15 +91,20 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
         }
     }, [initialData]);
 
+    // Khi đổi NCC → reset tất cả material_id về 0
+    const handleSupplierChange = (supplierId: number) => {
+        setFormData(prev => ({ ...prev, supplier_id: supplierId }));
+        setItems(prev => prev.map(item => ({ ...item, material_id: 0 })));
+    };
+
     const addItem = () => {
-        setItems([...items, { material_id: 0, quantity: 1, unit_price: 0, tax_rate: 0, discount_rate: 0, notes: '', expected_delivery_date: '', _attachmentList: [] }]);
+        setItems([...items, { material_id: 0, quantity: 1, unit_price: 0, tax_rate: 0, discount_rate: 0, notes: '', expected_delivery_date: '' }]);
     };
 
     const removeItem = (index: number) => {
         if (items.length <= 1) return;
         const newItems = [...items];
         newItems.splice(index, 1);
-        fileInputRefs.current.splice(index, 1);
         setItems(newItems);
     };
 
@@ -119,44 +114,19 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
         setItems(newItems);
     };
 
-    const handleFileUpload = (index: number, files: FileList | null) => {
-        if (!files || files.length === 0) return;
-        const item = items[index];
-        const existingList = item._attachmentList || [];
-
-        // Convert each file to base64 data URL so it can be stored in DB and opened later
-        const promises = Array.from(files).map(f => new Promise<ItemAttachment>((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve({
-                name: f.name,
-                url: e.target?.result as string, // base64 data URL
-                size: f.size,
-            });
-            reader.readAsDataURL(f);
-        }));
-
-        Promise.all(promises).then(newAttachments => {
-            const merged = [...existingList, ...newAttachments];
-            const newItems = [...items];
-            newItems[index] = {
-                ...newItems[index],
-                _attachmentList: merged,
-                attachments: JSON.stringify(merged),
-            };
-            setItems(newItems);
-        });
-    };
-
-    const removeAttachment = (itemIndex: number, attachIndex: number) => {
-        const item = items[itemIndex];
-        const newList = (item._attachmentList || []).filter((_, i) => i !== attachIndex);
-        const newItems = [...items];
-        newItems[itemIndex] = {
-            ...newItems[itemIndex],
-            _attachmentList: newList,
-            attachments: JSON.stringify(newList),
-        };
-        setItems(newItems);
+    // Khi chọn NVL → tự động điền đơn giá từ material_suppliers nếu có
+    const handleMaterialChange = (index: number, materialId: number) => {
+        updateItem(index, 'material_id', materialId);
+        // Tìm đơn giá của NCC hiện tại cho NVL này
+        const mat = filteredMaterials.find(m => m.id === materialId);
+        if (mat?.suppliers) {
+            const ms = mat.suppliers.find((s: any) => s.supplier_id === formData.supplier_id);
+            if (ms?.unit_price && ms.unit_price > 0) {
+                const newItems = [...items];
+                newItems[index] = { ...newItems[index], material_id: materialId, unit_price: ms.unit_price };
+                setItems(newItems);
+            }
+        }
     };
 
     const totals = useMemo(() => {
@@ -173,7 +143,7 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.supplier_id === 0 || formData.warehouse_id === 0 || items.some(i => i.material_id === 0)) {
-            alert('Vui lòng điền đầy đủ thông tin và chọn nguyên vật liệu cho tất cả dòng hàng.');
+            alert('Vui lòng chọn nhà cung cấp, kho nhận hàng và nguyên vật liệu cho tất cả dòng hàng.');
             return;
         }
         const payload = {
@@ -188,7 +158,6 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                 discount_rate: Number(item.discount_rate || 0),
                 notes: item.notes || '',
                 expected_delivery_date: item.expected_delivery_date || '',
-                attachments: item.attachments || '',
             })),
         };
         try {
@@ -226,7 +195,7 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                     <select
                         className={selectCls}
                         value={formData.supplier_id}
-                        onChange={(e) => setFormData({ ...formData, supplier_id: Number(e.target.value) })}
+                        onChange={(e) => handleSupplierChange(Number(e.target.value))}
                         required
                     >
                         <option value={0}>-- Chọn nhà cung cấp --</option>
@@ -261,7 +230,7 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                 </div>
             </div>
 
-            {/* Danh sách hàng hóa — mỗi item có ngày giao DK + đính kèm */}
+            {/* Danh sách hàng hóa */}
             <div className="card">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold flex items-center gap-2">
@@ -278,6 +247,12 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                     </button>
                 </div>
 
+                {formData.supplier_id === 0 && (
+                    <div className="text-center py-6 border-2 border-dashed border-amber-200 bg-amber-50 rounded-lg mb-4">
+                        <p className="text-sm text-amber-600 font-medium">Vui lòng chọn nhà cung cấp trước để lọc danh sách nguyên vật liệu</p>
+                    </div>
+                )}
+
                 <div className="space-y-4">
                     {items.map((item, index) => {
                         const lineTotal = item.quantity * item.unit_price * (1 + (item.tax_rate || 0) / 100) * (1 - (item.discount_rate || 0) / 100);
@@ -290,11 +265,12 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                                         <select
                                             className={selectCls}
                                             value={item.material_id}
-                                            onChange={(e) => updateItem(index, 'material_id', Number(e.target.value))}
+                                            onChange={(e) => handleMaterialChange(index, Number(e.target.value))}
                                             required
+                                            disabled={formData.supplier_id === 0}
                                         >
                                             <option value={0}>-- Chọn NVL --</option>
-                                            {materials.map(m => (
+                                            {filteredMaterials.map(m => (
                                                 <option key={m.id} value={m.id}>{m.trading_name} ({m.code})</option>
                                             ))}
                                         </select>
@@ -350,45 +326,16 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                                         />
                                     </div>
                                 </div>
-
-                                {/* Row 3: File đính kèm */}
-                                <div>
-                                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-1 mb-2">
-                                        <Paperclip className="w-3 h-3" /> Chứng từ đính kèm
-                                    </label>
-                                    <div className="flex flex-wrap gap-2 mb-2">
-                                        {(item._attachmentList || []).map((att, ai) => (
-                                            <span key={ai} className="inline-flex items-center gap-1.5 px-2 py-1 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700">
-                                                <Paperclip className="w-3 h-3" />
-                                                <a href={att.url} target="_blank" rel="noopener noreferrer" className="hover:underline max-w-[120px] truncate">{att.name}</a>
-                                                <span className="text-blue-400">({Math.round(att.size / 1024)}KB)</span>
-                                                <button type="button" onClick={() => removeAttachment(index, ai)} className="text-red-400 hover:text-red-600 ml-1">
-                                                    <XCircle className="w-3.5 h-3.5" />
-                                                </button>
-                                            </span>
-                                        ))}
-                                        <button
-                                            type="button"
-                                            onClick={() => fileInputRefs.current[index]?.click()}
-                                            className="inline-flex items-center gap-1 px-3 py-1 border border-dashed border-gray-400 rounded-lg text-xs text-gray-600 hover:border-primary hover:text-primary transition-colors"
-                                        >
-                                            <Plus className="w-3 h-3" /> Đính kèm file
-                                        </button>
-                                        <input
-                                            type="file"
-                                            multiple
-                                            ref={(el) => { fileInputRefs.current[index] = el; }}
-                                            className="hidden"
-                                            onChange={(e) => handleFileUpload(index, e.target.files)}
-                                            accept="*/*"
-                                        />
-                                    </div>
-                                </div>
                             </div>
                         );
                     })}
                 </div>
             </div>
+
+            {/* Chứng từ đơn hàng (chỉ khi edit) */}
+            {isEdit && initialData && (
+                <PODocuments poId={initialData.id} />
+            )}
 
             {/* Thông tin thêm + Tổng kết */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

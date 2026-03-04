@@ -127,6 +127,7 @@ import {
 } from '../../hooks/usePurchaseOrders';
 import type { PurchaseOrderItem } from '../../types/purchaseOrder';
 import { useAuditLogs } from '../../hooks/useAuditLogs';
+import PODocuments from '../../components/purchase-orders/PODocuments';
 
 
 export default function PurchaseOrderDetailPage() {
@@ -418,6 +419,9 @@ export default function PurchaseOrderDetailPage() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Chứng từ đơn hàng */}
+                        <PODocuments poId={poId} readOnly={po.status !== 'draft'} />
 
                     </div>
                 </div>
