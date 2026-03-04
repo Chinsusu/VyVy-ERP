@@ -329,44 +329,7 @@ export default function MRDetailPage() {
                             )}
                         </div>
 
-                        {/* Audit Log Card */}
-                        <div className="card">
-                            <h3 className="text-sm font-bold uppercase text-gray-500 mb-4 tracking-wider flex items-center gap-2">
-                                <History className="w-4 h-4" />
-                                Lịch sử
-                            </h3>
-                            <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-100">
-                                <div className="relative pl-8">
-                                    <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-primary-600 rounded-full flex items-center justify-center z-10">
-                                        <Plus className="w-3 h-3 text-primary-600" />
-                                    </div>
-                                    <p className="text-sm font-bold text-gray-900">Đã tạo</p>
-                                    <p className="text-xs text-gray-500">{new Date(mr.created_at).toLocaleString('vi-VN')}</p>
-                                    <p className="text-xs mt-1 text-gray-600">Phòng ban: {mr.department}</p>
-                                </div>
-
-                                {mr.approved_at && (
-                                    <div className="relative pl-8">
-                                        <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-green-500 rounded-full flex items-center justify-center z-10">
-                                            <CheckCircle className="w-3 h-3 text-green-500" />
-                                        </div>
-                                        <p className="text-sm font-bold text-gray-900">Đã duyệt</p>
-                                        <p className="text-xs text-gray-500">{new Date(mr.approved_at).toLocaleString('vi-VN')}</p>
-                                    </div>
-                                )}
-
-                                {mr.status === 'cancelled' && (
-                                    <div className="relative pl-8">
-                                        <div className="absolute left-0 top-1 w-[24px] h-[24px] bg-white border-2 border-red-500 rounded-full flex items-center justify-center z-10">
-                                            <XCircle className="w-3 h-3 text-red-500" />
-                                        </div>
-                                        <p className="text-sm font-bold text-gray-900">Đã hủy</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* System Audit Card */}
+                        {/* System Audit Card (gộp Lịch Sử + Kiểm Soát Hệ Thống) */}
                         <SystemAuditCard
                             createdByUser={(mr as any).created_by_user}
                             createdAt={mr.created_at}
@@ -374,7 +337,43 @@ export default function MRDetailPage() {
                             updatedAt={mr.updated_at}
                             approvedByUser={(mr as any).approved_by_user}
                             approvedAt={mr.approved_at}
+                            extra={
+                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                    <p className="text-xs font-semibold uppercase text-gray-400 mb-3 tracking-wider flex items-center gap-1">
+                                        <History className="w-3 h-3" />
+                                        Trạng thái
+                                    </p>
+                                    <div className="space-y-3 relative before:absolute before:left-[9px] before:top-2 before:bottom-2 before:w-[1px] before:bg-gray-200">
+                                        <div className="relative pl-6">
+                                            <div className="absolute left-0 top-0.5 w-5 h-5 bg-white border-2 border-primary-500 rounded-full flex items-center justify-center z-10">
+                                                <Plus className="w-2.5 h-2.5 text-primary-500" />
+                                            </div>
+                                            <p className="text-xs font-semibold text-gray-700">Đã tạo</p>
+                                            <p className="text-xs text-gray-400">{new Date(mr.created_at).toLocaleString('vi-VN')}</p>
+                                            {mr.department && <p className="text-xs text-gray-500">Phòng ban: {mr.department}</p>}
+                                        </div>
+                                        {mr.approved_at && (
+                                            <div className="relative pl-6">
+                                                <div className="absolute left-0 top-0.5 w-5 h-5 bg-white border-2 border-green-500 rounded-full flex items-center justify-center z-10">
+                                                    <CheckCircle className="w-2.5 h-2.5 text-green-500" />
+                                                </div>
+                                                <p className="text-xs font-semibold text-gray-700">Đã duyệt</p>
+                                                <p className="text-xs text-gray-400">{new Date(mr.approved_at).toLocaleString('vi-VN')}</p>
+                                            </div>
+                                        )}
+                                        {mr.status === 'cancelled' && (
+                                            <div className="relative pl-6">
+                                                <div className="absolute left-0 top-0.5 w-5 h-5 bg-white border-2 border-red-500 rounded-full flex items-center justify-center z-10">
+                                                    <XCircle className="w-2.5 h-2.5 text-red-500" />
+                                                </div>
+                                                <p className="text-xs font-semibold text-gray-700">Đã hủy</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            }
                         />
+
                     </div>
                 </div>
             </div>
