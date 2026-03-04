@@ -5,6 +5,7 @@ import { useMaterials } from '../../hooks/useMaterials';
 import { useSuppliers } from '../../hooks/useSuppliers';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import { useCreatePurchaseOrder, useUpdatePurchaseOrder } from '../../hooks/usePurchaseOrders';
+import PODocuments from './PODocuments';
 
 import type {
     PurchaseOrder,
@@ -388,6 +389,13 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                             <span className="text-primary">{totals.total.toLocaleString('vi-VN')} đ</span>
                         </div>
                     </div>
+
+                    {/* Chứng từ đơn hàng - chỉ khi edit */}
+                    {isEdit && initialData && (
+                        <div className="mt-8">
+                            <PODocuments poId={initialData.id} />
+                        </div>
+                    )}
 
                     <div className="flex gap-4 mt-8">
                         <button
