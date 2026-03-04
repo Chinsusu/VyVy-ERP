@@ -49,7 +49,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	warehouseLocationService := service.NewWarehouseLocationService(warehouseLocationRepo, warehouseRepo)
 	finishedProductService := service.NewFinishedProductService(finishedProductRepo, auditLogService)
 	productFormulaService := service.NewProductFormulaService(productFormulaRepo, finishedProductRepo, materialRepo)
-	purchaseOrderService := service.NewPurchaseOrderService(purchaseOrderRepo, purchaseOrderItemRepo, supplierRepo, warehouseRepo)
+	purchaseOrderService := service.NewPurchaseOrderService(purchaseOrderRepo, purchaseOrderItemRepo, supplierRepo, warehouseRepo, auditLogService)
 	grnService := service.NewGRNService(db, grnRepo, grnItemRepo, purchaseOrderRepo, purchaseOrderItemRepo, warehouseRepo, stockLedgerRepo, stockBalanceRepo)
 	mrService := service.NewMaterialRequestService(db, mrRepo, mrItemRepo, warehouseRepo, materialRepo, stockBalanceRepo, stockReservationRepo, auditLogService)
 	minService := service.NewMaterialIssueNoteService(minRepo, mrRepo, materialRepo, stockBalanceRepo, stockReservationRepo, db)

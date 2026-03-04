@@ -78,8 +78,10 @@ func (h *PurchaseOrderHandler) Create(c *gin.Context) {
 		return
 	}
 	userID := val.(int64)
+	usernameVal, _ := c.Get("username")
+	usernameStr, _ := usernameVal.(string)
 
-	po, err := h.service.CreatePurchaseOrder(&req, uint(userID))
+	po, err := h.service.CreatePurchaseOrder(&req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
@@ -110,8 +112,10 @@ func (h *PurchaseOrderHandler) Update(c *gin.Context) {
 		return
 	}
 	userID := val.(int64)
+	usernameVal, _ := c.Get("username")
+	usernameStr, _ := usernameVal.(string)
 
-	po, err := h.service.UpdatePurchaseOrder(uint(id), &req, uint(userID))
+	po, err := h.service.UpdatePurchaseOrder(uint(id), &req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return

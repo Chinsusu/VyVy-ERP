@@ -10,22 +10,22 @@ import (
 	"gorm.io/gorm"
 )
 
-// PurchaseOrderService defines the interface for purchase order business logic
 type PurchaseOrderService interface {
-	CreatePurchaseOrder(req *dto.CreatePurchaseOrderRequest, userID uint) (*models.SafePurchaseOrder, error)
+	CreatePurchaseOrder(req *dto.CreatePurchaseOrderRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
 	GetPurchaseOrderByID(id uint) (*models.SafePurchaseOrder, error)
 	ListPurchaseOrders(filter *dto.PurchaseOrderFilterRequest) ([]*models.SafePurchaseOrder, int64, error)
-	UpdatePurchaseOrder(id uint, req *dto.UpdatePurchaseOrderRequest, userID uint) (*models.SafePurchaseOrder, error)
+	UpdatePurchaseOrder(id uint, req *dto.UpdatePurchaseOrderRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
 	DeletePurchaseOrder(id uint) error
 	ApprovePurchaseOrder(id uint, userID uint) (*models.SafePurchaseOrder, error)
 	CancelPurchaseOrder(id uint) (*models.SafePurchaseOrder, error)
 }
 
 type purchaseOrderService struct {
-	poRepo         repository.PurchaseOrderRepository
-	poItemRepo     repository.PurchaseOrderItemRepository
-	supplierRepo   repository.SupplierRepository
-	warehouseRepo  repository.WarehouseRepository
+	poRepo        repository.PurchaseOrderRepository
+	poItemRepo    repository.PurchaseOrderItemRepository
+	supplierRepo  repository.SupplierRepository
+	warehouseRepo repository.WarehouseRepository
+	auditSvc      AuditLogService
 }
 
 // NewPurchaseOrderService creates a new PurchaseOrderService
@@ -34,17 +34,19 @@ func NewPurchaseOrderService(
 	poItemRepo repository.PurchaseOrderItemRepository,
 	supplierRepo repository.SupplierRepository,
 	warehouseRepo repository.WarehouseRepository,
+	auditSvc AuditLogService,
 ) PurchaseOrderService {
 	return &purchaseOrderService{
 		poRepo:        poRepo,
 		poItemRepo:    poItemRepo,
 		supplierRepo:  supplierRepo,
 		warehouseRepo: warehouseRepo,
+		auditSvc:      auditSvc,
 	}
 }
 
 // CreatePurchaseOrder creates a new purchase order with items
-func (s *purchaseOrderService) CreatePurchaseOrder(req *dto.CreatePurchaseOrderRequest, userID uint) (*models.SafePurchaseOrder, error) {
+func (s *purchaseOrderService) CreatePurchaseOrder(req *dto.CreatePurchaseOrderRequest, userID uint, username string) (*models.SafePurchaseOrder, error) {
 	// Validate PO number uniqueness
 	existing, err := s.poRepo.GetByPONumber(req.PONumber)
 	if err == nil && existing.ID > 0 {
@@ -135,10 +137,12 @@ func (s *purchaseOrderService) CreatePurchaseOrder(req *dto.CreatePurchaseOrderR
 		return nil, err
 	}
 
+	// Audit log - CREATE
+	_ = s.auditSvc.Log("purchase_orders", "CREATE", int64(po.ID), int64(userID), username, nil, po.ToSafe())
+
 	return po.ToSafe(), nil
 }
 
-// GetPurchaseOrderByID retrieves a purchase order by ID
 func (s *purchaseOrderService) GetPurchaseOrderByID(id uint) (*models.SafePurchaseOrder, error) {
 	po, err := s.poRepo.GetByID(id)
 	if err != nil {
@@ -166,7 +170,7 @@ func (s *purchaseOrderService) ListPurchaseOrders(filter *dto.PurchaseOrderFilte
 }
 
 // UpdatePurchaseOrder updates a purchase order (only if status is draft)
-func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurchaseOrderRequest, userID uint) (*models.SafePurchaseOrder, error) {
+func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurchaseOrderRequest, userID uint, username string) (*models.SafePurchaseOrder, error) {
 	// Get existing PO
 	po, err := s.poRepo.GetByID(id)
 	if err != nil {
@@ -175,6 +179,9 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		}
 		return nil, err
 	}
+
+	// Capture old values before mutation
+	oldValues := po.ToSafe()
 
 	// Check if PO can be updated (draft or approved)
 	if po.Status != "draft" && po.Status != "approved" {
@@ -281,10 +288,12 @@ func (s *purchaseOrderService) UpdatePurchaseOrder(id uint, req *dto.UpdatePurch
 		return nil, err
 	}
 
+	// Audit log - UPDATE
+	_ = s.auditSvc.Log("purchase_orders", "UPDATE", int64(po.ID), int64(userID), username, oldValues, po.ToSafe())
+
 	return po.ToSafe(), nil
 }
 
-// DeletePurchaseOrder deletes a purchase order (only if status is draft)
 func (s *purchaseOrderService) DeletePurchaseOrder(id uint) error {
 	// Get existing PO
 	po, err := s.poRepo.GetByID(id)
