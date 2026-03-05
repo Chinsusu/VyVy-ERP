@@ -681,7 +681,13 @@ export default function PurchaseOrderDetailPage() {
                                 changed_fields?: string[]; old_values?: Record<string, unknown>; new_values?: Record<string, unknown>
                             }) => (
                                 <div key={log.id} className="relative pl-10">
-                                    <div className={`absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white ${log.action === 'DELETE' ? 'bg-red-500' : 'bg-blue-500'
+                                    <div className={`absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white ${log.action === 'DELETE' ? 'bg-red-500' :
+                                            log.action === 'APPROVE' ? 'bg-emerald-500' :
+                                                log.action === 'CANCEL' ? 'bg-red-500' :
+                                                    log.action === 'UPDATE_PAYMENT_STATUS' ? 'bg-yellow-500' :
+                                                        log.action === 'UPDATE_INVOICE_STATUS' ? 'bg-purple-500' :
+                                                            log.action === 'UPDATE_ORDER_STATUS' ? 'bg-indigo-500' :
+                                                                'bg-blue-500'
                                         }`} />
                                     <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                                         <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
@@ -690,9 +696,25 @@ export default function PurchaseOrderDetailPage() {
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
                                                         <Edit className="w-3 h-3" /> Chỉnh sửa
                                                     </span>
-                                                ) : (
+                                                ) : log.action === 'DELETE' ? (
                                                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
                                                         <XCircle className="w-3 h-3" /> Xóa
+                                                    </span>
+                                                ) : log.action === 'UPDATE_ORDER_STATUS' ? (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">
+                                                        <Truck className="w-3 h-3" /> Cập nhật đặt hàng
+                                                    </span>
+                                                ) : log.action === 'UPDATE_PAYMENT_STATUS' ? (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700">
+                                                        <FileText className="w-3 h-3" /> Cập nhật thanh toán
+                                                    </span>
+                                                ) : log.action === 'UPDATE_INVOICE_STATUS' ? (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700">
+                                                        <FileText className="w-3 h-3" /> Cập nhật hóa đơn
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                                                        <Edit className="w-3 h-3" /> {log.action}
                                                     </span>
                                                 )}
                                                 <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
@@ -750,6 +772,32 @@ export default function PurchaseOrderDetailPage() {
                                                 </div>
                                             )
                                         })()}
+                                        {/* Workflow status changes: B4/B5/B6 */}
+                                        {['UPDATE_ORDER_STATUS', 'UPDATE_PAYMENT_STATUS', 'UPDATE_INVOICE_STATUS'].includes(log.action) && log.new_values && (
+                                            <div className="space-y-1 mt-2">
+                                                {Object.entries(log.new_values).map(([field, newVal]) => {
+                                                    const WLABELS: Record<string, string> = { order_status: 'Trạng thái đặt hàng', payment_status: 'Thanh toán', invoice_status: 'Hóa đơn', notes: 'Ghi chú' };
+                                                    const SLABELS: Record<string, string> = { pending: 'Chờ xử lý', ordered: 'Đã đặt', partial: 'Một phần', completed: 'Hoàn thành', received: 'Đã nhận' };
+                                                    const label = WLABELS[field] || field;
+                                                    const oldVal = log.old_values?.[field];
+                                                    const displayNew = SLABELS[String(newVal)] || String(newVal);
+                                                    const displayOld = oldVal ? (SLABELS[String(oldVal)] || String(oldVal)) : null;
+                                                    if (field === 'notes') {
+                                                        if (!newVal) return null;
+                                                        return <div key={field} className="flex items-start gap-2 text-xs"><span className="text-gray-500 min-w-[100px] pt-0.5">{label}:</span><span className="text-gray-700 italic">{String(newVal)}</span></div>;
+                                                    }
+                                                    return (
+                                                        <div key={field} className="flex items-start gap-2 text-xs">
+                                                            <span className="text-gray-500 min-w-[140px] pt-0.5">{label}:</span>
+                                                            <div className="flex items-center gap-1">
+                                                                {displayOld && <><span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">{displayOld}</span><ArrowRight className="w-3 h-3 text-gray-400" /></>}
+                                                                <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">{displayNew}</span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }).filter(Boolean)}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))}
