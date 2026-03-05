@@ -15,6 +15,7 @@ type UserRepository interface {
 	GetByUsername(ctx context.Context, username string) (*models.User, error)
 	Update(ctx context.Context, user *models.User) error
 	UpdateLastLogin(ctx context.Context, userID int64) error
+	ListAll(ctx context.Context) ([]*models.User, error)
 }
 
 // userRepository implements UserRepository
@@ -66,4 +67,10 @@ func (r *userRepository) UpdateLastLogin(ctx context.Context, userID int64) erro
 	return r.db.WithContext(ctx).Model(&models.User{}).
 		Where("id = ?", userID).
 		Update("last_login_at", gorm.Expr("NOW()")).Error
+}
+
+func (r *userRepository) ListAll(ctx context.Context) ([]*models.User, error) {
+	var users []*models.User
+	err := r.db.WithContext(ctx).Where("is_active = true OR is_active IS NULL").Order("full_name ASC").Find(&users).Error
+	return users, err
 }

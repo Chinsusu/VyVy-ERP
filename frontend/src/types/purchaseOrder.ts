@@ -36,6 +36,8 @@ export interface PurchaseOrder {
     notes?: string;
     approved_by?: number;
     approved_at?: string;
+    assigned_to?: number;
+    assigned_to_user?: UserBrief;
     created_by_user?: UserBrief;
     updated_by_user?: UserBrief;
     approved_by_user?: UserBrief;

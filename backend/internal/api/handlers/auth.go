@@ -126,3 +126,13 @@ func (h *AuthHandler) Me(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.SuccessResponse(claims))
 }
+
+// ListUsers returns a list of all active users (safe info only, for dropdowns)
+func (h *AuthHandler) ListUsers(c *gin.Context) {
+	users, err := h.authService.ListUsers(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("FETCH_ERROR", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, utils.SuccessResponse(users))
+}

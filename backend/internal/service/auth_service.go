@@ -21,6 +21,7 @@ type AuthService interface {
 	Login(ctx context.Context, email, password string) (*LoginResponse, error)
 	ValidateToken(tokenString string) (*utils.JWTClaims, error)
 	RefreshToken(ctx context.Context, userID int64) (*LoginResponse, error)
+	ListUsers(ctx context.Context) ([]models.SafeUser, error)
 }
 
 // authService implements AuthService
@@ -159,4 +160,17 @@ func (s *authService) RefreshToken(ctx context.Context, userID int64) (*LoginRes
 		ExpiresIn:    s.cfg.JWT.ExpiryHours * 3600,
 		User:         user.ToSafeUser(),
 	}, nil
+}
+
+// ListUsers returns all active users as SafeUser for dropdowns
+func (s *authService) ListUsers(ctx context.Context) ([]models.SafeUser, error) {
+	users, err := s.userRepo.ListAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	safeUsers := make([]models.SafeUser, len(users))
+	for i, u := range users {
+		safeUsers[i] = u.ToSafeUser()
+	}
+	return safeUsers, nil
 }

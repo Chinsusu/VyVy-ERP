@@ -121,6 +121,7 @@ export default function PurchaseOrderListPage() {
                                             <tr>
                                                 <th>Số PO</th>
                                                 <th>Nhà cung cấp</th>
+                                                <th>Phụ trách</th>
                                                 <th>Kho nhận hàng</th>
                                                 <th>Ngày đặt hàng</th>
                                                 <th>Trạng thái</th>
@@ -133,6 +134,7 @@ export default function PurchaseOrderListPage() {
                                                 <tr key={po.id}>
                                                     <td className="font-semibold text-primary-600">{po.po_number}</td>
                                                     <td>{po.supplier?.name || '-'}</td>
+                                                    <td className="text-sm text-gray-600">{po.assigned_to_user ? (po.assigned_to_user.full_name || po.assigned_to_user.username) : <span className="text-gray-400 italic">-</span>}</td>
                                                     <td>{po.warehouse?.name || '-'}</td>
                                                     <td>{new Date(po.order_date).toLocaleDateString('vi-VN')}</td>
                                                     <td>{getStatusBadge(po.status)}</td>

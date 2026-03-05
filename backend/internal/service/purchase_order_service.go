@@ -18,6 +18,7 @@ type PurchaseOrderService interface {
 	DeletePurchaseOrder(id uint) error
 	ApprovePurchaseOrder(id uint, userID uint, username string) (*models.SafePurchaseOrder, error)
 	CancelPurchaseOrder(id uint, userID uint, username string) (*models.SafePurchaseOrder, error)
+	AssignPurchaseOrder(id uint, assignedTo *uint, userID uint, username string) (*models.SafePurchaseOrder, error)
 	UpdateOrderStatus(id uint, req *dto.UpdateOrderStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
 	UpdatePaymentStatus(id uint, req *dto.UpdatePaymentStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
 	UpdateInvoiceStatus(id uint, req *dto.UpdateInvoiceStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
@@ -89,6 +90,7 @@ func (s *purchaseOrderService) CreatePurchaseOrder(req *dto.CreatePurchaseOrderR
 		Status:               "draft",
 		CreatedBy:            &userID,
 		UpdatedBy:            &userID,
+		AssignedTo:           req.AssignedTo,
 	}
 
 	// Set expected delivery date if provided
@@ -558,5 +560,56 @@ func (s *purchaseOrderService) UpdateInvoiceStatus(id uint, req *dto.UpdateInvoi
 	_ = s.auditSvc.Log("purchase_orders", "UPDATE_INVOICE_STATUS", int64(id), int64(userID), username,
 		map[string]interface{}{"invoice_status": oldStatus},
 		map[string]interface{}{"invoice_status": req.InvoiceStatus, "invoice_number": req.InvoiceNumber, "invoice_date": req.InvoiceDate})
+	return po.ToSafe(), nil
+}
+
+// AssignPurchaseOrder assigns (or unassigns) a responsible person to a PO
+func (s *purchaseOrderService) AssignPurchaseOrder(id uint, assignedTo *uint, userID uint, username string) (*models.SafePurchaseOrder, error) {
+	po, err := s.poRepo.GetByID(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("purchase order not found")
+		}
+		return nil, err
+	}
+
+	oldAssignedTo := po.AssignedTo
+	// Capture old assignee name BEFORE updating
+	oldAssigneeInfo := map[string]interface{}{"assigned_to": nil, "assigned_to_name": nil}
+	if oldAssignedTo != nil {
+		oldAssigneeInfo["assigned_to"] = *oldAssignedTo
+		if po.AssignedToUser != nil {
+			oldName := po.AssignedToUser.FullName
+			if oldName == "" {
+				oldName = po.AssignedToUser.Username
+			}
+			oldAssigneeInfo["assigned_to_name"] = oldName
+		}
+	}
+
+	if err := s.poRepo.Assign(id, assignedTo, userID); err != nil {
+		return nil, err
+	}
+
+	po, err = s.poRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Build new assignee info with name
+	newAssigneeInfo := map[string]interface{}{"assigned_to": nil, "assigned_to_name": nil}
+	if po.AssignedTo != nil {
+		newAssigneeInfo["assigned_to"] = *po.AssignedTo
+		if po.AssignedToUser != nil {
+			newName := po.AssignedToUser.FullName
+			if newName == "" {
+				newName = po.AssignedToUser.Username
+			}
+			newAssigneeInfo["assigned_to_name"] = newName
+		}
+	}
+	_ = s.auditSvc.Log("purchase_orders", "ASSIGN", int64(id), int64(userID), username,
+		oldAssigneeInfo, newAssigneeInfo)
+
 	return po.ToSafe(), nil
 }

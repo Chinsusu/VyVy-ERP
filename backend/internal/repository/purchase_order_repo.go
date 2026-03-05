@@ -22,6 +22,7 @@ type PurchaseOrderRepository interface {
 	UpdateWorkflowStatus(id uint, field string, value string, notes string, updatedBy uint) error
 	UpdateInvoiceInfo(id uint, invoiceStatus string, invoiceNumber string, invoiceDate string, updatedBy uint) error
 	CompleteIfFullyReceived(id uint, updatedBy uint) error
+	Assign(id uint, assignedTo *uint, updatedBy uint) error
 }
 
 type purchaseOrderRepository struct {
@@ -70,6 +71,12 @@ func (r *purchaseOrderRepository) GetByID(id uint) (*models.PurchaseOrder, error
 			po.ApprovedByUser = &user
 		}
 	}
+	if po.AssignedTo != nil {
+		var user models.User
+		if e := r.db.First(&user, *po.AssignedTo).Error; e == nil {
+			po.AssignedToUser = &user
+		}
+	}
 
 	return &po, nil
 }
@@ -109,7 +116,16 @@ func (r *purchaseOrderRepository) List(filter *dto.PurchaseOrderFilterRequest) (
 		query = query.Where("status = ?", filter.Status)
 	}
 
-	// Apply order date range filter
+	// Apply payment status filter
+	if filter.PaymentStatus != "" {
+		query = query.Where("payment_status = ?", filter.PaymentStatus)
+	}
+
+	// Apply assigned_to filter
+	if filter.AssignedTo != nil {
+		query = query.Where("assigned_to = ?", *filter.AssignedTo)
+	}
+
 	if filter.OrderDateFrom != "" {
 		query = query.Where("order_date >= ?", filter.OrderDateFrom)
 	}
@@ -148,6 +164,8 @@ func (r *purchaseOrderRepository) List(filter *dto.PurchaseOrderFilterRequest) (
 		Preload("Supplier").
 		Preload("Warehouse").
 		Preload("ApprovedByUser").
+		Preload("AssignedToUser").
+		Preload("CreatedByUser").
 		Preload("Items").
 		Preload("Items.Material").
 		Find(&pos).Error
@@ -280,4 +298,11 @@ func (r *purchaseOrderRepository) CompleteIfFullyReceived(id uint, updatedBy uin
 	}
 	return nil
 }
-
+// Assign sets (or clears) the person responsible for a PO
+func (r *purchaseOrderRepository) Assign(id uint, assignedTo *uint, updatedBy uint) error {
+	updates := map[string]interface{}{
+		"assigned_to": assignedTo,
+		"updated_by":  updatedBy,
+	}
+	return r.db.Model(&models.PurchaseOrder{}).Where("id = ?", id).Updates(updates).Error
+}

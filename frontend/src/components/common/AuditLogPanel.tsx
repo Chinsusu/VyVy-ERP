@@ -1,4 +1,4 @@
-import { History, User, Clock, ArrowRight, Plus, Trash2, Edit, CheckCircle, XCircle, Truck, CreditCard, FileText } from 'lucide-react';
+import { History, User, Clock, ArrowRight, Plus, Trash2, Edit, CheckCircle, XCircle, Truck, CreditCard, FileText, UserCheck } from 'lucide-react';
 import { useAuditLogs } from '../../hooks/useAuditLogs';
 
 interface AuditLogPanelProps {
@@ -113,6 +113,7 @@ function ActionBadge({ action }: { action: string }) {
     if (action === 'UPDATE_ORDER_STATUS') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700"><Truck className="w-3 h-3" />Cập nhật đặt hàng</span>;
     if (action === 'UPDATE_PAYMENT_STATUS') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700"><CreditCard className="w-3 h-3" />Cập nhật thanh toán</span>;
     if (action === 'UPDATE_INVOICE_STATUS') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700"><FileText className="w-3 h-3" />Cập nhật hóa đơn</span>;
+    if (action === 'ASSIGN') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700"><UserCheck className="w-3 h-3" />Phân công</span>;
     return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600"><Edit className="w-3 h-3" />{action}</span>;
 }
 
@@ -269,6 +270,33 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                                     {log.action === 'CANCEL' && (
                                         <p className="text-xs text-gray-500 mt-1">Đơn hàng đã bị hủy</p>
                                     )}
+
+                                    {/* Detail for ASSIGN */}
+                                    {log.action === 'ASSIGN' && (() => {
+                                        const newName = log.new_values?.assigned_to_name;
+                                        const oldName = log.old_values?.assigned_to_name;
+                                        const newId = log.new_values?.assigned_to;
+                                        const oldId = log.old_values?.assigned_to;
+                                        const displayNew = newName || (newId != null ? `#${newId}` : null);
+                                        const displayOld = oldName || (oldId != null ? `#${oldId}` : null);
+                                        return (
+                                            <div className="flex items-center gap-2 text-xs mt-2">
+                                                <span className="text-gray-500 min-w-[80px]">Phụ trách:</span>
+                                                <div className="flex items-center gap-1">
+                                                    {displayOld && (
+                                                        <>
+                                                            <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">{String(displayOld)}</span>
+                                                            <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
+                                                        </>
+                                                    )}
+                                                    {displayNew
+                                                        ? <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">{String(displayNew)}</span>
+                                                        : <span className="bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded italic">Bỏ phân công</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
 
                                     {/* Summary for DELETE */}
                                     {log.action === 'DELETE' && (

@@ -136,3 +136,16 @@ export const useUpdatePOInvoiceStatus = () => {
         },
     });
 };
+
+export const useAssignPO = () => {
+    const queryClient = useQueryClient();
+    type AssignVars = { id: number; assignedTo: number | null };
+    return useMutation<PurchaseOrder, Error, AssignVars>({
+        mutationFn: ({ id, assignedTo }: AssignVars) =>
+            purchaseOrdersAPI.assign(id, assignedTo),
+        onSuccess: (_: PurchaseOrder, variables: AssignVars) => {
+            queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(variables.id) });
+            queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.lists() });
+        },
+    });
+};

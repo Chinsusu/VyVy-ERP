@@ -24,6 +24,7 @@ type CreatePurchaseOrderRequest struct {
 	PaymentTerms         string                            `json:"payment_terms"`
 	ShippingMethod       string                            `json:"shipping_method"`
 	Notes                string                            `json:"notes"`
+	AssignedTo           *uint                             `json:"assigned_to"`
 	Items                []CreatePurchaseOrderItemRequest  `json:"items" binding:"required,min=1,dive"`
 }
 
@@ -49,7 +50,13 @@ type UpdatePurchaseOrderRequest struct {
 	PaymentTerms         string                            `json:"payment_terms"`
 	ShippingMethod       string                            `json:"shipping_method"`
 	Notes                string                            `json:"notes"`
+	AssignedTo           *uint                             `json:"assigned_to"`
 	Items                []UpdatePurchaseOrderItemRequest  `json:"items" binding:"omitempty,dive"`
+}
+
+// AssignPORequest represents the request to assign a responsible person to a PO
+type AssignPORequest struct {
+	AssignedTo *uint `json:"assigned_to"` // nil = unassign
 }
 
 // PurchaseOrderFilterRequest represents the filter for listing purchase orders
@@ -59,6 +66,7 @@ type PurchaseOrderFilterRequest struct {
 	WarehouseID   *uint  `form:"warehouse_id"`
 	Status        string `form:"status"`
 	PaymentStatus string `form:"payment_status"`
+	AssignedTo    *uint  `form:"assigned_to"`
 	OrderDateFrom string `form:"order_date_from"` // YYYY-MM-DD
 	OrderDateTo   string `form:"order_date_to"`   // YYYY-MM-DD
 	Page          int    `form:"page"`

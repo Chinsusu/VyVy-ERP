@@ -51,12 +51,16 @@ type PurchaseOrder struct {
 	UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime" json:"updated_at"`
 	UpdatedBy *uint     `gorm:"column:updated_by" json:"updated_by,omitempty"`
 
+	// Assignment
+	AssignedTo     *uint      `gorm:"column:assigned_to" json:"assigned_to,omitempty"`
+
 	// Relationships
-	Supplier       *Supplier           `gorm:"foreignKey:SupplierID" json:"supplier,omitempty"`
-	Warehouse      *Warehouse          `gorm:"foreignKey:WarehouseID" json:"warehouse,omitempty"`
-	ApprovedByUser *User               `gorm:"foreignKey:ApprovedBy;references:ID" json:"approved_by_user,omitempty"`
-	CreatedByUser  *User               `gorm:"foreignKey:CreatedBy;references:ID" json:"created_by_user,omitempty"`
-	UpdatedByUser  *User               `gorm:"foreignKey:UpdatedBy;references:ID" json:"updated_by_user,omitempty"`
+	Supplier        *Supplier           `gorm:"foreignKey:SupplierID" json:"supplier,omitempty"`
+	Warehouse       *Warehouse          `gorm:"foreignKey:WarehouseID" json:"warehouse,omitempty"`
+	ApprovedByUser  *User               `gorm:"foreignKey:ApprovedBy;references:ID" json:"approved_by_user,omitempty"`
+	CreatedByUser   *User               `gorm:"foreignKey:CreatedBy;references:ID" json:"created_by_user,omitempty"`
+	UpdatedByUser   *User               `gorm:"foreignKey:UpdatedBy;references:ID" json:"updated_by_user,omitempty"`
+	AssignedToUser  *User               `gorm:"foreignKey:AssignedTo;references:ID" json:"assigned_to_user,omitempty"`
 	Items          []*PurchaseOrderItem `gorm:"foreignKey:PurchaseOrderID" json:"items,omitempty"`
 }
 
@@ -93,11 +97,13 @@ type SafePurchaseOrder struct {
 	InvoiceNumber        string                    `json:"invoice_number,omitempty"`
 	InvoiceDate          *string                   `json:"invoice_date,omitempty"`
 	Notes                string                    `json:"notes,omitempty"`
-	ApprovedBy           *uint                     `json:"approved_by,omitempty"`
-	ApprovedAt           *time.Time                `json:"approved_at,omitempty"`
-	CreatedByUser        *SafeUser                 `json:"created_by_user,omitempty"`
-	UpdatedByUser        *SafeUser                 `json:"updated_by_user,omitempty"`
-	ApprovedByUser       *SafeUser                 `json:"approved_by_user,omitempty"`
+	ApprovedBy          *uint                     `json:"approved_by,omitempty"`
+	ApprovedAt          *time.Time                `json:"approved_at,omitempty"`
+	AssignedTo          *uint                     `json:"assigned_to,omitempty"`
+	AssignedToUser      *SafeUser                 `json:"assigned_to_user,omitempty"`
+	CreatedByUser       *SafeUser                 `json:"created_by_user,omitempty"`
+	UpdatedByUser       *SafeUser                 `json:"updated_by_user,omitempty"`
+	ApprovedByUser      *SafeUser                 `json:"approved_by_user,omitempty"`
 	Items                []*SafePurchaseOrderItem  `json:"items,omitempty"`
 	CreatedAt            time.Time                 `json:"created_at"`
 	UpdatedAt            time.Time                 `json:"updated_at"`
@@ -132,6 +138,7 @@ func (po *PurchaseOrder) ToSafe() *SafePurchaseOrder {
 		Notes:                po.Notes,
 		ApprovedBy:           po.ApprovedBy,
 		ApprovedAt:           po.ApprovedAt,
+		AssignedTo:           po.AssignedTo,
 		CreatedAt:            po.CreatedAt,
 		UpdatedAt:            po.UpdatedAt,
 	}
@@ -154,6 +161,10 @@ func (po *PurchaseOrder) ToSafe() *SafePurchaseOrder {
 	if po.ApprovedByUser != nil {
 		safeUser := po.ApprovedByUser.ToSafeUser()
 		safe.ApprovedByUser = &safeUser
+	}
+	if po.AssignedToUser != nil {
+		safeUser := po.AssignedToUser.ToSafeUser()
+		safe.AssignedToUser = &safeUser
 	}
 	if po.Items != nil {
 		safe.Items = make([]*SafePurchaseOrderItem, len(po.Items))

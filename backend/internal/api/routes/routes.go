@@ -107,6 +107,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		authGroup.GET("/me", middleware.AuthMiddleware(authService), authHandler.Me)
 	}
 
+	// Users list (for dropdowns/assignment)
+	v1.GET("/users", middleware.AuthMiddleware(authService), authHandler.ListUsers)
+
 	// Material routes - All protected
 	materialGroup := v1.Group("/materials")
 	materialGroup.Use(middleware.AuthMiddleware(authService))
@@ -190,6 +193,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		// Workflow endpoints
 		poGroup.POST("/:id/approve", middleware.RequireRole("procurement_manager"), purchaseOrderHandler.Approve)
 		poGroup.POST("/:id/cancel", middleware.RequireRole("procurement_manager"), purchaseOrderHandler.Cancel)
+		poGroup.PUT("/:id/assign", purchaseOrderHandler.Assign)
 		poGroup.PUT("/:id/order-status", purchaseOrderHandler.UpdateOrderStatus)
 		poGroup.PUT("/:id/payment-status", purchaseOrderHandler.UpdatePaymentStatus)
 		poGroup.PUT("/:id/invoice-status", purchaseOrderHandler.UpdateInvoiceStatus)

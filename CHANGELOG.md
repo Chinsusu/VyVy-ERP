@@ -7,7 +7,36 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc20] - 2026-03-05
+
+### Added
+- **PO Assignee Feature**: Phân công người phụ trách cho từng đơn mua hàng.
+  - Migration `000036_add_assigned_to_purchase_orders`: Thêm cột `assigned_to` (FK → users) vào `purchase_orders`.
+  - Backend: Endpoint `PUT /api/v1/purchase-orders/:id/assign` — gán hoặc bỏ gán người phụ trách (truyền `null` để unassign).
+  - Backend: `AssignPurchaseOrder()` service method với audit log ASSIGN đầy đủ (ghi tên người cũ và mới).
+  - Frontend: Card **Người phụ trách** trong sidebar PO Detail — hiển thị avatar gradient + tên + nút Đổi/Phân công.
+  - Frontend: Modal phân công dạng card list (giống card Tiến trình xử lý) — chọn user hoặc "Bỏ phân công".
+
+- **ASSIGN Audit Log**: Action type `ASSIGN` được ghi vào `audit_logs` với `old_values` và `new_values` chứa cả `assigned_to` (ID) và `assigned_to_name` (FullName hoặc Username). AuditLogPanel hiển thị "Phụ trách: [tên cũ] → [tên mới]".
+
+- **APPROVE / CANCEL Audit Log**: Hai action này được ghi vào audit log (trước đây bị bỏ qua).
+
+### Changed
+- **PO Detail Page — Layout mới (2-cột chuẩn ERP)**:
+  - **Info bar compact** (thay card NCC/Kho 2 cột cũ): 4 cell ngang (NCC / Kho nhận / Ngày đặt / Tổng tiền) trong 1 card với `divide-x`.
+  - **Bảng items** tích hợp luôn footer tóm tắt tài chính (Tạm tính → Thuế → Tổng) — bỏ card "Tóm tắt đơn hàng" riêng.
+  - **Cột trái (2/3)**: Bảng items + Ghi chú + `<AuditLogPanel>`.
+  - **Cột phải (1/3 sidebar)**: Người phụ trách → Tiến trình xử lý (B4/B5/B6) → Chứng từ.
+  - `<AuditLogPanel>` chuyển từ full-width bên ngoài grid vào cuối cột trái — gọn gàng hơn.
+
+- **UI/UX Standards** (`standards/ui_ux.md`): Chuẩn hóa **Standard Detail Page Layout** thành pattern chính thức với ASCII diagram và 5 quy tắc, lấy `PurchaseOrderDetailPage.tsx` làm reference implementation.
+
+- **PO Design Doc** (`purchase_order_design.md`): Cập nhật Section 5 (layout diagram mới), Section 6 (thêm ASSIGN vào bảng action types + note về assigned_to_name logging).
+
+---
+
 ## [1.0.0-rc19] - 2026-03-04
+
 
 ### Added
 - **SearchInput Component** (`frontend/src/components/common/SearchInput.tsx`): Component tìm kiếm tái sử dụng với icon kính lúp, realtime search (trigger trên mỗi keystroke), nút clear (X) có auto-focus, và prop `width` tuỳ chỉnh.

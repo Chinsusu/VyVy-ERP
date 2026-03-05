@@ -66,5 +66,11 @@ export const purchaseOrdersAPI = {
         const response = await axios.put(`/purchase-orders/${id}/invoice-status`, input);
         return response.data.data;
     },
+
+    // Assign responsible person
+    assign: async (id: number, assignedTo: number | null): Promise<PurchaseOrder> => {
+        const response = await axios.put(`/purchase-orders/${id}/assign`, { assigned_to: assignedTo });
+        return response.data.data;
+    },
 };
 

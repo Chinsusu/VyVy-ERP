@@ -198,6 +198,37 @@ func (h *PurchaseOrderHandler) Cancel(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.SuccessResponse(po))
 }
 
+// Assign sets (or clears) the responsible person for a PO
+func (h *PurchaseOrderHandler) Assign(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
+		return
+	}
+	var req dto.AssignPORequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
+		return
+	}
+	val, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
+		return
+	}
+	userID := val.(int64)
+	usernameVal, _ := c.Get("username")
+	usernameStr, _ := usernameVal.(string)
+
+	po, err := h.service.AssignPurchaseOrder(uint(id), req.AssignedTo, uint(userID), usernameStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("ASSIGN_ERROR", err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(po))
+}
+
 // UpdateOrderStatus updates the ordering status of a PO (B4)
 func (h *PurchaseOrderHandler) UpdateOrderStatus(c *gin.Context) {
 	idParam := c.Param("id")

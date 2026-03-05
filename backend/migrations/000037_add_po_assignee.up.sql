@@ -1,0 +1,1 @@
+ALTER TABLE purchase_orders ADD COLUMN IF NOT EXISTS assigned_to BIGINT REFERENCES users(id) ON DELETE SET NULL;
