@@ -3,122 +3,9 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Edit, CheckCircle, XCircle, Trash2,
     Truck, Building2, Calendar, FileText, Package,
-    Plus, History, User, Clock, ArrowRight
 } from 'lucide-react';
 
-const PO_FIELD_LABELS: Record<string, string> = {
-    order_date: 'Ngày đặt hàng',
-    expected_delivery_date: 'Ngày giao dự kiến',
-    status: 'Trạng thái',
-    supplier_id: 'Nhà cung cấp',
-    warehouse_id: 'Kho nhận',
-    subtotal: 'Tạm tính',
-    tax_amount: 'Thuế',
-    discount_amount: 'Giảm giá',
-    total_amount: 'Tổng cộng',
-    payment_terms: 'Điều khoản thanh toán',
-    shipping_method: 'Phương thức vận chuyển',
-    notes: 'Ghi chú',
-    po_number: 'Mã PO',
-    items: 'Danh sách sản phẩm',
-};
 
-interface ItemSnapshot {
-    material_id: number;
-    material_name?: string;
-    quantity: number;
-    unit_price: number;
-    tax_rate: number;
-    discount_rate: number;
-    expected_delivery_date?: string;
-    notes?: string;
-}
-
-function renderItemDiff(oldItems: ItemSnapshot[], newItems: ItemSnapshot[], materialLookup?: Map<number, string>) {
-    const ITEM_LABELS: Record<string, string> = {
-        quantity: 'Số lượng',
-        unit_price: 'Đơn giá',
-        tax_rate: 'Thuế (%)',
-        discount_rate: 'Giảm giá (%)',
-        expected_delivery_date: 'Ngày giao',
-        notes: 'Ghi chú',
-    };
-    const diffs: Array<{ materialId: number; field: string; oldVal: unknown; newVal: unknown }> = [];
-    const newMap = new Map(newItems.map(it => [it.material_id, it]));
-    const oldMap = new Map(oldItems.map(it => [it.material_id, it]));
-
-    // Added items
-    newMap.forEach((_newIt, mid) => {
-        if (!oldMap.has(mid)) {
-            diffs.push({ materialId: mid, field: '__added__', oldVal: null, newVal: null });
-        }
-    });
-    // Removed items
-    oldMap.forEach((_oldIt, mid) => {
-        if (!newMap.has(mid)) {
-            diffs.push({ materialId: mid, field: '__removed__', oldVal: null, newVal: null });
-        }
-    });
-    // Changed fields (exclude metadata fields)
-    const COMPARABLE_FIELDS = ['quantity', 'unit_price', 'tax_rate', 'discount_rate', 'expected_delivery_date', 'notes'] as (keyof ItemSnapshot)[];
-    // Normalize a field value for comparison (dates: take first 10 chars only)
-    const normalizeForCmp = (f: keyof ItemSnapshot, v: unknown): string => {
-        if (f === 'expected_delivery_date' && typeof v === 'string' && v.length >= 10) {
-            return v.substring(0, 10); // YYYY-MM-DD
-        }
-        return String(v ?? '');
-    };
-    newMap.forEach((newIt, mid) => {
-        const oldIt = oldMap.get(mid);
-        if (!oldIt) return;
-        COMPARABLE_FIELDS.forEach(f => {
-            if (normalizeForCmp(f, oldIt[f]) !== normalizeForCmp(f, newIt[f])) {
-                diffs.push({ materialId: mid, field: f, oldVal: oldIt[f], newVal: newIt[f] });
-            }
-        });
-    });
-    if (diffs.length === 0) return <span className="text-xs text-gray-400">Không có thay đổi chi tiết</span>;
-    const getMaterialLabel = (mid: number) => {
-        const item = newMap.get(mid) || oldMap.get(mid);
-        // Priority: snapshot name > current PO items lookup > raw ID
-        if (item?.material_name) return item.material_name;
-        if (materialLookup?.has(mid)) return materialLookup.get(mid)!;
-        return `#${mid}`;
-    };
-    return (
-        <div className="space-y-1">
-            {diffs.map((d, i) => (
-                <div key={i} className="flex items-start gap-2 text-xs">
-                    <span className="text-gray-500 min-w-[160px] pt-0.5">
-                        {d.field === '__added__' ? `Thêm: ${getMaterialLabel(d.materialId)}` :
-                            d.field === '__removed__' ? `Xóa: ${getMaterialLabel(d.materialId)}` :
-                                `${getMaterialLabel(d.materialId)} – ${ITEM_LABELS[d.field] || d.field}`}:
-                    </span>
-                    {d.field !== '__added__' && d.field !== '__removed__' && (
-                        <div className="flex items-center gap-1 flex-wrap">
-                            <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">{poFormatValue(d.oldVal)}</span>
-                            <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
-                            <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">{poFormatValue(d.newVal)}</span>
-                        </div>
-                    )}
-                    {(d.field === '__added__') && <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">Thêm mới</span>}
-                    {(d.field === '__removed__') && <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">Đã xóa</span>}
-                </div>
-            ))}
-        </div>
-    );
-}
-
-function poFormatValue(value: unknown): string {
-    if (value === null || value === undefined) return '—';
-    if (typeof value === 'boolean') return value ? 'Có' : 'Không';
-    if (typeof value === 'number') return value.toLocaleString('vi-VN');
-    if (typeof value === 'string') {
-        if (/^\d{4}-\d{2}-\d{2}T/.test(value)) return new Date(value).toLocaleString('vi-VN');
-        return value;
-    }
-    return String(value);
-}
 import {
     usePurchaseOrder,
     useApprovePurchaseOrder,
@@ -129,7 +16,7 @@ import {
     useUpdatePOInvoiceStatus,
 } from '../../hooks/usePurchaseOrders';
 import type { PurchaseOrderItem } from '../../types/purchaseOrder';
-import { useAuditLogs } from '../../hooks/useAuditLogs';
+import AuditLogPanel from '../../components/common/AuditLogPanel';
 import PODocuments from '../../components/purchase-orders/PODocuments';
 
 
@@ -150,7 +37,7 @@ export default function PurchaseOrderDetailPage() {
     const [showConfirmModal, setShowConfirmModal] = useState<'approve' | 'cancel' | 'delete' | null>(null);
     const [activeWorkflow, setActiveWorkflow] = useState<'order' | 'payment' | 'invoice' | null>(null);
     const [workflowForm, setWorkflowForm] = useState({ order_status: 'ordered', payment_status: 'partial', invoice_status: 'received', invoice_number: '', invoice_date: '', notes: '' });
-    const { data: auditLogs } = useAuditLogs('purchase_orders', poId);
+
 
 
 
@@ -634,263 +521,59 @@ export default function PurchaseOrderDetailPage() {
 
 
 
-            {/* Timeline - full width at the bottom, dọ kiểu MR */}
-            <div className="mt-8 card">
-                <h3 className="text-sm font-bold uppercase text-gray-500 mb-6 tracking-wider flex items-center gap-2">
-                    <History className="w-4 h-4" />
-                    Timeline
-                </h3>
-                <div className="relative">
-                    {/* Dường dọc */}
-                    <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-200" />
-                    <div className="space-y-4">
 
-                        {/* Đã tạo */}
-                        <div className="relative pl-10">
-                            <div className="absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white bg-green-500" />
-                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                                <div className="flex items-center justify-between flex-wrap gap-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
-                                            <Plus className="w-3 h-3" /> Tạo mới
-                                        </span>
-                                        {po.created_by_user && (
-                                            <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
-                                                <User className="w-3.5 h-3.5 text-gray-400" />
-                                                {po.created_by_user.full_name || po.created_by_user.username}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <span className="flex items-center gap-1 text-xs text-gray-500">
-                                        <Clock className="w-3 h-3" />
-                                        {new Date(po.created_at).toLocaleString('vi-VN')}
-                                    </span>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-1">Bản ghi được tạo lần đầu</p>
-                            </div>
-                        </div>
-
-                        {/* Audit log entries (UPDATE, DELETE) — sorted ASC by time */}
-                        {auditLogs && [...auditLogs]
-                            .filter((log: { action: string }) => log.action !== 'CREATE')
-                            .sort((a: { created_at: string }, b: { created_at: string }) =>
-                                new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-                            )
-                            .map((log: {
-                                id: number; action: string; username?: string; created_at: string;
-                                changed_fields?: string[]; old_values?: Record<string, unknown>; new_values?: Record<string, unknown>
-                            }) => (
-                                <div key={log.id} className="relative pl-10">
-                                    <div className={`absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white ${log.action === 'DELETE' ? 'bg-red-500' :
-                                            log.action === 'APPROVE' ? 'bg-emerald-500' :
-                                                log.action === 'CANCEL' ? 'bg-red-500' :
-                                                    log.action === 'UPDATE_PAYMENT_STATUS' ? 'bg-yellow-500' :
-                                                        log.action === 'UPDATE_INVOICE_STATUS' ? 'bg-purple-500' :
-                                                            log.action === 'UPDATE_ORDER_STATUS' ? 'bg-indigo-500' :
-                                                                'bg-blue-500'
-                                        }`} />
-                                    <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                                        <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-                                            <div className="flex items-center gap-2">
-                                                {log.action === 'UPDATE' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
-                                                        <Edit className="w-3 h-3" /> Chỉnh sửa
-                                                    </span>
-                                                ) : log.action === 'DELETE' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
-                                                        <XCircle className="w-3 h-3" /> Xóa
-                                                    </span>
-                                                ) : log.action === 'UPDATE_ORDER_STATUS' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">
-                                                        <Truck className="w-3 h-3" /> Cập nhật đặt hàng
-                                                    </span>
-                                                ) : log.action === 'UPDATE_PAYMENT_STATUS' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700">
-                                                        <FileText className="w-3 h-3" /> Cập nhật thanh toán
-                                                    </span>
-                                                ) : log.action === 'UPDATE_INVOICE_STATUS' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700">
-                                                        <FileText className="w-3 h-3" /> Cập nhật hóa đơn
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-                                                        <Edit className="w-3 h-3" /> {log.action}
-                                                    </span>
-                                                )}
-                                                <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
-                                                    <User className="w-3.5 h-3.5 text-gray-400" />
-                                                    {log.username || 'Hệ thống'}
-                                                </span>
-                                            </div>
-                                            <span className="flex items-center gap-1 text-xs text-gray-500">
-                                                <Clock className="w-3 h-3" />
-                                                {new Date(log.created_at).toLocaleString('vi-VN')}
-                                            </span>
-                                        </div>
-                                        {log.action === 'UPDATE' && log.changed_fields && log.changed_fields.length > 0 && (() => {
-                                            const NOISE_FIELDS = new Set(['updated_at', 'created_at', 'deleted_at', 'updated_by', 'created_by']);
-                                            const visibleFields = log.changed_fields.filter((f: string) => !NOISE_FIELDS.has(f));
-                                            if (visibleFields.length === 0) return null;
-                                            return (
-                                                <div className="space-y-1 mt-2">
-                                                    {visibleFields.map((field: string) => {
-                                                        if (field === 'items') {
-                                                            const oldItems = (log.old_values?.['items'] as ItemSnapshot[]) || [];
-                                                            const newItems = (log.new_values?.['items'] as ItemSnapshot[]) || [];
-                                                            return (
-                                                                <div key={field} className="text-xs">
-                                                                    <span className="text-gray-500 font-medium">Danh sách sản phẩm:</span>
-                                                                    <div className="mt-1 pl-2 border-l-2 border-blue-100">
-                                                                        {renderItemDiff(oldItems, newItems, new Map(
-                                                                            (po.items || []).map((it: { material_id: number; material?: { trading_name?: string }; trade?: string }) => [
-                                                                                it.material_id,
-                                                                                it.material?.trading_name || `#${it.material_id}`
-                                                                            ])
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        }
-                                                        const label = PO_FIELD_LABELS[field] || field;
-                                                        const oldVal = log.old_values?.[field];
-                                                        const newVal = log.new_values?.[field];
-                                                        return (
-                                                            <div key={field} className="flex items-start gap-2 text-xs">
-                                                                <span className="text-gray-500 min-w-[140px] pt-0.5">{label}:</span>
-                                                                <div className="flex items-center gap-1 flex-wrap">
-                                                                    <span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">
-                                                                        {poFormatValue(oldVal)}
-                                                                    </span>
-                                                                    <ArrowRight className="w-3 h-3 text-gray-400 shrink-0" />
-                                                                    <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
-                                                                        {poFormatValue(newVal)}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            )
-                                        })()}
-                                        {/* Workflow status changes: B4/B5/B6 */}
-                                        {['UPDATE_ORDER_STATUS', 'UPDATE_PAYMENT_STATUS', 'UPDATE_INVOICE_STATUS'].includes(log.action) && log.new_values && (
-                                            <div className="space-y-1 mt-2">
-                                                {Object.entries(log.new_values).map(([field, newVal]) => {
-                                                    const WLABELS: Record<string, string> = { order_status: 'Trạng thái đặt hàng', payment_status: 'Thanh toán', invoice_status: 'Hóa đơn', notes: 'Ghi chú' };
-                                                    const SLABELS: Record<string, string> = { pending: 'Chờ xử lý', ordered: 'Đã đặt', partial: 'Một phần', completed: 'Hoàn thành', received: 'Đã nhận' };
-                                                    const label = WLABELS[field] || field;
-                                                    const oldVal = log.old_values?.[field];
-                                                    const displayNew = SLABELS[String(newVal)] || String(newVal);
-                                                    const displayOld = oldVal ? (SLABELS[String(oldVal)] || String(oldVal)) : null;
-                                                    if (field === 'notes') {
-                                                        if (!newVal) return null;
-                                                        return <div key={field} className="flex items-start gap-2 text-xs"><span className="text-gray-500 min-w-[100px] pt-0.5">{label}:</span><span className="text-gray-700 italic">{String(newVal)}</span></div>;
-                                                    }
-                                                    return (
-                                                        <div key={field} className="flex items-start gap-2 text-xs">
-                                                            <span className="text-gray-500 min-w-[140px] pt-0.5">{label}:</span>
-                                                            <div className="flex items-center gap-1">
-                                                                {displayOld && <><span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">{displayOld}</span><ArrowRight className="w-3 h-3 text-gray-400" /></>}
-                                                                <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">{displayNew}</span>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                }).filter(Boolean)}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-
-                        {/* Đã duyệt */}
-                        {po.approved_at && (
-                            <div className="relative pl-10">
-                                <div className="absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white bg-green-500" />
-                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                                    <div className="flex items-center justify-between flex-wrap gap-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
-                                                <CheckCircle className="w-3 h-3" /> Đã duyệt
-                                            </span>
-                                            {po.approved_by_user && (
-                                                <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
-                                                    <User className="w-3.5 h-3.5 text-gray-400" />
-                                                    {po.approved_by_user.full_name || po.approved_by_user.username}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <span className="flex items-center gap-1 text-xs text-gray-500">
-                                            <Clock className="w-3 h-3" />
-                                            {new Date(po.approved_at).toLocaleString('vi-VN')}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Đã hủy */}
-                        {po.status === 'cancelled' && (
-                            <div className="relative pl-10">
-                                <div className="absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white bg-red-500" />
-                                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
-                                        <XCircle className="w-3 h-3" /> Đã hủy
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-
-                        {!auditLogs && (
-                            <div className="relative pl-10 text-sm text-gray-400">Đang tải lịch sử...</div>
-                        )}
-                    </div>
-                </div>
-            </div>
+            {/* Timeline - dùng AuditLogPanel component */}
+            <AuditLogPanel tableName="purchase_orders" recordId={poId} />
 
             {/* AuditLogPanel đã được gộp vào Timeline card sidebar */}
 
-            {/* Confirmation Modals */}
-            {showConfirmModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 space-y-6">
-                        <div className="text-center space-y-2">
-                            <h3 className="text-premium-2xl font-bold text-gray-900">
-                                {showConfirmModal === 'approve' ? 'Duyệt đơn hàng?' :
-                                    showConfirmModal === 'cancel' ? 'Hủy đơn hàng?' : 'Xóa đơn hàng?'}
-                            </h3>
-                            <p className="text-gray-500">
-                                Bạn có chắc muốn {showConfirmModal === 'approve' ? 'duyệt' : showConfirmModal === 'cancel' ? 'hủy' : 'xóa'} đơn mua hàng <strong>{po.po_number}</strong>?
-                                {showConfirmModal === 'delete' && ' Hành động này không thể hoàn tác.'}
-                            </p>
-                        </div>
 
-                        <div className="flex gap-4">
-                            <button
-                                onClick={() => setShowConfirmModal(null)}
-                                className="btn btn-secondary flex-1"
-                                disabled={approveMutation.isPending || cancelMutation.isPending || deleteMutation.isPending}
-                            >
-                                Quay lại
-                            </button>
-                            <button
-                                onClick={
-                                    showConfirmModal === 'approve' ? handleApprove :
-                                        showConfirmModal === 'cancel' ? handleCancel :
-                                            handleDelete
-                                }
-                                className={`btn flex-1 ${showConfirmModal === 'delete' ? 'btn-danger' :
-                                    showConfirmModal === 'approve' ? 'btn-success' : 'btn-warning'
-                                    }`}
-                                disabled={approveMutation.isPending || cancelMutation.isPending || deleteMutation.isPending}
-                            >
-                                {approveMutation.isPending || cancelMutation.isPending || deleteMutation.isPending ? 'Đang xử lý...' :
-                                    showConfirmModal === 'approve' ? 'Xác nhận duyệt' :
-                                        showConfirmModal === 'cancel' ? 'Xác nhận hủy' : 'Xác nhận xóa'}
-                            </button>
+
+
+            {/* Confirmation Modals */}
+            {
+                showConfirmModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                        <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-8 space-y-6">
+                            <div className="text-center space-y-2">
+                                <h3 className="text-premium-2xl font-bold text-gray-900">
+                                    {showConfirmModal === 'approve' ? 'Duyệt đơn hàng?' :
+                                        showConfirmModal === 'cancel' ? 'Hủy đơn hàng?' : 'Xóa đơn hàng?'}
+                                </h3>
+                                <p className="text-gray-500">
+                                    Bạn có chắc muốn {showConfirmModal === 'approve' ? 'duyệt' : showConfirmModal === 'cancel' ? 'hủy' : 'xóa'} đơn mua hàng <strong>{po.po_number}</strong>?
+                                    {showConfirmModal === 'delete' && ' Hành động này không thể hoàn tác.'}
+                                </p>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => setShowConfirmModal(null)}
+                                    className="btn btn-secondary flex-1"
+                                    disabled={approveMutation.isPending || cancelMutation.isPending || deleteMutation.isPending}
+                                >
+                                    Quay lại
+                                </button>
+                                <button
+                                    onClick={
+                                        showConfirmModal === 'approve' ? handleApprove :
+                                            showConfirmModal === 'cancel' ? handleCancel :
+                                                handleDelete
+                                    }
+                                    className={`btn flex-1 ${showConfirmModal === 'delete' ? 'btn-danger' :
+                                        showConfirmModal === 'approve' ? 'btn-success' : 'btn-warning'
+                                        }`}
+                                    disabled={approveMutation.isPending || cancelMutation.isPending || deleteMutation.isPending}
+                                >
+                                    {approveMutation.isPending || cancelMutation.isPending || deleteMutation.isPending ? 'Đang xử lý...' :
+                                        showConfirmModal === 'approve' ? 'Xác nhận duyệt' :
+                                            showConfirmModal === 'cancel' ? 'Xác nhận hủy' : 'Xác nhận xóa'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
