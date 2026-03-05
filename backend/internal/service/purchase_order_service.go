@@ -16,8 +16,8 @@ type PurchaseOrderService interface {
 	ListPurchaseOrders(filter *dto.PurchaseOrderFilterRequest) ([]*models.SafePurchaseOrder, int64, error)
 	UpdatePurchaseOrder(id uint, req *dto.UpdatePurchaseOrderRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
 	DeletePurchaseOrder(id uint) error
-	ApprovePurchaseOrder(id uint, userID uint) (*models.SafePurchaseOrder, error)
-	CancelPurchaseOrder(id uint) (*models.SafePurchaseOrder, error)
+	ApprovePurchaseOrder(id uint, userID uint, username string) (*models.SafePurchaseOrder, error)
+	CancelPurchaseOrder(id uint, userID uint, username string) (*models.SafePurchaseOrder, error)
 	UpdateOrderStatus(id uint, req *dto.UpdateOrderStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
 	UpdatePaymentStatus(id uint, req *dto.UpdatePaymentStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
 	UpdateInvoiceStatus(id uint, req *dto.UpdateInvoiceStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
@@ -413,7 +413,7 @@ func (s *purchaseOrderService) DeletePurchaseOrder(id uint) error {
 }
 
 // ApprovePurchaseOrder approves a purchase order (draft → approved)
-func (s *purchaseOrderService) ApprovePurchaseOrder(id uint, userID uint) (*models.SafePurchaseOrder, error) {
+func (s *purchaseOrderService) ApprovePurchaseOrder(id uint, userID uint, username string) (*models.SafePurchaseOrder, error) {
 	// Get existing PO
 	po, err := s.poRepo.GetByID(id)
 	if err != nil {
@@ -428,6 +428,7 @@ func (s *purchaseOrderService) ApprovePurchaseOrder(id uint, userID uint) (*mode
 		return nil, errors.New("can only approve purchase orders in draft status")
 	}
 
+	oldStatus := po.Status
 	// Update status to approved
 	now := time.Now()
 	if err := s.poRepo.UpdateStatus(id, "approved", &userID, &now); err != nil {
@@ -440,11 +441,15 @@ func (s *purchaseOrderService) ApprovePurchaseOrder(id uint, userID uint) (*mode
 		return nil, err
 	}
 
+	_ = s.auditSvc.Log("purchase_orders", "APPROVE", int64(id), int64(userID), username,
+		map[string]interface{}{"status": oldStatus},
+		map[string]interface{}{"status": "approved"})
+
 	return po.ToSafe(), nil
 }
 
 // CancelPurchaseOrder cancels a purchase order
-func (s *purchaseOrderService) CancelPurchaseOrder(id uint) (*models.SafePurchaseOrder, error) {
+func (s *purchaseOrderService) CancelPurchaseOrder(id uint, userID uint, username string) (*models.SafePurchaseOrder, error) {
 	// Get existing PO
 	po, err := s.poRepo.GetByID(id)
 	if err != nil {
@@ -459,6 +464,7 @@ func (s *purchaseOrderService) CancelPurchaseOrder(id uint) (*models.SafePurchas
 		return nil, errors.New("purchase order is already cancelled")
 	}
 
+	oldStatus := po.Status
 	// Update status to cancelled
 	if err := s.poRepo.UpdateStatus(id, "cancelled", nil, nil); err != nil {
 		return nil, err
@@ -469,6 +475,10 @@ func (s *purchaseOrderService) CancelPurchaseOrder(id uint) (*models.SafePurchas
 	if err != nil {
 		return nil, err
 	}
+
+	_ = s.auditSvc.Log("purchase_orders", "CANCEL", int64(id), int64(userID), username,
+		map[string]interface{}{"status": oldStatus},
+		map[string]interface{}{"status": "cancelled"})
 
 	return po.ToSafe(), nil
 }

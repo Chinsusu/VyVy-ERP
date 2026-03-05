@@ -151,15 +151,17 @@ func (h *PurchaseOrderHandler) Approve(c *gin.Context) {
 		return
 	}
 
-	// Get user ID from context
+	// Get user ID and username from context
 	val, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
 		return
 	}
 	userID := val.(int64)
+	usernameVal, _ := c.Get("username")
+	usernameStr, _ := usernameVal.(string)
 
-	po, err := h.service.ApprovePurchaseOrder(uint(id), uint(userID))
+	po, err := h.service.ApprovePurchaseOrder(uint(id), uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("APPROVE_ERROR", err.Error()))
 		return
@@ -177,7 +179,17 @@ func (h *PurchaseOrderHandler) Cancel(c *gin.Context) {
 		return
 	}
 
-	po, err := h.service.CancelPurchaseOrder(uint(id))
+	// Get user ID and username from context
+	val, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
+		return
+	}
+	userID := val.(int64)
+	usernameVal, _ := c.Get("username")
+	usernameStr, _ := usernameVal.(string)
+
+	po, err := h.service.CancelPurchaseOrder(uint(id), uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CANCEL_ERROR", err.Error()))
 		return
