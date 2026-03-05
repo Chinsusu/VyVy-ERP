@@ -19,7 +19,14 @@ export interface PurchaseOrder {
     warehouse?: Warehouse;
     order_date: string; // YYYY-MM-DD
     expected_delivery_date?: string; // YYYY-MM-DD
-    status: 'draft' | 'approved' | 'cancelled';
+    status: 'draft' | 'approved' | 'cancelled' | 'completed';
+    // Workflow status fields (B4-B7)
+    order_status?: 'pending' | 'ordered';
+    payment_status?: 'pending' | 'partial' | 'completed';
+    invoice_status?: 'pending' | 'received';
+    receipt_status?: 'pending' | 'completed';
+    invoice_number?: string;
+    invoice_date?: string;
     subtotal: number;
     tax_amount: number;
     discount_amount: number;
@@ -36,6 +43,7 @@ export interface PurchaseOrder {
     created_at: string;
     updated_at: string;
 }
+
 
 export interface PurchaseOrderItem {
     id: number;
@@ -102,6 +110,7 @@ export interface PurchaseOrderFilters {
     supplier_id?: number;
     warehouse_id?: number;
     status?: string;
+    payment_status?: string;
     order_date_from?: string;
     order_date_to?: string;
     page?: number;
@@ -109,6 +118,7 @@ export interface PurchaseOrderFilters {
     sort_by?: string;
     sort_order?: string;
 }
+
 
 export interface PurchaseOrderListResponse {
     data: PurchaseOrder[];

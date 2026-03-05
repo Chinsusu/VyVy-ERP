@@ -58,6 +58,7 @@ type PurchaseOrderFilterRequest struct {
 	SupplierID    *uint  `form:"supplier_id"`
 	WarehouseID   *uint  `form:"warehouse_id"`
 	Status        string `form:"status"`
+	PaymentStatus string `form:"payment_status"`
 	OrderDateFrom string `form:"order_date_from"` // YYYY-MM-DD
 	OrderDateTo   string `form:"order_date_to"`   // YYYY-MM-DD
 	Page          int    `form:"page"`
@@ -65,6 +66,27 @@ type PurchaseOrderFilterRequest struct {
 	SortBy        string `form:"sort_by"`
 	SortOrder     string `form:"sort_order"`
 }
+
+// UpdateOrderStatusRequest represents the request to update PO ordering status (B4)
+type UpdateOrderStatusRequest struct {
+	OrderStatus string `json:"order_status" binding:"required,oneof=pending ordered"`
+	Notes       string `json:"notes"`
+}
+
+// UpdatePaymentStatusRequest represents the request to update PO payment status (B5)
+type UpdatePaymentStatusRequest struct {
+	PaymentStatus string `json:"payment_status" binding:"required,oneof=pending partial completed"`
+	Notes         string `json:"notes"`
+}
+
+// UpdateInvoiceStatusRequest represents the request to update PO invoice status (B6)
+type UpdateInvoiceStatusRequest struct {
+	InvoiceStatus string `json:"invoice_status" binding:"required,oneof=pending received"`
+	InvoiceNumber string `json:"invoice_number"`
+	InvoiceDate   string `json:"invoice_date"` // YYYY-MM-DD
+}
+
+
 
 // PurchaseOrderResponse represents a purchase order response with metadata
 type PurchaseOrderResponse struct {

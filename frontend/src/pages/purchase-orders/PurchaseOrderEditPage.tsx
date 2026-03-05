@@ -12,7 +12,7 @@ export default function PurchaseOrderEditPage() {
     if (isLoading) {
         return (
             <div className="animate-fade-in p-6 flex items-center justify-center">
-                <div className="text-gray-500 text-lg">Loading order details...</div>
+                <div className="text-gray-500 text-lg">Đang tải thông tin đơn hàng...</div>
             </div>
         );
     }
@@ -22,14 +22,14 @@ export default function PurchaseOrderEditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                        {error ? `Error: ${(error as Error).message}` : 'Purchase Order not found'}
+                        {error ? `Lỗi: ${(error as Error).message}` : 'Không tìm thấy đơn mua hàng'}
                     </div>
                     <Link
                         to="/purchase-orders"
                         className="text-primary hover:underline flex items-center gap-2 mt-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Purchase Orders
+                        Quay lại danh sách
                     </Link>
                 </div>
             </div>
@@ -42,15 +42,15 @@ export default function PurchaseOrderEditPage() {
             <div className="animate-fade-in p-6">
                 <div>
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-amber-800">
-                        <h2 className="text-xl font-bold mb-2">Order Not Editable</h2>
-                        <p>Purchase Orders with status <strong>{po.status}</strong> cannot be edited.</p>
+                        <h2 className="text-xl font-bold mb-2">Đơn hàng không thể chỉnh sửa</h2>
+                        <p>Đơn mua hàng có trạng thái <strong>{po.status}</strong> không thể chỉnh sửa.</p>
                     </div>
                     <Link
                         to={`/purchase-orders/${poId}`}
                         className="btn btn-primary mt-6 flex items-center gap-2 w-max"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        View Order Details
+                        Xem chi tiết đơn hàng
                     </Link>
                 </div>
             </div>
@@ -67,10 +67,10 @@ export default function PurchaseOrderEditPage() {
                         className="text-primary hover:underline flex items-center gap-2 mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Details
+                        Quay lại chi tiết đơn
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Edit Purchase Order</h1>
-                    <p className="text-gray-600 mt-1">Updating {po.po_number}</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Chỉnh Sửa Đơn Mua Hàng</h1>
+                    <p className="text-gray-600 mt-1">Đang cập nhật {po.po_number}</p>
                 </div>
 
                 {/* Form */}

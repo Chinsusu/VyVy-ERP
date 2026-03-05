@@ -19,11 +19,11 @@ export default function PurchaseOrderListPage() {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'draft':
-                return <span className="badge badge-secondary">Draft</span>;
+                return <span className="badge badge-secondary">Nháp</span>;
             case 'approved':
-                return <span className="badge badge-success">Approved</span>;
+                return <span className="badge badge-success">Đã duyệt</span>;
             case 'cancelled':
-                return <span className="badge badge-danger">Cancelled</span>;
+                return <span className="badge badge-danger">Đã hủy</span>;
             default:
                 return <span className="badge">{status}</span>;
         }
@@ -39,12 +39,12 @@ export default function PurchaseOrderListPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-slate-900">Purchase Orders</h1>
-                        <p className="text-slate-500 mt-1 text-premium-sm">Manage purchase orders and procurement</p>
+                        <h1 className="text-slate-900">Đơn Mua Hàng</h1>
+                        <p className="text-slate-500 mt-1 text-premium-sm">Quản lý đơn đặt mua hàng</p>
                     </div>
                     <Link to="/purchase-orders/new" className="btn btn-primary flex items-center gap-2">
                         <Plus className="w-4 h-4" />
-                        Add Purchase Order
+                        Thêm Đơn Mua Hàng
                     </Link>
                 </div>
 
@@ -62,20 +62,20 @@ export default function PurchaseOrderListPage() {
                     {/* Additional Filters */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
                             <select
                                 className="input"
                                 value={filters.status || ''}
                                 onChange={(e) => setFilters({ ...filters, status: e.target.value, page: 1 })}
                             >
-                                <option value="">All Statuses</option>
-                                <option value="draft">Draft</option>
-                                <option value="approved">Approved</option>
-                                <option value="cancelled">Cancelled</option>
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="draft">Nháp</option>
+                                <option value="approved">Đã duyệt</option>
+                                <option value="cancelled">Đã hủy</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Order Date From</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Ngày đặt hàng từ</label>
                             <input
                                 type="date"
                                 className="input"
@@ -84,7 +84,7 @@ export default function PurchaseOrderListPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Order Date To</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Ngày đặt hàng đến</label>
                             <input
                                 type="date"
                                 className="input"
@@ -100,17 +100,17 @@ export default function PurchaseOrderListPage() {
                     <div className="table-container">
                         {isLoading ? (
                             <div className="flex items-center justify-center h-64">
-                                <div className="text-gray-500">Loading purchase orders...</div>
+                                <div className="text-gray-500">Đang tải đơn mua hàng...</div>
                             </div>
                         ) : error ? (
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                                Error loading purchase orders: {(error as Error).message}
+                                Lỗi: {(error as Error).message}
                             </div>
                         ) : purchaseOrders.length === 0 ? (
                             <div className="text-center py-12">
-                                <p className="text-gray-500 mb-4">No purchase orders found</p>
+                                <p className="text-gray-500 mb-4">Chưa có đơn mua hàng nào</p>
                                 <Link to="/purchase-orders/new" className="btn btn-primary">
-                                    Create Your First Purchase Order
+                                    Tạo Đơn Mua Hàng Đầu Tiên
                                 </Link>
                             </div>
                         ) : (
@@ -119,13 +119,13 @@ export default function PurchaseOrderListPage() {
                                     <table className="table">
                                         <thead>
                                             <tr>
-                                                <th>PO Number</th>
-                                                <th>Supplier</th>
-                                                <th>Warehouse</th>
-                                                <th>Order Date</th>
-                                                <th>Status</th>
-                                                <th>Total Amount</th>
-                                                <th>Actions</th>
+                                                <th>Số PO</th>
+                                                <th>Nhà cung cấp</th>
+                                                <th>Kho nhận hàng</th>
+                                                <th>Ngày đặt hàng</th>
+                                                <th>Trạng thái</th>
+                                                <th>Tổng tiền</th>
+                                                <th>Thao tác</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -143,14 +143,14 @@ export default function PurchaseOrderListPage() {
                                                                 to={`/purchase-orders/${po.id}`}
                                                                 className="text-primary hover:underline text-sm font-medium"
                                                             >
-                                                                View
+                                                                Xem
                                                             </Link>
                                                             {po.status === 'draft' && (
                                                                 <Link
                                                                     to={`/purchase-orders/${po.id}/edit`}
                                                                     className="text-primary hover:underline text-sm font-medium"
                                                                 >
-                                                                    Edit
+                                                                    Điều chỉnh
                                                                 </Link>
                                                             )}
                                                         </div>
@@ -193,7 +193,7 @@ export default function PurchaseOrderListPage() {
                                                     disabled={pagination.page >= pagination.total_pages}
                                                     className="btn btn-secondary"
                                                 >
-                                                    Next
+                                                    Tiếp
                                                 </button>
                                             </div>
                                         )}

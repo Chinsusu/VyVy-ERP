@@ -1,4 +1,4 @@
-import { History, User, Clock, ArrowRight, Plus, Trash2, Edit } from 'lucide-react';
+import { History, User, Clock, ArrowRight, Plus, Trash2, Edit, CheckCircle, XCircle, Truck, CreditCard, FileText } from 'lucide-react';
 import { useAuditLogs } from '../../hooks/useAuditLogs';
 
 interface AuditLogPanelProps {
@@ -87,30 +87,35 @@ function formatValue(value: unknown): string {
     return String(value);
 }
 
+const WORKFLOW_FIELD_LABELS: Record<string, string> = {
+    order_status: 'Trạng thái đặt hàng',
+    payment_status: 'Thanh toán',
+    invoice_status: 'Hóa đơn',
+    invoice_number: 'Số hóa đơn',
+    invoice_date: 'Ngày hóa đơn',
+    notes: 'Ghi chú',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+    pending: 'Chờ xử lý',
+    ordered: 'Đã đặt',
+    partial: 'Một phần',
+    completed: 'Hoàn thành',
+    received: 'Đã nhận',
+};
+
 function ActionBadge({ action }: { action: string }) {
-    if (action === 'CREATE') {
-        return (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
-                <Plus className="w-3 h-3" />
-                Tạo mới
-            </span>
-        );
-    }
-    if (action === 'UPDATE') {
-        return (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
-                <Edit className="w-3 h-3" />
-                Chỉnh sửa
-            </span>
-        );
-    }
-    return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
-            <Trash2 className="w-3 h-3" />
-            Xóa
-        </span>
-    );
+    if (action === 'CREATE') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700"><Plus className="w-3 h-3" />Tạo mới</span>;
+    if (action === 'UPDATE') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700"><Edit className="w-3 h-3" />Chỉnh sửa</span>;
+    if (action === 'DELETE') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700"><Trash2 className="w-3 h-3" />Xóa</span>;
+    if (action === 'APPROVE') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700"><CheckCircle className="w-3 h-3" />Đã duyệt</span>;
+    if (action === 'CANCEL') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700"><XCircle className="w-3 h-3" />Đã hủy</span>;
+    if (action === 'UPDATE_ORDER_STATUS') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700"><Truck className="w-3 h-3" />Cập nhật đặt hàng</span>;
+    if (action === 'UPDATE_PAYMENT_STATUS') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700"><CreditCard className="w-3 h-3" />Cập nhật thanh toán</span>;
+    if (action === 'UPDATE_INVOICE_STATUS') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700"><FileText className="w-3 h-3" />Cập nhật hóa đơn</span>;
+    return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600"><Edit className="w-3 h-3" />{action}</span>;
 }
+
 
 export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProps) {
     const { data: logs, isLoading, error } = useAuditLogs(tableName, recordId);
@@ -140,11 +145,16 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                     <div className="absolute left-4 top-0 bottom-0 w-px bg-gray-200" />
 
                     <div className="space-y-4">
-                        {logs.map((log) => (
+                        {[...logs].reverse().map((log) => (
                             <div key={log.id} className="relative pl-10">
                                 {/* Timeline dot */}
                                 <div className={`absolute left-2.5 top-2 w-3 h-3 rounded-full border-2 border-white ${log.action === 'CREATE' ? 'bg-green-500' :
-                                    log.action === 'DELETE' ? 'bg-red-500' : 'bg-blue-500'
+                                    log.action === 'DELETE' ? 'bg-red-500' :
+                                        log.action === 'APPROVE' ? 'bg-emerald-500' :
+                                            log.action === 'CANCEL' ? 'bg-red-500' :
+                                                log.action === 'UPDATE_PAYMENT_STATUS' ? 'bg-yellow-500' :
+                                                    log.action === 'UPDATE_INVOICE_STATUS' ? 'bg-purple-500' :
+                                                        'bg-blue-500'
                                     }`} />
 
                                 <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
@@ -163,7 +173,7 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                                         </span>
                                     </div>
 
-                                    {/* Changed fields */}
+                                    {/* Changed fields for UPDATE */}
                                     {log.action === 'UPDATE' && (() => {
                                         const NOISE = new Set(['updated_at', 'created_at', 'deleted_at', 'updated_by', 'created_by']);
                                         const ARRAY_FIELDS = new Set(['items', 'suppliers']);
@@ -214,15 +224,57 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                                         return <div className="space-y-1 mt-2">{rows}</div>;
                                     })()}
 
+                                    {/* Workflow status updates: B4/B5/B6 */}
+                                    {['UPDATE_ORDER_STATUS', 'UPDATE_PAYMENT_STATUS', 'UPDATE_INVOICE_STATUS'].includes(log.action) && (
+                                        <div className="space-y-1 mt-2">
+                                            {Object.entries(log.new_values || {}).map(([field, newVal]) => {
+                                                const label = WORKFLOW_FIELD_LABELS[field] || field;
+                                                const oldVal = log.old_values?.[field];
+                                                const displayNew = STATUS_LABELS[String(newVal)] || String(newVal);
+                                                const displayOld = oldVal ? (STATUS_LABELS[String(oldVal)] || String(oldVal)) : null;
+                                                if (field === 'notes') {
+                                                    if (!newVal) return null;
+                                                    return (
+                                                        <div key={field} className="flex items-start gap-2 text-xs">
+                                                            <span className="text-gray-500 min-w-[100px] pt-0.5">{label}:</span>
+                                                            <span className="text-gray-700 italic">{String(newVal)}</span>
+                                                        </div>
+                                                    );
+                                                }
+                                                return (
+                                                    <div key={field} className="flex items-start gap-2 text-xs">
+                                                        <span className="text-gray-500 min-w-[100px] pt-0.5">{label}:</span>
+                                                        <div className="flex items-center gap-1">
+                                                            {displayOld && (
+                                                                <><span className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded line-through">{displayOld}</span>
+                                                                    <ArrowRight className="w-3 h-3 text-gray-400" /></>
+                                                            )}
+                                                            <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">{displayNew}</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }).filter(Boolean)}
+                                        </div>
+                                    )}
+
                                     {/* Summary for CREATE */}
                                     {log.action === 'CREATE' && (
                                         <p className="text-xs text-gray-500 mt-1">Bản ghi được tạo lần đầu</p>
+                                    )}
+
+                                    {/* Summary for APPROVE/CANCEL */}
+                                    {log.action === 'APPROVE' && (
+                                        <p className="text-xs text-gray-500 mt-1">Đơn hàng đã được duyệt</p>
+                                    )}
+                                    {log.action === 'CANCEL' && (
+                                        <p className="text-xs text-gray-500 mt-1">Đơn hàng đã bị hủy</p>
                                     )}
 
                                     {/* Summary for DELETE */}
                                     {log.action === 'DELETE' && (
                                         <p className="text-xs text-gray-500 mt-1">Bản ghi đã bị xóa</p>
                                     )}
+
                                 </div>
                             </div>
                         ))}

@@ -4,7 +4,9 @@ import type {
     CreatePurchaseOrderInput,
     UpdatePurchaseOrderInput,
     PurchaseOrderFilters,
+    PurchaseOrder,
 } from '../types/purchaseOrder';
+
 
 // Query key factory
 export const purchaseOrderKeys = {
@@ -91,6 +93,45 @@ export const useCancelPurchaseOrder = () => {
         onSuccess: (_: any, id: number) => {
             // Invalidate specific detail and all lists
             queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(id) });
+            queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.lists() });
+        },
+    });
+};
+
+export const useUpdatePOOrderStatus = () => {
+    const queryClient = useQueryClient();
+    type OrderVars = { id: number; input: { order_status: string; notes?: string } };
+    return useMutation<PurchaseOrder, Error, OrderVars>({
+        mutationFn: ({ id, input }: OrderVars) =>
+            purchaseOrdersAPI.updateOrderStatus(id, input),
+        onSuccess: (_: PurchaseOrder, variables: OrderVars) => {
+            queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(variables.id) });
+            queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.lists() });
+        },
+    });
+};
+
+export const useUpdatePOPaymentStatus = () => {
+    const queryClient = useQueryClient();
+    type PaymentVars = { id: number; input: { payment_status: string; notes?: string } };
+    return useMutation<PurchaseOrder, Error, PaymentVars>({
+        mutationFn: ({ id, input }: PaymentVars) =>
+            purchaseOrdersAPI.updatePaymentStatus(id, input),
+        onSuccess: (_: PurchaseOrder, variables: PaymentVars) => {
+            queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(variables.id) });
+            queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.lists() });
+        },
+    });
+};
+
+export const useUpdatePOInvoiceStatus = () => {
+    const queryClient = useQueryClient();
+    type InvoiceVars = { id: number; input: { invoice_status: string; invoice_number?: string; invoice_date?: string } };
+    return useMutation<PurchaseOrder, Error, InvoiceVars>({
+        mutationFn: ({ id, input }: InvoiceVars) =>
+            purchaseOrdersAPI.updateInvoiceStatus(id, input),
+        onSuccess: (_: PurchaseOrder, variables: InvoiceVars) => {
+            queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.detail(variables.id) });
             queryClient.invalidateQueries({ queryKey: purchaseOrderKeys.lists() });
         },
     });

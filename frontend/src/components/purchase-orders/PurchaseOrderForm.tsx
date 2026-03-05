@@ -6,6 +6,7 @@ import { useSuppliers } from '../../hooks/useSuppliers';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import { useCreatePurchaseOrder, useUpdatePurchaseOrder } from '../../hooks/usePurchaseOrders';
 import PODocuments from './PODocuments';
+import SearchableSelect from '../common/SearchableSelect';
 
 import type {
     PurchaseOrder,
@@ -22,8 +23,8 @@ interface ExtendedItem extends CreatePurchaseOrderItemInput {
     expected_delivery_date?: string;
 }
 
-const selectCls = 'w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent';
 const inputCls = 'input w-full';
+
 const inputRightCls = 'input w-full text-right';
 
 export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrderFormProps) {
@@ -193,31 +194,23 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                 </div>
                 <div>
                     <label className="label">Nhà cung cấp <span className="text-red-500">*</span></label>
-                    <select
-                        className={selectCls}
+                    <SearchableSelect
+                        options={suppliers.map(s => ({ value: s.id, label: `${s.code} - ${s.name}` }))}
                         value={formData.supplier_id}
-                        onChange={(e) => handleSupplierChange(Number(e.target.value))}
-                        required
-                    >
-                        <option value={0}>-- Chọn nhà cung cấp --</option>
-                        {suppliers.map(s => (
-                            <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
-                        ))}
-                    </select>
+                        onChange={(val) => handleSupplierChange(val)}
+                        placeholder="-- Chọn nhà cung cấp --"
+                        searchPlaceholder="Tìm nhà cung cấp..."
+                    />
                 </div>
                 <div>
                     <label className="label">Kho nhận hàng <span className="text-red-500">*</span></label>
-                    <select
-                        className={selectCls}
+                    <SearchableSelect
+                        options={warehouses.map(w => ({ value: w.id, label: `${w.code} - ${w.name}` }))}
                         value={formData.warehouse_id}
-                        onChange={(e) => setFormData({ ...formData, warehouse_id: Number(e.target.value) })}
-                        required
-                    >
-                        <option value={0}>-- Chọn kho --</option>
-                        {warehouses.map(w => (
-                            <option key={w.id} value={w.id}>{w.name} ({w.code})</option>
-                        ))}
-                    </select>
+                        onChange={(val) => setFormData({ ...formData, warehouse_id: val })}
+                        placeholder="-- Chọn kho --"
+                        searchPlaceholder="Tìm kho..."
+                    />
                 </div>
                 <div>
                     <label className="label">Ngày đặt hàng <span className="text-red-500">*</span></label>
@@ -263,18 +256,14 @@ export default function PurchaseOrderForm({ initialData, isEdit }: PurchaseOrder
                                 <div className="grid grid-cols-12 gap-3 items-end">
                                     <div className="col-span-12 md:col-span-4">
                                         <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Nguyên vật liệu *</label>
-                                        <select
-                                            className={selectCls}
+                                        <SearchableSelect
+                                            options={filteredMaterials.map(m => ({ value: m.id, label: `${m.code} - ${m.trading_name}` }))}
                                             value={item.material_id}
-                                            onChange={(e) => handleMaterialChange(index, Number(e.target.value))}
-                                            required
+                                            onChange={(val) => handleMaterialChange(index, val)}
+                                            placeholder="-- Chọn NVL --"
+                                            searchPlaceholder="Tìm nguyên vật liệu..."
                                             disabled={formData.supplier_id === 0}
-                                        >
-                                            <option value={0}>-- Chọn NVL --</option>
-                                            {filteredMaterials.map(m => (
-                                                <option key={m.id} value={m.id}>{m.trading_name} ({m.code})</option>
-                                            ))}
-                                        </select>
+                                        />
                                     </div>
                                     <div className="col-span-4 md:col-span-2">
                                         <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</label>

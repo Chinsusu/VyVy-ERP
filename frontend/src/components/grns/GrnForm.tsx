@@ -81,12 +81,12 @@ export default function GrnForm() {
         e.preventDefault();
 
         if (formData.purchase_order_id === 0 || formData.warehouse_id === 0 || items.length === 0) {
-            alert('Please select a Purchase Order, Warehouse, and ensure there are items to receive.');
+            alert('Vui lòng chọn đơn mua hàng, kho nhận hàng, và đảm bảo có ít nhất 1 hàng để nhập.');
             return;
         }
 
         if (items.some(item => item.quantity <= 0 || item.warehouse_location_id === 0)) {
-            alert('Please ensure all items have a quantity greater than 0 and a warehouse location selected.');
+            alert('Vui lòng đảm bảo tất cả các dòng hàng có số lượng > 0 và đã chọn vị trí kho.');
             return;
         }
 
@@ -109,7 +109,7 @@ export default function GrnForm() {
             navigate(`/grns/${result.id}`);
         } catch (err: any) {
             console.error('Failed to create GRN:', err);
-            alert(`Error creating GRN: ${err.response?.data?.error?.message || err.message}`);
+            alert(`Lỗi khi tạo lệnh nhập kho: ${err.response?.data?.error?.message || err.message}`);
         }
     };
 
@@ -121,7 +121,7 @@ export default function GrnForm() {
             {/* Main Info */}
             <div className="card grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
                 <div className="lg:col-span-1">
-                    <label className="label">GRN Number <span className="text-red-500">*</span></label>
+                    <label className="label">Số LNK <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         className="input w-full bg-gray-50"
@@ -131,14 +131,14 @@ export default function GrnForm() {
                     />
                 </div>
                 <div className="lg:col-span-1">
-                    <label className="label">Purchase Order <span className="text-red-500">*</span></label>
+                    <label className="label">Đơn Mua Hàng <span className="text-red-500">*</span></label>
                     <select
                         className="select w-full"
                         value={selectedPOId}
                         onChange={(e) => setSelectedPOId(Number(e.target.value))}
                         required
                     >
-                        <option value={0}>Select Approved PO</option>
+                        <option value={0}>Chọn đơn mua hàng đã duyệt</option>
                         {approvedPOs.map((po: PurchaseOrder) => (
                             <option key={po.id} value={po.id}>
                                 {po.po_number} - {po.supplier?.name}
@@ -147,21 +147,21 @@ export default function GrnForm() {
                     </select>
                 </div>
                 <div>
-                    <label className="label">Warehouse <span className="text-red-500">*</span></label>
+                    <label className="label">Kho nhận hàng <span className="text-red-500">*</span></label>
                     <select
                         className="select w-full"
                         value={formData.warehouse_id}
                         onChange={(e) => setFormData({ ...formData, warehouse_id: Number(e.target.value) })}
                         required
                     >
-                        <option value={0}>Select Warehouse</option>
+                        <option value={0}>Chọn kho</option>
                         {warehouses.map(w => (
                             <option key={w.id} value={w.id}>{w.name}</option>
                         ))}
                     </select>
                 </div>
                 <div>
-                    <label className="label">Receipt Date <span className="text-red-500">*</span></label>
+                    <label className="label">Ngày nhập kho <span className="text-red-500">*</span></label>
                     <input
                         type="date"
                         className="input w-full"
@@ -177,32 +177,32 @@ export default function GrnForm() {
                 <div className="p-4 border-b bg-gray-50 flex items-center justify-between">
                     <h3 className="font-bold flex items-center gap-2">
                         <Package className="w-5 h-5 text-primary" />
-                        Received Items
+                        Dách sách hàng nhập
                     </h3>
                     <div className="text-sm text-gray-500">
-                        {items.length} items to receive
+                        {items.length} hàng cần nhập
                     </div>
                 </div>
 
                 {isLoadingPO ? (
                     <div className="p-12 text-center text-gray-500">
-                        Loading PO items...
+                        Đang tải dữ liệu đơn hàng...
                     </div>
                 ) : items.length === 0 ? (
                     <div className="p-12 text-center text-gray-500 border-2 border-dashed border-gray-200 m-4 rounded-lg">
                         <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                        <p>Select an approved Purchase Order to load items</p>
+                        <p>Chọn một đơn mua hàng đã duyệt để tải danh sách hàng</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="table w-full">
                             <thead>
                                 <tr className="bg-gray-50 text-left">
-                                    <th className="px-4 py-3 min-w-[250px]">Material</th>
-                                    <th className="px-4 py-3 text-right">Qty to Receive</th>
-                                    <th className="px-4 py-3 min-w-[200px]">Warehouse Location <span className="text-red-500">*</span></th>
-                                    <th className="px-4 py-3 min-w-[150px]">Batch/Lot</th>
-                                    <th className="px-4 py-3 min-w-[150px]">Dates</th>
+                                    <th className="px-4 py-3 min-w-[250px]">Nguyên vật liệu</th>
+                                    <th className="px-4 py-3 text-right">Số lượng nhập</th>
+                                    <th className="px-4 py-3 min-w-[200px]">Vị trí kho <span className="text-red-500">*</span></th>
+                                    <th className="px-4 py-3 min-w-[150px]">Lô / Lot</th>
+                                    <th className="px-4 py-3 min-w-[150px]">Ngày</th>
                                     <th className="px-4 py-3 text-center"></th>
                                 </tr>
                             </thead>
@@ -215,7 +215,7 @@ export default function GrnForm() {
                                                 <div className="font-medium">{poItem?.material?.trading_name}</div>
                                                 <div className="text-xs text-gray-500">{poItem?.material?.code}</div>
                                                 <div className="mt-1 text-[length:var(--font-size-3xs)] text-primary uppercase font-bold">
-                                                    Ordered: {poItem?.quantity} | Received: {poItem?.received_quantity}
+                                                    Đã đặt: {poItem?.quantity} | Đã nhập: {poItem?.received_quantity}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3">
@@ -236,7 +236,7 @@ export default function GrnForm() {
                                                     onChange={(e) => updateItem(index, 'warehouse_location_id', Number(e.target.value))}
                                                     required
                                                 >
-                                                    <option value={0}>Select Location</option>
+                                                    <option value={0}>Chọn vị trí</option>
                                                     {warehouseLocations.map((loc: WarehouseLocation) => (
                                                         <option key={loc.id} value={loc.id}>{loc.full_path}</option>
                                                     ))}
@@ -260,7 +260,7 @@ export default function GrnForm() {
                                             </td>
                                             <td className="px-4 py-3 space-y-2">
                                                 <div>
-                                                    <label className="text-[length:var(--font-size-3xs)] uppercase text-gray-500 font-bold block">Mfg Date</label>
+                                                    <label className="text-[length:var(--font-size-3xs)] uppercase text-gray-500 font-bold block">Ngày SX</label>
                                                     <input
                                                         type="date"
                                                         className="input w-full text-xs py-1 px-2 h-auto"
@@ -269,7 +269,7 @@ export default function GrnForm() {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="text-[length:var(--font-size-3xs)] uppercase text-gray-500 font-bold block">Expiry Date</label>
+                                                    <label className="text-[length:var(--font-size-3xs)] uppercase text-gray-500 font-bold block">Hạn dùng</label>
                                                     <input
                                                         type="date"
                                                         className="input w-full text-xs py-1 px-2 h-auto"
@@ -297,13 +297,13 @@ export default function GrnForm() {
             </div>
 
             <div className="card p-6">
-                <label className="label">General Notes</label>
+                <label className="label">Ghi chú chung</label>
                 <textarea
                     className="input w-full"
                     rows={3}
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Provide any additional information about this receipt..."
+                    placeholder="Thông tin bổ sung về lủ hàng này..."
                 />
             </div>
 
@@ -314,7 +314,7 @@ export default function GrnForm() {
                     onClick={() => navigate(-1)}
                     className="btn btn-secondary px-8"
                 >
-                    Cancel
+                    Hủy
                 </button>
                 <button
                     type="submit"
@@ -322,7 +322,7 @@ export default function GrnForm() {
                     disabled={createMutation.isPending || items.length === 0}
                 >
                     <Save className="w-4 h-4" />
-                    {createMutation.isPending ? 'Saving...' : 'Save Receipt'}
+                    {createMutation.isPending ? 'Đang lưu...' : 'Lưu Lệnh Nhập Kho'}
                 </button>
             </div>
         </form>

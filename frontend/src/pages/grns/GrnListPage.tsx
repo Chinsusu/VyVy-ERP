@@ -21,28 +21,28 @@ export default function GrnListPage() {
                 return (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                         <Clock className="w-3 h-3" />
-                        Pending
+                        Chưa KCS
                     </span>
                 );
             case 'pass':
                 return (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         <CheckCircle className="w-3 h-3" />
-                        Pass
+                        KCS Đạt
                     </span>
                 );
             case 'fail':
                 return (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         <AlertTriangle className="w-3 h-3" />
-                        Fail
+                        KCS Không Đạt
                     </span>
                 );
             case 'conditional':
                 return (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                         <Clock className="w-3 h-3" />
-                        Conditional
+                        KCS Điều Kiện
                     </span>
                 );
             default:
@@ -55,14 +55,14 @@ export default function GrnListPage() {
             return (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     <Package className="w-3 h-3" />
-                    Posted
+                    Đã nhập kho
                 </span>
             );
         }
         return (
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                 <Clock className="w-3 h-3" />
-                Draft
+                Nháp
             </span>
         );
     };
@@ -87,12 +87,12 @@ export default function GrnListPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Goods Receipt Notes</h1>
-                        <p className="text-gray-600 mt-1">Manage incoming materials and quality control</p>
+                        <h1 className="text-3xl font-bold text-gray-900">Lệnh Nhập Kho</h1>
+                        <p className="text-gray-600 mt-1">Quản lý lệnh nhập kho và kiểm tra chất lượng</p>
                     </div>
                     <Link to="/grns/new" className="btn btn-primary flex items-center gap-2">
                         <Plus className="w-4 h-4" />
-                        Receive Goods
+                        Tạo Lệnh Nhập Kho
                     </Link>
                 </div>
 
@@ -104,34 +104,34 @@ export default function GrnListPage() {
                             <input
                                 type="text"
                                 name="search"
-                                placeholder="Search by GRN or PO number..."
+                                placeholder="Tìm theo số LNK hoặc số PO..."
                                 className="input pl-10 w-full"
                                 defaultValue={filters.search}
                             />
                         </div>
                         <button type="submit" className="btn btn-secondary">
-                            Search
+                            Tìm kiếm
                         </button>
                     </form>
 
                     {/* Additional Filters */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">QC Status</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái KCS</label>
                             <select
                                 className="input"
                                 value={filters.overall_qc_status || ''}
                                 onChange={(e) => setFilters({ ...filters, overall_qc_status: e.target.value, page: 1 })}
                             >
-                                <option value="">All Statuses</option>
-                                <option value="pending">Pending</option>
-                                <option value="pass">Pass</option>
-                                <option value="fail">Fail</option>
-                                <option value="conditional">Conditional</option>
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="pending">Chưa KCS</option>
+                                <option value="pass">KCS Đạt</option>
+                                <option value="fail">KCS Không Đạt</option>
+                                <option value="conditional">KCS Điều Kiện</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Receipt Date From</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Ngày nhập từ</label>
                             <input
                                 type="date"
                                 className="input"
@@ -140,7 +140,7 @@ export default function GrnListPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Receipt Date To</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Ngày nhập đến</label>
                             <input
                                 type="date"
                                 className="input"
@@ -177,13 +177,13 @@ export default function GrnListPage() {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th className="w-32">GRN Number</th>
-                                            <th className="w-32">PO Number</th>
-                                            <th>Warehouse</th>
-                                            <th className="w-32">Receipt Date</th>
-                                            <th className="w-32">QC Status</th>
-                                            <th className="w-36">Inventory Status</th>
-                                            <th className="text-right">Actions</th>
+                                            <th className="w-32">Số LNK</th>
+                                            <th className="w-32">Số PO</th>
+                                            <th>Kho nhập</th>
+                                            <th className="w-32">Ngày nhập</th>
+                                            <th className="w-32">Trạng thái KCS</th>
+                                            <th className="w-36">Trạng thái kho</th>
+                                            <th className="text-right">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -213,7 +213,7 @@ export default function GrnListPage() {
                                                             to={`/grns/${grn.id}`}
                                                             className="text-primary hover:bg-primary-50 px-4 py-2 rounded-lg font-medium text-sm transition-colors"
                                                         >
-                                                            Details
+                                                            Xem chi tiết
                                                         </Link>
                                                     </div>
                                                 </td>
@@ -245,7 +245,7 @@ export default function GrnListPage() {
                                                 disabled={pagination.page === 1}
                                                 className="btn btn-sm btn-secondary"
                                             >
-                                                Previous
+                                                Trước
                                             </button>
                                             <span className="text-sm text-gray-600 self-center">
                                                 Trang {pagination.page} / {pagination.total_pages}
@@ -255,7 +255,7 @@ export default function GrnListPage() {
                                                 disabled={pagination.page >= pagination.total_pages}
                                                 className="btn btn-sm btn-secondary"
                                             >
-                                                Next
+                                                Tiếp
                                             </button>
                                         </div>
                                     )}

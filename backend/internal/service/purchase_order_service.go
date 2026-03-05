@@ -18,6 +18,9 @@ type PurchaseOrderService interface {
 	DeletePurchaseOrder(id uint) error
 	ApprovePurchaseOrder(id uint, userID uint) (*models.SafePurchaseOrder, error)
 	CancelPurchaseOrder(id uint) (*models.SafePurchaseOrder, error)
+	UpdateOrderStatus(id uint, req *dto.UpdateOrderStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
+	UpdatePaymentStatus(id uint, req *dto.UpdatePaymentStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
+	UpdateInvoiceStatus(id uint, req *dto.UpdateInvoiceStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error)
 }
 
 type purchaseOrderService struct {
@@ -467,5 +470,83 @@ func (s *purchaseOrderService) CancelPurchaseOrder(id uint) (*models.SafePurchas
 		return nil, err
 	}
 
+	return po.ToSafe(), nil
+}
+
+// UpdateOrderStatus updates the ordering status of a PO (B4: procurement confirms order placed)
+func (s *purchaseOrderService) UpdateOrderStatus(id uint, req *dto.UpdateOrderStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error) {
+	po, err := s.poRepo.GetByID(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("purchase order not found")
+		}
+		return nil, err
+	}
+	if po.Status != "approved" {
+		return nil, errors.New("can only update order status for approved purchase orders")
+	}
+	oldStatus := po.OrderStatus
+	if err := s.poRepo.UpdateWorkflowStatus(id, "order_status", req.OrderStatus, req.Notes, userID); err != nil {
+		return nil, err
+	}
+	po, err = s.poRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	_ = s.auditSvc.Log("purchase_orders", "UPDATE_ORDER_STATUS", int64(id), int64(userID), username,
+		map[string]interface{}{"order_status": oldStatus},
+		map[string]interface{}{"order_status": req.OrderStatus, "notes": req.Notes})
+	return po.ToSafe(), nil
+}
+
+// UpdatePaymentStatus updates the payment status of a PO (B5: accounting marks payment)
+func (s *purchaseOrderService) UpdatePaymentStatus(id uint, req *dto.UpdatePaymentStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error) {
+	po, err := s.poRepo.GetByID(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("purchase order not found")
+		}
+		return nil, err
+	}
+	if po.Status == "draft" || po.Status == "cancelled" {
+		return nil, errors.New("cannot update payment status for draft or cancelled purchase orders")
+	}
+	oldStatus := po.PaymentStatus
+	if err := s.poRepo.UpdateWorkflowStatus(id, "payment_status", req.PaymentStatus, req.Notes, userID); err != nil {
+		return nil, err
+	}
+	po, err = s.poRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	_ = s.auditSvc.Log("purchase_orders", "UPDATE_PAYMENT_STATUS", int64(id), int64(userID), username,
+		map[string]interface{}{"payment_status": oldStatus},
+		map[string]interface{}{"payment_status": req.PaymentStatus, "notes": req.Notes})
+	return po.ToSafe(), nil
+}
+
+// UpdateInvoiceStatus updates the invoice receipt status of a PO (B6: accounting confirms invoice received)
+func (s *purchaseOrderService) UpdateInvoiceStatus(id uint, req *dto.UpdateInvoiceStatusRequest, userID uint, username string) (*models.SafePurchaseOrder, error) {
+	po, err := s.poRepo.GetByID(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("purchase order not found")
+		}
+		return nil, err
+	}
+	if po.Status == "draft" || po.Status == "cancelled" {
+		return nil, errors.New("cannot update invoice status for draft or cancelled purchase orders")
+	}
+	oldStatus := po.InvoiceStatus
+	if err := s.poRepo.UpdateInvoiceInfo(id, req.InvoiceStatus, req.InvoiceNumber, req.InvoiceDate, userID); err != nil {
+		return nil, err
+	}
+	po, err = s.poRepo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	_ = s.auditSvc.Log("purchase_orders", "UPDATE_INVOICE_STATUS", int64(id), int64(userID), username,
+		map[string]interface{}{"invoice_status": oldStatus},
+		map[string]interface{}{"invoice_status": req.InvoiceStatus, "invoice_number": req.InvoiceNumber, "invoice_date": req.InvoiceDate})
 	return po.ToSafe(), nil
 }

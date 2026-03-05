@@ -123,7 +123,10 @@ import {
     usePurchaseOrder,
     useApprovePurchaseOrder,
     useCancelPurchaseOrder,
-    useDeletePurchaseOrder
+    useDeletePurchaseOrder,
+    useUpdatePOOrderStatus,
+    useUpdatePOPaymentStatus,
+    useUpdatePOInvoiceStatus,
 } from '../../hooks/usePurchaseOrders';
 import type { PurchaseOrderItem } from '../../types/purchaseOrder';
 import { useAuditLogs } from '../../hooks/useAuditLogs';
@@ -140,9 +143,15 @@ export default function PurchaseOrderDetailPage() {
     const approveMutation = useApprovePurchaseOrder();
     const cancelMutation = useCancelPurchaseOrder();
     const deleteMutation = useDeletePurchaseOrder();
+    const updateOrderStatusMutation = useUpdatePOOrderStatus();
+    const updatePaymentStatusMutation = useUpdatePOPaymentStatus();
+    const updateInvoiceStatusMutation = useUpdatePOInvoiceStatus();
 
     const [showConfirmModal, setShowConfirmModal] = useState<'approve' | 'cancel' | 'delete' | null>(null);
+    const [activeWorkflow, setActiveWorkflow] = useState<'order' | 'payment' | 'invoice' | null>(null);
+    const [workflowForm, setWorkflowForm] = useState({ order_status: 'ordered', payment_status: 'partial', invoice_status: 'received', invoice_number: '', invoice_date: '', notes: '' });
     const { data: auditLogs } = useAuditLogs('purchase_orders', poId);
+
 
 
     if (isLoading) {
@@ -197,6 +206,29 @@ export default function PurchaseOrderDetailPage() {
             alert('Xóa đơn thất bại');
         }
     };
+
+    const handleUpdateOrderStatus = async () => {
+        try {
+            await updateOrderStatusMutation.mutateAsync({ id: poId, input: { order_status: workflowForm.order_status, notes: workflowForm.notes } });
+            setActiveWorkflow(null);
+        } catch (err: any) { alert(err?.response?.data?.message || 'Có lỗi xảy ra'); }
+    };
+
+
+    const handleUpdatePaymentStatus = async () => {
+        try {
+            await updatePaymentStatusMutation.mutateAsync({ id: poId, input: { payment_status: workflowForm.payment_status, notes: workflowForm.notes } });
+            setActiveWorkflow(null);
+        } catch (err: any) { alert(err?.response?.data?.message || 'Có lỗi xảy ra'); }
+    };
+
+    const handleUpdateInvoiceStatus = async () => {
+        try {
+            await updateInvoiceStatusMutation.mutateAsync({ id: poId, input: { invoice_status: workflowForm.invoice_status, invoice_number: workflowForm.invoice_number, invoice_date: workflowForm.invoice_date } });
+            setActiveWorkflow(null);
+        } catch (err: any) { alert(err?.response?.data?.message || 'Có lỗi xảy ra'); }
+    };
+
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -423,9 +455,184 @@ export default function PurchaseOrderDetailPage() {
                         {/* Chứng từ đơn hàng */}
                         <PODocuments poId={poId} readOnly={po.status !== 'draft'} />
 
+                        {/* Tiến trình xử lý đơn - Workflow B4-B6 */}
+                        {po.status !== 'draft' && po.status !== 'cancelled' && (
+                            <div className="card">
+                                <h3 className="font-bold text-gray-700 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                    <CheckCircle className="w-4 h-4 text-primary" /> Tiến trình xử lý
+                                </h3>
+                                <div className="space-y-1">
+
+                                    {/* B4: Đặt hàng */}
+                                    <div className="rounded-lg border border-transparent hover:border-gray-100 transition-colors">
+                                        <div className="flex items-center justify-between py-2 px-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${po.order_status === 'ordered' ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-700">Đặt hàng</p>
+                                                    <span className={`text-xs font-medium ${po.order_status === 'ordered' ? 'text-green-600' : 'text-gray-400'}`}>
+                                                        {po.order_status === 'ordered' ? 'Đã đặt' : 'Chưa đặt'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {po.order_status !== 'ordered' && (
+                                                <button type="button"
+                                                    onClick={() => { setWorkflowForm(f => ({ ...f, notes: '' })); setActiveWorkflow(activeWorkflow === 'order' ? null : 'order'); }}
+                                                    className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${activeWorkflow === 'order'
+                                                        ? 'bg-gray-100 text-gray-600'
+                                                        : 'bg-primary/10 text-primary hover:bg-primary/20'
+                                                        }`}>
+                                                    {activeWorkflow === 'order' ? 'Đóng' : 'Xác nhận'}
+                                                </button>
+                                            )}
+                                        </div>
+                                        {/* Inline form B4 */}
+                                        {activeWorkflow === 'order' && (
+                                            <div className="mx-1 mb-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                                <p className="text-xs text-gray-500 mb-2">Ghi chú (tùy chọn)</p>
+                                                <textarea
+                                                    className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 resize-none focus:outline-none focus:border-primary"
+                                                    rows={2}
+                                                    placeholder="Ví dụ: Đã gửi PO qua email NCC ngày..."
+                                                    value={workflowForm.notes}
+                                                    onChange={e => setWorkflowForm(f => ({ ...f, notes: e.target.value }))}
+                                                />
+                                                <button type="button" onClick={handleUpdateOrderStatus}
+                                                    disabled={updateOrderStatusMutation.isPending}
+                                                    className="mt-2 w-full btn btn-primary text-sm py-1.5">
+                                                    {updateOrderStatusMutation.isPending ? 'Đang lưu...' : 'Xác nhận đã đặt hàng'}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="border-t border-dashed border-gray-100" />
+
+                                    {/* B5: Thanh toán */}
+                                    <div className="rounded-lg border border-transparent hover:border-gray-100 transition-colors">
+                                        <div className="flex items-center justify-between py-2 px-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${po.payment_status === 'completed' ? 'bg-green-500' :
+                                                    po.payment_status === 'partial' ? 'bg-yellow-400' : 'bg-gray-300'
+                                                    }`} />
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-700">Thanh toán</p>
+                                                    <span className={`text-xs font-medium ${po.payment_status === 'completed' ? 'text-green-600' :
+                                                        po.payment_status === 'partial' ? 'text-yellow-600' : 'text-gray-400'
+                                                        }`}>
+                                                        {po.payment_status === 'completed' ? 'Hoàn thành' : po.payment_status === 'partial' ? 'Một phần' : 'Chưa thanh toán'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {po.payment_status !== 'completed' && (
+                                                <button type="button"
+                                                    onClick={() => { setWorkflowForm(f => ({ ...f, payment_status: po.payment_status === 'partial' ? 'completed' : 'partial', notes: '' })); setActiveWorkflow(activeWorkflow === 'payment' ? null : 'payment'); }}
+                                                    className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${activeWorkflow === 'payment'
+                                                        ? 'bg-gray-100 text-gray-600'
+                                                        : 'bg-primary/10 text-primary hover:bg-primary/20'
+                                                        }`}>
+                                                    {activeWorkflow === 'payment' ? 'Đóng' : 'Cập nhật'}
+                                                </button>
+                                            )}
+                                        </div>
+                                        {/* Inline form B5 */}
+                                        {activeWorkflow === 'payment' && (
+                                            <div className="mx-1 mb-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                                <p className="text-xs text-gray-500 mb-2">Trạng thái thanh toán</p>
+                                                <select
+                                                    className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-primary mb-2"
+                                                    value={workflowForm.payment_status}
+                                                    onChange={e => setWorkflowForm(f => ({ ...f, payment_status: e.target.value }))}
+                                                >
+                                                    <option value="partial">Thanh toán một phần</option>
+                                                    <option value="completed">Thanh toán hoàn thành</option>
+                                                </select>
+                                                <textarea
+                                                    className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 resize-none focus:outline-none focus:border-primary"
+                                                    rows={2}
+                                                    placeholder="Số chứng từ, ngày thanh toán..."
+                                                    value={workflowForm.notes}
+                                                    onChange={e => setWorkflowForm(f => ({ ...f, notes: e.target.value }))}
+                                                />
+                                                <button type="button" onClick={handleUpdatePaymentStatus}
+                                                    disabled={updatePaymentStatusMutation.isPending}
+                                                    className="mt-2 w-full btn btn-primary text-sm py-1.5">
+                                                    {updatePaymentStatusMutation.isPending ? 'Đang lưu...' : 'Lưu trạng thái'}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="border-t border-dashed border-gray-100" />
+
+                                    {/* B6: Hóa đơn */}
+                                    <div className="rounded-lg border border-transparent hover:border-gray-100 transition-colors">
+                                        <div className="flex items-center justify-between py-2 px-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${po.invoice_status === 'received' ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-700">Hóa đơn</p>
+                                                    <span className={`text-xs font-medium ${po.invoice_status === 'received' ? 'text-green-600' : 'text-gray-400'}`}>
+                                                        {po.invoice_status === 'received'
+                                                            ? `Đã nhận${po.invoice_number ? ` · ${po.invoice_number}` : ''}`
+                                                            : 'Chưa nhận'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {po.invoice_status !== 'received' && (
+                                                <button type="button"
+                                                    onClick={() => { setWorkflowForm(f => ({ ...f, invoice_number: '', invoice_date: '' })); setActiveWorkflow(activeWorkflow === 'invoice' ? null : 'invoice'); }}
+                                                    className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${activeWorkflow === 'invoice'
+                                                        ? 'bg-gray-100 text-gray-600'
+                                                        : 'bg-primary/10 text-primary hover:bg-primary/20'
+                                                        }`}>
+                                                    {activeWorkflow === 'invoice' ? 'Đóng' : 'Xác nhận'}
+                                                </button>
+                                            )}
+                                        </div>
+                                        {/* Inline form B6 */}
+                                        {activeWorkflow === 'invoice' && (
+                                            <div className="mx-1 mb-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                                <div className="grid grid-cols-2 gap-2 mb-2">
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 mb-1">Số hóa đơn</p>
+                                                        <input type="text"
+                                                            className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-primary"
+                                                            placeholder="HD-2024-001"
+                                                            value={workflowForm.invoice_number}
+                                                            onChange={e => setWorkflowForm(f => ({ ...f, invoice_number: e.target.value }))}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 mb-1">Ngày hóa đơn</p>
+                                                        <input type="date"
+                                                            className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-primary"
+                                                            value={workflowForm.invoice_date}
+                                                            onChange={e => setWorkflowForm(f => ({ ...f, invoice_date: e.target.value }))}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <button type="button" onClick={handleUpdateInvoiceStatus}
+                                                    disabled={updateInvoiceStatusMutation.isPending}
+                                                    className="w-full btn btn-primary text-sm py-1.5">
+                                                    {updateInvoiceStatusMutation.isPending ? 'Đang lưu...' : 'Xác nhận nhận hóa đơn'}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                        )}
+
+
                     </div>
                 </div>
             </div>
+
+
 
             {/* Timeline - full width at the bottom, dọ kiểu MR */}
             <div className="mt-8 card">

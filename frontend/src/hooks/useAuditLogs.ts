@@ -5,7 +5,7 @@ export interface AuditLog {
     id: number;
     table_name: string;
     record_id: number;
-    action: 'CREATE' | 'UPDATE' | 'DELETE';
+    action: 'CREATE' | 'UPDATE' | 'DELETE' | 'APPROVE' | 'CANCEL' | 'UPDATE_ORDER_STATUS' | 'UPDATE_PAYMENT_STATUS' | 'UPDATE_INVOICE_STATUS' | string;
     old_values?: Record<string, unknown>;
     new_values?: Record<string, unknown>;
     changed_fields?: string[];

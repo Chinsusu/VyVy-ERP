@@ -185,3 +185,91 @@ func (h *PurchaseOrderHandler) Cancel(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.SuccessResponse(po))
 }
+
+// UpdateOrderStatus updates the ordering status of a PO (B4)
+func (h *PurchaseOrderHandler) UpdateOrderStatus(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
+		return
+	}
+	var req dto.UpdateOrderStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
+		return
+	}
+	val, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
+		return
+	}
+	userID := val.(int64)
+	username, _ := c.Get("username")
+	userStr, _ := username.(string)
+	po, err := h.service.UpdateOrderStatus(uint(id), &req, uint(userID), userStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, utils.SuccessResponse(po))
+}
+
+// UpdatePaymentStatus updates the payment status of a PO (B5)
+func (h *PurchaseOrderHandler) UpdatePaymentStatus(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
+		return
+	}
+	var req dto.UpdatePaymentStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
+		return
+	}
+	val, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
+		return
+	}
+	userID := val.(int64)
+	username, _ := c.Get("username")
+	userStr, _ := username.(string)
+	po, err := h.service.UpdatePaymentStatus(uint(id), &req, uint(userID), userStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, utils.SuccessResponse(po))
+}
+
+// UpdateInvoiceStatus updates the invoice status of a PO (B6)
+func (h *PurchaseOrderHandler) UpdateInvoiceStatus(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid purchase order ID"))
+		return
+	}
+	var req dto.UpdateInvoiceStatusRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_REQUEST", err.Error()))
+		return
+	}
+	val, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, utils.ErrorResponse("UNAUTHORIZED", "User not authenticated"))
+		return
+	}
+	userID := val.(int64)
+	username, _ := c.Get("username")
+	userStr, _ := username.(string)
+	po, err := h.service.UpdateInvoiceStatus(uint(id), &req, uint(userID), userStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, utils.SuccessResponse(po))
+}
+

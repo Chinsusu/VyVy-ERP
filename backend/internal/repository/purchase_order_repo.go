@@ -19,6 +19,9 @@ type PurchaseOrderRepository interface {
 	GetItems(poID uint) ([]*models.PurchaseOrderItem, error)
 	UpdateStatus(id uint, status string, approvedBy *uint, approvedAt *time.Time) error
 	CalculateTotals(poID uint) error
+	UpdateWorkflowStatus(id uint, field string, value string, notes string, updatedBy uint) error
+	UpdateInvoiceInfo(id uint, invoiceStatus string, invoiceNumber string, invoiceDate string, updatedBy uint) error
+	CompleteIfFullyReceived(id uint, updatedBy uint) error
 }
 
 type purchaseOrderRepository struct {
@@ -225,3 +228,56 @@ func (r *purchaseOrderRepository) CalculateTotals(poID uint) error {
 			"total_amount":    totalAmount,
 		}).Error
 }
+
+// UpdateWorkflowStatus updates a single workflow status field (order_status or payment_status)
+func (r *purchaseOrderRepository) UpdateWorkflowStatus(id uint, field string, value string, notes string, updatedBy uint) error {
+	updates := map[string]interface{}{
+		field:        value,
+		"updated_by": updatedBy,
+	}
+	// NOTE: 'notes' here is for audit log only, NOT stored in PO.notes field
+	// to avoid overwriting the general PO notes on repeated workflow updates
+	return r.db.Model(&models.PurchaseOrder{}).Where("id = ?", id).Updates(updates).Error
+}
+
+// UpdateInvoiceInfo updates invoice-related fields
+func (r *purchaseOrderRepository) UpdateInvoiceInfo(id uint, invoiceStatus string, invoiceNumber string, invoiceDate string, updatedBy uint) error {
+	updates := map[string]interface{}{
+		"invoice_status": invoiceStatus,
+		"updated_by":     updatedBy,
+	}
+	if invoiceNumber != "" {
+		updates["invoice_number"] = invoiceNumber
+	}
+	if invoiceDate != "" {
+		updates["invoice_date"] = invoiceDate
+	}
+	return r.db.Model(&models.PurchaseOrder{}).Where("id = ?", id).Updates(updates).Error
+}
+
+// CompleteIfFullyReceived checks if all PO items are fully received and marks PO as completed
+func (r *purchaseOrderRepository) CompleteIfFullyReceived(id uint, updatedBy uint) error {
+	var po models.PurchaseOrder
+	if err := r.db.Preload("Items").First(&po, id).Error; err != nil {
+		return err
+	}
+	if po.Status != "approved" {
+		return nil // Only auto-complete approved POs
+	}
+	allReceived := true
+	for _, item := range po.Items {
+		if item.ReceivedQuantity < item.Quantity {
+			allReceived = false
+			break
+		}
+	}
+	if allReceived && len(po.Items) > 0 {
+		return r.db.Model(&models.PurchaseOrder{}).Where("id = ?", id).Updates(map[string]interface{}{
+			"status":         "completed",
+			"receipt_status": "completed",
+			"updated_by":     updatedBy,
+		}).Error
+	}
+	return nil
+}
+

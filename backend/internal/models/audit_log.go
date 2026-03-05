@@ -74,7 +74,7 @@ type AuditLog struct {
 	ID            int64       `gorm:"primaryKey;autoIncrement" json:"id"`
 	EntityTable   string      `gorm:"column:table_name;type:varchar(100);not null;index" json:"table_name"`
 	RecordID      int64       `gorm:"not null;index" json:"record_id"`
-	Action        string      `gorm:"type:varchar(20);not null" json:"action"` // CREATE, UPDATE, DELETE
+	Action        string      `gorm:"type:varchar(50);not null" json:"action"` // CREATE, UPDATE, DELETE, APPROVE, CANCEL, UPDATE_ORDER_STATUS, etc.
 	OldValues     JSONMap     `gorm:"type:jsonb" json:"old_values,omitempty"`
 	NewValues     JSONMap     `gorm:"type:jsonb" json:"new_values,omitempty"`
 	ChangedFields StringSlice `gorm:"type:jsonb" json:"changed_fields,omitempty"`

@@ -334,5 +334,11 @@ func (s *grnService) PostGRN(id uint, userID uint) (*models.SafeGoodsReceiptNote
 		return nil, err
 	}
 
+	// B7: Auto-complete PO if all items fully received
+	if grn.PurchaseOrderID != nil {
+		_ = s.poRepo.CompleteIfFullyReceived(*grn.PurchaseOrderID, userID)
+	}
+
 	return grn.ToSafe(), nil
 }
+

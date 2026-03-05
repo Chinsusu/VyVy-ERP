@@ -190,11 +190,15 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		// Workflow endpoints
 		poGroup.POST("/:id/approve", middleware.RequireRole("procurement_manager"), purchaseOrderHandler.Approve)
 		poGroup.POST("/:id/cancel", middleware.RequireRole("procurement_manager"), purchaseOrderHandler.Cancel)
+		poGroup.PUT("/:id/order-status", purchaseOrderHandler.UpdateOrderStatus)
+		poGroup.PUT("/:id/payment-status", purchaseOrderHandler.UpdatePaymentStatus)
+		poGroup.PUT("/:id/invoice-status", purchaseOrderHandler.UpdateInvoiceStatus)
 		// Documents
 		poGroup.GET("/:id/documents", poDocHandler.List)
 		poGroup.POST("/:id/documents", poDocHandler.Upload)
 		poGroup.DELETE("/:id/documents/:docId", poDocHandler.Delete)
 	}
+
 
 	// Stock / Inventory routes - All protected
 	invGroup := v1.Group("/inventory")

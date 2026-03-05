@@ -4,6 +4,7 @@ import { Plus, Trash2, Save, X, ClipboardList } from 'lucide-react';
 import { useFinishedProducts } from '../../hooks/useFinishedProducts';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import { useCreateProductionPlan, useUpdateProductionPlan } from '../../hooks/useProductionPlans';
+import SearchableSelect from '../common/SearchableSelect';
 import type { FinishedProduct } from '../../types/finishedProduct';
 import type { Warehouse } from '../../types/warehouse';
 import type {
@@ -153,17 +154,13 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                 </div>
                 <div>
                     <label className="label">Kho hàng <span className="text-red-500">*</span></label>
-                    <select
-                        className="input w-full"
+                    <SearchableSelect
+                        options={warehouses.map((w: Warehouse) => ({ value: w.id, label: `${w.code} - ${w.name}` }))}
                         value={formData.warehouse_id}
-                        onChange={(e) => setFormData({ ...formData, warehouse_id: Number(e.target.value) })}
-                        required
-                    >
-                        <option value={0}>Chọn kho hàng</option>
-                        {warehouses.map((w: Warehouse) => (
-                            <option key={w.id} value={w.id}>{w.name} ({w.code})</option>
-                        ))}
-                    </select>
+                        onChange={(val) => setFormData({ ...formData, warehouse_id: val })}
+                        placeholder="Chọn kho hàng"
+                        searchPlaceholder="Tìm kho..."
+                    />
                 </div>
                 <div>
                     <label className="label">Ngày yêu cầu <span className="text-red-500">*</span></label>
@@ -227,17 +224,13 @@ export default function MRForm({ initialData, isEdit }: MRFormProps) {
                             {items.map((item, index) => (
                                 <tr key={index} className="border-b last:border-0">
                                     <td className="py-3 px-3">
-                                        <select
-                                            className="input w-full"
+                                        <SearchableSelect
+                                            options={products.map((p: FinishedProduct) => ({ value: p.id, label: `${p.code} - ${p.name} - ${p.unit}` }))}
                                             value={item.material_id}
-                                            onChange={(e) => updateItem(index, 'material_id', Number(e.target.value))}
-                                            required
-                                        >
-                                            <option value={0}>Chọn sản phẩm</option>
-                                            {products.map((p: FinishedProduct) => (
-                                                <option key={p.id} value={p.id}>{p.name} ({p.code}) - {p.unit}</option>
-                                            ))}
-                                        </select>
+                                            onChange={(val) => updateItem(index, 'material_id', val)}
+                                            placeholder="Chọn sản phẩm"
+                                            searchPlaceholder="Tìm sản phẩm..."
+                                        />
                                     </td>
                                     <td className="py-3 px-3">
                                         <input

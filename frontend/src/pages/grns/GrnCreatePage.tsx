@@ -13,10 +13,10 @@ export default function GrnCreatePage() {
                         className="text-primary hover:underline flex items-center gap-2 mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Goods Receipt Notes
+                        Quay lại Danh Sách Lệnh Nhập Kho
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Receive Goods</h1>
-                    <p className="text-gray-600 mt-1">Record a new shipment receipt against an approved purchase order</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Tạo Lệnh Nhập Kho</h1>
+                    <p className="text-gray-600 mt-1">Ghi nhận hàng nhập kho từ đơn mua hàng đã được duyệt</p>
                 </div>
 
                 {/* Form */}

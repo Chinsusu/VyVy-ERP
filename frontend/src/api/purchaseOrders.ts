@@ -48,4 +48,23 @@ export const purchaseOrdersAPI = {
         const response = await axios.post(`/purchase-orders/${id}/cancel`, {});
         return response.data.data;
     },
+
+    // Update order status (B4: procurement confirms order placed)
+    updateOrderStatus: async (id: number, input: { order_status: string; notes?: string }): Promise<PurchaseOrder> => {
+        const response = await axios.put(`/purchase-orders/${id}/order-status`, input);
+        return response.data.data;
+    },
+
+    // Update payment status (B5: accounting marks payment)
+    updatePaymentStatus: async (id: number, input: { payment_status: string; notes?: string }): Promise<PurchaseOrder> => {
+        const response = await axios.put(`/purchase-orders/${id}/payment-status`, input);
+        return response.data.data;
+    },
+
+    // Update invoice status (B6: accounting confirms invoice received)
+    updateInvoiceStatus: async (id: number, input: { invoice_status: string; invoice_number?: string; invoice_date?: string }): Promise<PurchaseOrder> => {
+        const response = await axios.put(`/purchase-orders/${id}/invoice-status`, input);
+        return response.data.data;
+    },
 };
+

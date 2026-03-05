@@ -13,6 +13,7 @@ COPY . .
 # Build for production
 RUN npm run build
 
+
 # Production stage
 FROM nginx:stable-alpine AS production-stage
 
