@@ -11,17 +11,10 @@ interface MaterialFormProps {
     onCancel?: () => void;
 }
 
-// Normalize legacy material_type values from seed data (raw_material, packaging, fragrance)
-// to current enum values (HOA_PHAM, HUONG_LIEU, BAO_BI)
-const VALID_TYPES = new Set(['HOA_PHAM', 'HUONG_LIEU', 'BAO_BI']);
 function normalizeMaterialType(t?: string | null): string {
-    if (!t) return 'HOA_PHAM';
-    if (VALID_TYPES.has(t)) return t;
-    // legacy mapping
-    const up = t.toUpperCase();
-    if (up.includes('FRAGRANCE') || up.includes('HUONG')) return 'HUONG_LIEU';
-    if (up.includes('PACK') || up.includes('BAO')) return 'BAO_BI';
-    return 'HOA_PHAM'; // default for raw_material and anything else
+    if (!t) return 'raw_material';
+    if (t === 'packaging') return 'packaging';
+    return 'raw_material';
 }
 
 const emptySupplier = (): MaterialSupplierInput => ({
@@ -218,9 +211,8 @@ export default function MaterialForm({ material, onSuccess, onCancel }: Material
                             value={formData.material_type}
                             onChange={(e) => handleChange('material_type', e.target.value)}
                         >
-                            <option value="HOA_PHAM">Hóa phẩm</option>
-                            <option value="HUONG_LIEU">Hương liệu</option>
-                            <option value="BAO_BI">Bao bì</option>
+                            <option value="raw_material">Nguyên Liệu</option>
+                            <option value="packaging">Bao Bì</option>
                         </select>
                         {errors.material_type && <p className="text-red-500 text-sm mt-1">{errors.material_type}</p>}
                     </div>
