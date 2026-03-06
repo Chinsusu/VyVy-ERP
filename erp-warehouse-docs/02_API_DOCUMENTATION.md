@@ -25,7 +25,7 @@ Lấy danh sách nguyên liệu có phân trang và filter
 ?page=1
 &limit=50
 &search=citric              # Tìm theo code hoặc name
-&material_type=raw_material # raw_material, packaging, fragrance
+&material_type=raw_material # raw_material, packaging
 &category=ACI               # ACI, ACT, EMU, MOI, OIL
 &supplier_id=123
 &is_active=true

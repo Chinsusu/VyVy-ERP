@@ -24,7 +24,7 @@ CREATE TABLE materials (
     code VARCHAR(50) UNIQUE NOT NULL,                    -- VD: ACI_Citric, ACT_B3, EMU_Cetyl
     trading_name VARCHAR(255) NOT NULL,                  -- Tên thương mại
     inci_name VARCHAR(255),                              -- Danh pháp quốc tế (INCI)
-    material_type VARCHAR(50) NOT NULL,                  -- raw_material, packaging, fragrance, semi_finished
+    material_type VARCHAR(50) NOT NULL,                  -- raw_material (Nguyên Liệu), packaging (Bao Bì)
     category VARCHAR(100),                               -- VD: ACI (Acid), ACT (Active), EMU (Emulsifier), MOI (Moisturizer), OIL (Oil)
     sub_category VARCHAR(100),                           -- Phân loại chi tiết hơn
     unit VARCHAR(20) NOT NULL DEFAULT 'KG',              -- KG, L, PC (piece), BOX
@@ -1479,7 +1479,7 @@ Các indexes quan trọng đã được tạo:
 3. **warehouses** - Tạo data cơ bản
    ```sql
    INSERT INTO warehouses (code, name, warehouse_type) VALUES
-   ('WH-MAIN', 'Kho Chính - Nhà Trắc', 'main');
+   ('WH-MAIN', 'Kho Chính - Nhà Trắc', 'factory');
    ```
 
 ---

@@ -437,7 +437,7 @@ interface Material {
   id: number;
   code: string;
   trading_name: string;
-  material_type: 'raw_material' | 'packaging' | 'fragrance';
+  material_type: 'raw_material' | 'packaging';
   unit: 'KG' | 'L' | 'PC' | 'BOX';
   min_stock_level: number;
   is_active: boolean;
