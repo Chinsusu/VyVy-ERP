@@ -17,7 +17,7 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
     const [formData, setFormData] = useState<CreateWarehouseInput>({
         code: warehouse?.code || '',
         name: warehouse?.name || '',
-        warehouse_type: warehouse?.warehouse_type || 'main',
+        warehouse_type: warehouse?.warehouse_type || 'lab',
         address: warehouse?.address || '',
         city: warehouse?.city || '',
         manager_id: warehouse?.manager_id,
@@ -139,11 +139,9 @@ export default function WarehouseForm({ warehouse, onSuccess, onCancel }: Wareho
                                 onChange={(e) => handleChange('warehouse_type', e.target.value)}
                                 disabled={isSubmitting}
                             >
-                                <option value="main">Kho Tổng</option>
-                                <option value="satellite">Kho Vệ Tinh</option>
-                                <option value="returns">Kho Hoàn Hàng</option>
-                                <option value="staging">Kho Trung Chuyển</option>
-                                <option value="other">Khác</option>
+                                <option value="lab">Kho Lab (Nguyên Vật Liệu)</option>
+                                <option value="commercial">Kho Bán Hàng (Thành Phẩm &amp; Bao Bì)</option>
+                                <option value="factory">Kho Nhà Máy (Nguyên Liệu &amp; Bao Bì)</option>
                             </select>
                         </div>
 

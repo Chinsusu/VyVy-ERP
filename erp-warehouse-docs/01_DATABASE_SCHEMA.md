@@ -138,7 +138,7 @@ CREATE TABLE warehouses (
     id BIGSERIAL PRIMARY KEY,
     code VARCHAR(50) UNIQUE NOT NULL,                   -- VD: WH-HCM, WH-HN
     name VARCHAR(255) NOT NULL,
-    warehouse_type VARCHAR(50),                         -- main, transit, retail, quarantine
+    warehouse_type VARCHAR(50),                         -- lab (Nguyên Vật Liệu), commercial (Thành Phẩm & Bao Bì), factory (Nhà Máy)
     
     -- Location
     address TEXT,
@@ -170,9 +170,10 @@ CREATE INDEX idx_warehouses_type ON warehouses(warehouse_type);
 **Dữ liệu mẫu:**
 ```sql
 INSERT INTO warehouses (code, name, warehouse_type) VALUES
-('WH-MAIN', 'Kho Chính - Nhà Trắc', 'main'),
-('WH-QC', 'Kho QC/Cách Ly', 'quarantine'),
-('WH-FG', 'Kho Thành Phẩm', 'main');
+('LAB',      'Phòng Lab',                  'lab'),
+('KHO_TONG', 'Kho Tổng - VyVy',             'commercial'),
+('KHO_MY',   'Kho Thuê Ngoài',               'commercial'),
+('TAMI',     'Nhà Máy TAMI',                 'factory');
 ```
 
 ---

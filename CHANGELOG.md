@@ -7,7 +7,27 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc21] - 2026-03-06
+
+### Added
+- **Kho Nhà Máy (factory type)**: Thêm loại kho thứ 3 `factory` cho các nhà máy gia công — chứa Nguyên Liệu & Bao Bì, nơi diễn ra sản xuất thành phẩm rồi đẩy về Kho Bán Hàng.
+
+### Changed
+- **Phân loại kho đơn giản hóa**: Từ nhiều loại (`main`, `external`, `outsource`, `returns`, `staging`, `other`) → chỉ còn **3 loại**:
+  - `lab` — **Kho Lab**: chứa Nguyên Vật Liệu (R&D, test)
+  - `commercial` — **Kho Bán Hàng**: chứa Thành Phẩm & Bao Bì
+  - `factory` — **Kho Nhà Máy**: chứa Nguyên Liệu & Bao Bì (nơi sản xuất)
+- **DB Migration**: `UPDATE warehouses SET warehouse_type = 'commercial' WHERE warehouse_type NOT IN ('lab', 'factory')`.
+- **Backend Model**: `default` của `warehouse_type` đổi từ `'main'` → `'commercial'`.
+- **Frontend**: `WAREHOUSE_TYPE_CONFIG` và `TYPE_FILTER_TABS` trong `WarehouseListPage`, `WarehouseDetailPage`; `WarehouseForm` dropdown — chỉ còn 3 loại.
+
+### Removed
+- **2 kho placeholder** (`_PLACEHOLDER_1`, `_PLACEHOLDER_2`) đã bị xóa khỏi DB. References trong `production_plans` và `purchase_orders` được chuyển sang `KHO_TONG`.
+
+---
+
 ## [1.0.0-rc20] - 2026-03-05
+
 
 ### Added
 - **PO Assignee Feature**: Phân công người phụ trách cho từng đơn mua hàng.

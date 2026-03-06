@@ -9,7 +9,7 @@ type Warehouse struct {
 	ID            uint       `json:"id" gorm:"primaryKey"`
 	Code          string     `json:"code" gorm:"uniqueIndex;not null"`
 	Name          string     `json:"name" gorm:"not null"`
-	WarehouseType string     `json:"warehouse_type" gorm:"default:'main'"`
+	WarehouseType string     `json:"warehouse_type" gorm:"default:'commercial'"`
 	Address       *string    `json:"address"`
 	City          *string    `json:"city"`
 	ManagerID     *uint      `json:"manager_id"`
