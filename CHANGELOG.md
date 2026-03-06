@@ -7,6 +7,30 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc22] - 2026-03-06
+
+### Changed
+- **Đơn giản hóa `material_type`**: Từ nhiều loại (`HOA_PHAM`, `HUONG_LIEU`, `BAO_BI`, `fragrance`, `semi_finished`) → chỉ còn **2 loại**:
+  - `raw_material` — **Nguyên Liệu**: acids, actives, emulsifiers, oils, fragrances, dyes, semi-finished
+  - `packaging` — **Bao Bì**: chai, hũ, tuýp, nhãn, hộp, túi
+- **DB Migration**: Map legacy types → `raw_material`, `BAO_BI` → `packaging`. Verified: chỉ còn 2 distinct values trong DB.
+- **Frontend**: `MaterialForm` dropdown, `MaterialListPage` tabs/labels/colors, `MaterialDetailPage` labels, `SupplierDetailPage` material type display — tất cả update sang 2 loại mới.
+
+### Added
+- **Warehouse-Material Type Rules** (GRN Form): Khi tạo Lệnh Nhập Kho, dropdown kho được lọc tự động theo loại NVL trong PO:
+  - PO chứa `raw_material` → hiện **Kho Lab** + **Kho Nhà Máy**
+  - PO chứa `packaging` → hiện **Kho Nhà Máy** + **Kho Bán Hàng**
+  - PO chứa cả 2 loại → chỉ hiện **Kho Nhà Máy** (intersection)
+  - Auto-reset warehouse nếu gợi ý từ PO không phù hợp
+  - Warning text khi không có kho phù hợp
+
+### Decision Notes
+- `semi_finished` → `raw_material`: VyVy không cần phân biệt bán thành phẩm, tất cả đều là nguyên liệu đầu vào.
+- Kho Nhà Máy có thể chứa `finished_product` (TP mới ra lò), nhưng chỉ được xuất về Kho Bán Hàng, không xuất thẳng cho khách.
+- Kho Lab **không** chứa bao bì (kể cả bao bì test mẫu — không tính vào kho chính thức).
+
+---
+
 ## [1.0.0-rc21] - 2026-03-06
 
 ### Added

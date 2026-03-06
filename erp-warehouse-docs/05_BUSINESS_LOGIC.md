@@ -527,3 +527,48 @@ Khách khiếu nại sản phẩm (DO-2025-001234)
 ---
 
 Đây là toàn bộ business logic. Còn phần nào cần làm rõ không?
+
+---
+
+## VIII. WAREHOUSE - MATERIAL TYPE RULES
+
+### Mục đích
+Mỗi loại kho chỉ được phép lưu trữ một số loại vật liệu nhất định, nhằm đảm bảo phân tách rõ ràng giữa nguyên vật liệu R&D, sản xuất và thương mại.
+
+### Bảng Quy Tắc
+
+| Warehouse Type | Tên VI | Loại hàng được nhập | Ghi chú |
+|----------------|--------|---------------------|---------|
+| `lab` | Kho Lab | `raw_material` | Chỉ NVL phục vụ R&D/test. Không chứa bao bì, không chứa thành phẩm. |
+| `factory` | Kho Nhà Máy | `raw_material`, `packaging`, `finished_product` | Nơi sản xuất. TP mới ra lò chờ chuyển về Kho Bán Hàng. |
+| `commercial` | Kho Bán Hàng | `packaging`, `finished_product` | Bao bì thương mại + TP sẵn sàng bán. |
+
+### Quy Tắc Xuất Hàng (Kho Nhà Máy)
+- `finished_product` tại Kho Nhà Máy → **chỉ được** xuất về Kho Bán Hàng (`commercial`)
+- **Không được** xuất thành phẩm từ Kho Nhà Máy trực tiếp cho khách hàng
+
+### Tác Động Lên GRN Form
+
+Khi tạo Lệnh Nhập Kho (GRN), dropdown "Kho nhận hàng" được lọc tự động theo loại NVL trong PO:
+
+| Material Types trong PO | Kho được phép chọn |
+|------------------------|-------------------|
+| Chỉ `raw_material` | Kho Lab, Kho Nhà Máy |
+| Chỉ `packaging` | Kho Nhà Máy, Kho Bán Hàng |
+| Cả `raw_material` + `packaging` | Chỉ Kho Nhà Máy (intersection) |
+
+**Logic implementation:**
+- Khi user chọn PO → hệ thống scan `material_type` của tất cả items trong PO
+- Lọc danh sách kho theo rules trên
+- Nếu kho gợi ý từ PO không hợp lệ → tự động reset warehouse field
+- Hiển thị warning nếu không có kho nào phù hợp
+
+### material_type Simplified (áp dụng từ v1.0.0-rc22)
+
+| Value | Tên VI | Bao gồm (lịch sử) |
+|-------|--------|-------------------|
+| `raw_material` | Nguyên Liệu | Acids, actives, emulsifiers, oils, fragrances, dyes, semi-finished, HOA_PHAM, HUONG_LIEU |
+| `packaging` | Bao Bì | Chai, hũ, tuýp, nhãn, hộp, túi, BAO_BI |
+
+> **Note**: `semi_finished` được map về `raw_material`. Trong quy trình sản xuất VyVy, không cần phân biệt bán thành phẩm riêng vì tất cả đều nhập vào kho như là nguyên liệu đầu vào.
+

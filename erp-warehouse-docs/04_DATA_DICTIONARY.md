@@ -9,7 +9,7 @@ Tài liệu này định nghĩa chi tiết tất cả các bảng, cột, kiểu
 
 ### 1. materials
 
-**Mô tả:** Lưu trữ danh mục nguyên liệu, bao bì, hương liệu sử dụng trong sản xuất
+**Mô tả:** Lưu trữ danh mục nguyên vật liệu (Nguyên Liệu, Bao Bì) sử dụng trong sản xuất
 
 | Column | Type | Nullable | Default | Description |
 |--------|------|----------|---------|-------------|
@@ -17,7 +17,7 @@ Tài liệu này định nghĩa chi tiết tất cả các bảng, cột, kiểu
 | code | VARCHAR(50) | No | - | Mã nguyên liệu (unique, VD: ACI_Citric) |
 | trading_name | VARCHAR(255) | No | - | Tên thương mại |
 | inci_name | VARCHAR(255) | Yes | NULL | Tên quốc tế (INCI - International Nomenclature of Cosmetic Ingredients) |
-| material_type | VARCHAR(50) | No | - | Loại: raw_material, packaging, fragrance, semi_finished |
+| material_type | VARCHAR(50) | No | - | Loại NVL: `raw_material` (Nguyên Liệu), `packaging` (Bao Bì) |
 | category | VARCHAR(100) | Yes | NULL | Phân loại: ACI, ACT, EMU, MOI, OIL, etc. |
 | sub_category | VARCHAR(100) | Yes | NULL | Phân loại chi tiết hơn |
 | unit | VARCHAR(20) | No | 'KG' | Đơn vị tính: KG, L, PC, BOX |
@@ -101,7 +101,7 @@ Tài liệu này định nghĩa chi tiết tất cả các bảng, cột, kiểu
 | id | BIGSERIAL | No | AUTO | Primary key |
 | code | VARCHAR(50) | No | - | Mã kho (unique, VD: WH-MAIN) |
 | name | VARCHAR(255) | No | - | Tên kho |
-| warehouse_type | VARCHAR(50) | Yes | NULL | Loại: main, transit, retail, quarantine |
+| warehouse_type | VARCHAR(50) | Yes | 'commercial' | Loại kho: `lab` (Kho Lab), `factory` (Kho Nhà Máy), `commercial` (Kho Bán Hàng) |
 | address | TEXT | Yes | NULL | Địa chỉ |
 | city | VARCHAR(100) | Yes | NULL | Thành phố |
 | district | VARCHAR(100) | Yes | NULL | Quận/Huyện |
@@ -340,16 +340,21 @@ Tài liệu này định nghĩa chi tiết tất cả các bảng, cột, kiểu
 ## ENUMERATIONS (Enum Values)
 
 ### material_type
-- raw_material
-- packaging
-- fragrance
-- semi_finished
+| Value | Tên VI | Áp dụng |
+|-------|--------|--------|
+| `raw_material` | Nguyên Liệu | Acids, actives, emulsifiers, oils, fragrances, dyes, etc. |
+| `packaging` | Bao Bì | Chai, hũ, tuýp, nhãn, hộp, túi, etc. |
+
+> **Lịch sử**: Trước v1.0.0-rc22, còn có `fragrance`, `semi_finished`, `HOA_PHAM`, `HUONG_LIEU`, `BAO_BI`. Tất cả đã được migrate về `raw_material` hoặc `packaging`.
 
 ### warehouse_type
-- main
-- transit
-- retail
-- quarantine
+| Value | Tên VI | Loại hàng được phép |
+|-------|--------|-----------------------|
+| `lab` | Kho Lab | `raw_material` |
+| `factory` | Kho Nhà Máy | `raw_material`, `packaging`, `finished_product` |
+| `commercial` | Kho Bán Hàng | `packaging`, `finished_product` |
+
+> **Ghi chú**: Kho Nhà Máy có thể chứa thành phẩm mới ra lò nhưng chỉ được xuất về Kho Bán Hàng, **không** xuất thẳng cho khách hàng.
 
 ### po_status
 - draft
