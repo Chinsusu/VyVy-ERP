@@ -13,11 +13,24 @@ export default function GrnForm() {
     const createMutation = useCreateGRN();
 
     // Data for dropdowns
-    const { data: posData } = usePurchaseOrders({ status: 'approved', page: 1, page_size: 1000 });
+    // Lấy tất cả PO (không filter status cứng vì PO B4-B6 vẫn cần tạo GRN được)
+    const { data: posData } = usePurchaseOrders({ page: 1, page_size: 200 });
     const { data: warehousesData } = useWarehouses();
 
-    const approvedPOs = posData?.data || [];
+    // Chỉ hiển thị PO đã approved (loại draft và cancelled)
+    const approvedPOs = (posData?.data || []).filter(
+        (po: PurchaseOrder) => po.status !== 'draft' && po.status !== 'cancelled' && po.status !== 'completed'
+    );
     const warehouses = warehousesData?.data || [];
+
+    // Quy tắc kho theo loại NVL:
+    // raw_material  -> lab, factory
+    // packaging     -> factory, commercial
+    // mixed (cả hai) -> factory only
+    const WAREHOUSE_RULES: Record<string, string[]> = {
+        raw_material: ['lab', 'factory'],
+        packaging: ['factory', 'commercial'],
+    };
 
     // State
     const [selectedPOId, setSelectedPOId] = useState<number>(0);
@@ -36,14 +49,35 @@ export default function GrnForm() {
     // Handle PO selection and populate items
     useEffect(() => {
         if (selectedPO) {
+            // Xác định các loại material trong PO
+            const poItems = selectedPO.items || [];
+            const materialTypes = new Set(
+                poItems.map((item: PurchaseOrderItem) => item.material?.material_type || 'raw_material')
+            );
+
+            // Tính allowed warehouse types
+            let allowedTypes: string[];
+            if (materialTypes.has('raw_material') && materialTypes.has('packaging')) {
+                allowedTypes = ['factory']; // chỉ factory chứa được cả 2
+            } else if (materialTypes.has('packaging')) {
+                allowedTypes = WAREHOUSE_RULES['packaging'];
+            } else {
+                allowedTypes = WAREHOUSE_RULES['raw_material'];
+            }
+
+            // Tìm kho hợp lệ mặc định (ưu tiên kho gợi ý từ PO; nếu không hợp lệ thì reset)
+            const suggestedId = selectedPO.warehouse_id;
+            const isValid = warehouses.some(
+                (w: any) => w.id === suggestedId && allowedTypes.includes(w.warehouse_type)
+            );
+
             setFormData(prev => ({
                 ...prev,
                 purchase_order_id: selectedPO.id,
-                warehouse_id: selectedPO.warehouse_id, // Default to PO warehouse
+                warehouse_id: isValid ? suggestedId : 0,
             }));
 
             // Auto-populate items with remaining quantity
-            const poItems = selectedPO.items || [];
             const grnItems: CreateGRNItemInput[] = poItems
                 .filter((item: PurchaseOrderItem) => item.quantity > item.received_quantity)
                 .map((item: PurchaseOrderItem) => ({
@@ -85,8 +119,8 @@ export default function GrnForm() {
             return;
         }
 
-        if (items.some(item => item.quantity <= 0 || item.warehouse_location_id === 0)) {
-            alert('Vui lòng đảm bảo tất cả các dòng hàng có số lượng > 0 và đã chọn vị trí kho.');
+        if (items.some(item => item.quantity <= 0)) {
+            alert('Vui lòng đảm bảo tất cả các dòng hàng có số lượng > 0.');
             return;
         }
 
@@ -99,10 +133,11 @@ export default function GrnForm() {
                     ...item,
                     po_item_id: Number(item.po_item_id),
                     material_id: Number(item.material_id),
-                    warehouse_location_id: Number(item.warehouse_location_id),
+                    // Gửi null khi không chọn vị trí kho (tránh FK=0 violation)
+                    warehouse_location_id: item.warehouse_location_id || null,
                     quantity: Number(item.quantity),
                     unit_cost: Number(item.unit_cost),
-                })),
+                })) as any[],
             };
 
             const result = await createMutation.mutateAsync(payload);
@@ -113,8 +148,32 @@ export default function GrnForm() {
         }
     };
 
-    const selectedWarehouse = warehouses.find(w => w.id === formData.warehouse_id);
+    const selectedWarehouse = warehouses.find((w: any) => w.id === formData.warehouse_id);
     const warehouseLocations = selectedWarehouse?.locations || [];
+
+    // Tính danh sách kho hợp lệ cho PO đang chọn
+    const filteredWarehouses = (() => {
+        if (!selectedPO) return warehouses;
+        const poItems = selectedPO.items || [];
+        const materialTypes = new Set(
+            poItems.map((item: PurchaseOrderItem) => item.material?.material_type || 'raw_material')
+        );
+        let allowedTypes: string[];
+        if (materialTypes.has('raw_material') && materialTypes.has('packaging')) {
+            allowedTypes = ['factory'];
+        } else if (materialTypes.has('packaging')) {
+            allowedTypes = WAREHOUSE_RULES['packaging'];
+        } else {
+            allowedTypes = WAREHOUSE_RULES['raw_material'];
+        }
+        return warehouses.filter((w: any) => allowedTypes.includes(w.warehouse_type));
+    })();
+
+    const TYPE_LABELS: Record<string, string> = {
+        lab: 'Kho Lab',
+        factory: 'Kho Nhà Máy',
+        commercial: 'Kho Bán Hàng',
+    };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6 pb-20">
@@ -154,11 +213,19 @@ export default function GrnForm() {
                         onChange={(e) => setFormData({ ...formData, warehouse_id: Number(e.target.value) })}
                         required
                     >
-                        <option value={0}>Chọn kho</option>
-                        {warehouses.map(w => (
-                            <option key={w.id} value={w.id}>{w.name}</option>
+                        <option value={0}>{selectedPO ? 'Chọn kho phù hợp' : 'Chọn kho'}</option>
+                        {filteredWarehouses.map((w: any) => (
+                            <option key={w.id} value={w.id}>
+                                {w.name} ({TYPE_LABELS[w.warehouse_type] || w.warehouse_type})
+                            </option>
                         ))}
                     </select>
+                    {selectedPO && filteredWarehouses.length === 0 && (
+                        <p className="text-xs text-amber-600 mt-1">⚠ Không có kho phù hợp với loại NVL trong PO này.</p>
+                    )}
+                    {selectedPO && filteredWarehouses.length > 0 && (
+                        <p className="text-xs text-gray-400 mt-1">Chỉ hiển thị kho phù hợp với loại NVL của PO.</p>
+                    )}
                 </div>
                 <div>
                     <label className="label">Ngày nhập kho <span className="text-red-500">*</span></label>
@@ -201,7 +268,7 @@ export default function GrnForm() {
                                     <th className="px-4 py-3 min-w-[250px]">Nguyên vật liệu</th>
                                     <th className="px-4 py-3 text-right">Số lượng nhập</th>
                                     <th className="px-4 py-3 min-w-[200px]">Vị trí kho <span className="text-red-500">*</span></th>
-                                    <th className="px-4 py-3 min-w-[150px]">Lô / Lot</th>
+                                    <th className="px-4 py-3 min-w-[150px]">Số Lô</th>
                                     <th className="px-4 py-3 min-w-[150px]">Ngày</th>
                                     <th className="px-4 py-3 text-center"></th>
                                 </tr>
@@ -224,7 +291,8 @@ export default function GrnForm() {
                                                     className="input w-24 text-right"
                                                     value={item.quantity}
                                                     onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
-                                                    min={0.001}
+                                                    min={1}
+                                                    step={1}
                                                     max={poItem ? poItem.quantity - poItem.received_quantity : undefined}
                                                     required
                                                 />
@@ -234,7 +302,6 @@ export default function GrnForm() {
                                                     className="select w-full"
                                                     value={item.warehouse_location_id}
                                                     onChange={(e) => updateItem(index, 'warehouse_location_id', Number(e.target.value))}
-                                                    required
                                                 >
                                                     <option value={0}>Chọn vị trí</option>
                                                     {warehouseLocations.map((loc: WarehouseLocation) => (
@@ -242,20 +309,16 @@ export default function GrnForm() {
                                                     ))}
                                                 </select>
                                             </td>
-                                            <td className="px-4 py-3 space-y-2">
+                                            <td className="px-4 py-3">
                                                 <input
                                                     type="text"
-                                                    placeholder="Batch #"
+                                                    placeholder="Số lô"
                                                     className="input w-full text-xs py-1 px-2 h-auto"
                                                     value={item.batch_number || ''}
-                                                    onChange={(e) => updateItem(index, 'batch_number', e.target.value)}
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Lot #"
-                                                    className="input w-full text-xs py-1 px-2 h-auto"
-                                                    value={item.lot_number || ''}
-                                                    onChange={(e) => updateItem(index, 'lot_number', e.target.value)}
+                                                    onChange={(e) => {
+                                                        updateItem(index, 'batch_number', e.target.value);
+                                                        updateItem(index, 'lot_number', e.target.value);
+                                                    }}
                                                 />
                                             </td>
                                             <td className="px-4 py-3 space-y-2">
