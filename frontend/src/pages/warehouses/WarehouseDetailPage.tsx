@@ -113,27 +113,39 @@ export default function WarehouseDetailPage() {
     return (
         <div className="animate-fade-in">
             {/* Back */}
-            <Link to="/warehouses" className="text-primary hover:underline flex items-center gap-2 mb-4 text-sm">
-                <ArrowLeft className="w-4 h-4" /> Quay lại danh sách
-            </Link>
+            <button
+                onClick={() => navigate('/warehouses')}
+                className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-4 text-sm"
+            >
+                <ArrowLeft className="w-4 h-4" />
+                Kho Hàng
+            </button>
 
             {/* Header */}
-            <div className="flex items-start justify-between mb-5">
-                <div>
-                    <div className="flex items-center gap-3 mb-1">
-                        <h1 className="text-2xl font-bold text-gray-900">{warehouse.name}</h1>
-                        {warehouse.is_active
-                            ? <span className="badge badge-success">Hoạt động</span>
-                            : <span className="badge badge-secondary">Dừng</span>
-                        }
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${typeConfig.badge}`}>
-                            {typeConfig.icon}
-                            {typeConfig.label}
-                        </span>
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+                        <WarehouseIcon className="w-6 h-6 text-primary" />
                     </div>
-                    <p className="text-gray-500 text-sm font-mono">{warehouse.code}{typeConfig.subtitle && ` · ${typeConfig.subtitle}`}</p>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-2xl font-bold text-gray-900">{warehouse.name}</h1>
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${typeConfig?.badge}`}>
+                                {typeConfig?.icon}
+                                {typeConfig?.label}
+                            </span>
+                            {warehouse.is_active
+                                ? <span className="badge badge-success">Đang HĐ</span>
+                                : <span className="badge badge-secondary">Ngừng HĐ</span>
+                            }
+                        </div>
+                        <p className="text-gray-600 mt-0.5">
+                            <span className="font-mono font-semibold">{warehouse.code}</span>
+                            {typeConfig?.subtitle && <span className="text-gray-400 ml-2">· {typeConfig.subtitle}</span>}
+                        </p>
+                    </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                     <Link to={`/warehouses/${warehouseId}/edit`} className="btn btn-secondary flex items-center gap-2">
                         <Edit className="w-4 h-4" /> Điều chỉnh
                     </Link>
@@ -144,26 +156,25 @@ export default function WarehouseDetailPage() {
             </div>
 
             {/* Info Bar */}
-            <div className="card mb-6">
-                <div className="grid grid-cols-3 divide-x divide-gray-100">
-                    <div className="pr-6">
-                        <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Vị trí kho</p>
-                        <p className="text-lg font-bold text-primary">{locations?.length || 0}</p>
-                        <p className="text-xs text-gray-500">vị trí đã thiết lập</p>
+            <div className="card mb-6 py-3">
+                <div className="flex divide-x divide-gray-200">
+                    <div className="flex-1 px-4 first:pl-0">
+                        <p className="text-xs text-gray-500">Loại kho</p>
+                        <p className="font-medium text-sm text-gray-900 mt-0.5">{typeConfig?.label || '—'}</p>
                     </div>
-                    <div className="px-6">
-                        <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Tổng tồn kho</p>
-                        <p className="text-lg font-bold text-gray-900">
-                            {inventoryLoading ? '—' : inventoryItems.length}
-                        </p>
-                        <p className="text-xs text-gray-500">loại hàng hoá</p>
+                    <div className="flex-1 px-4">
+                        <p className="text-xs text-gray-500">Vị trí kho</p>
+                        <p className="font-medium text-sm text-gray-900 mt-0.5">{locations?.length || 0} vị trí</p>
                     </div>
-                    <div className="pl-6">
-                        <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Tổng SL</p>
-                        <p className="text-lg font-bold text-gray-900">
+                    <div className="flex-1 px-4">
+                        <p className="text-xs text-gray-500">Loại hàng tồn</p>
+                        <p className="font-medium text-sm text-gray-900 mt-0.5">{inventoryLoading ? '—' : inventoryItems.length} loại</p>
+                    </div>
+                    <div className="flex-1 px-4 last:pr-0">
+                        <p className="text-xs text-gray-500">Tổng số lượng</p>
+                        <p className="font-medium text-sm text-gray-900 mt-0.5">
                             {inventoryLoading ? '—' : totalQty.toLocaleString('vi-VN', { maximumFractionDigits: 1 })}
                         </p>
-                        <p className="text-xs text-gray-500">đơn vị</p>
                     </div>
                 </div>
             </div>
@@ -177,13 +188,13 @@ export default function WarehouseDetailPage() {
                     {/* Tồn kho */}
                     <div className="card">
                         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-                            <h2 className="text-lg font-semibold flex items-center gap-2">
-                                <Package className="w-5 h-5 text-primary" />
+                            <h3 className="text-base font-semibold flex items-center gap-2">
+                                <Package className="w-4 h-4 text-primary" />
                                 Tồn Kho
                                 {!inventoryLoading && (
                                     <span className="text-sm font-normal text-gray-400">({filteredInventory.length})</span>
                                 )}
-                            </h2>
+                            </h3>
                             <SearchInput
                                 value={inventorySearch}
                                 onChange={setInventorySearch}
@@ -257,11 +268,11 @@ export default function WarehouseDetailPage() {
                     {/* Vị trí trong kho */}
                     <div className="card">
                         <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-semibold flex items-center gap-2">
-                                <WarehouseIcon className="w-5 h-5 text-primary" />
+                            <h3 className="text-base font-semibold flex items-center gap-2">
+                                <WarehouseIcon className="w-4 h-4 text-primary" />
                                 Vị Trí Trong Kho
                                 <span className="text-sm font-normal text-gray-400">({locations?.length || 0})</span>
-                            </h2>
+                            </h3>
                             <button
                                 type="button"
                                 onClick={() => setShowLocationForm(!showLocationForm)}
@@ -380,33 +391,30 @@ export default function WarehouseDetailPage() {
                 </div>
 
                 {/* Right sidebar (1/3) */}
-                <div className="space-y-4">
+                <div className="space-y-6">
 
                     {/* Thông tin cơ bản */}
                     <div className="card">
-                        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
                             <Building2 className="w-4 h-4 text-primary" /> Thông Tin Cơ Bản
                         </h3>
-                        <div className="space-y-3">
+                        <div className="space-y-3 text-sm">
                             <div>
-                                <p className="text-xs text-gray-400">Mã kho</p>
-                                <p className="font-mono font-semibold text-primary">{warehouse.code}</p>
+                                <p className="text-gray-500">Mã kho</p>
+                                <p className="font-mono font-semibold text-gray-900 mt-0.5">{warehouse.code}</p>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400">Loại kho</p>
-                                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${typeConfig.badge}`}>
-                                    {typeConfig.icon} {typeConfig.label}
+                                <p className="text-gray-500">Loại kho</p>
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium mt-0.5 ${typeConfig?.badge}`}>
+                                    {typeConfig?.icon} {typeConfig?.label}
                                 </span>
-                                {typeConfig.subtitle && (
-                                    <p className="text-xs text-gray-400 mt-0.5">{typeConfig.subtitle}</p>
-                                )}
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400">Trạng thái</p>
-                                {warehouse.is_active
+                                <p className="text-gray-500">Trạng thái</p>
+                                <div className="mt-0.5">{warehouse.is_active
                                     ? <span className="badge badge-success">Đang hoạt động</span>
-                                    : <span className="badge badge-secondary">Ngừng hoạt động</span>
-                                }
+                                    : <span className="badge badge-secondary">Ngừng hoạt động</span>}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -414,11 +422,11 @@ export default function WarehouseDetailPage() {
                     {/* Địa chỉ */}
                     {(warehouse.address || warehouse.city) && (
                         <div className="card">
-                            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
                                 <MapPin className="w-4 h-4 text-primary" /> Địa Chỉ
                             </h3>
-                            <div className="space-y-2 text-sm text-gray-700">
-                                {warehouse.city && <p className="font-medium">{warehouse.city}</p>}
+                            <div className="space-y-2 text-sm">
+                                {warehouse.city && <p className="font-medium text-gray-900">{warehouse.city}</p>}
                                 {warehouse.address && <p className="text-gray-600 whitespace-pre-wrap">{warehouse.address}</p>}
                             </div>
                         </div>
@@ -427,10 +435,10 @@ export default function WarehouseDetailPage() {
                     {/* Ghi chú */}
                     {warehouse.notes && (
                         <div className="card">
-                            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-primary" /> Ghi Chú
                             </h3>
-                            <p className="text-sm text-gray-600 whitespace-pre-wrap">{warehouse.notes}</p>
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{warehouse.notes}</p>
                         </div>
                     )}
                 </div>
@@ -439,7 +447,7 @@ export default function WarehouseDetailPage() {
             {/* Modal xóa */}
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-xl">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
                         <h3 className="text-lg font-bold mb-3">Xác Nhận Xóa</h3>
                         <p className="text-gray-600 mb-2">
                             Bạn có chắc chắn muốn xóa kho <strong>{warehouse.name}</strong>?
