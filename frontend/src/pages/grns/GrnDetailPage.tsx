@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
     CheckCircle,
@@ -11,14 +11,13 @@ import {
     X,
     ClipboardCheck,
     Warehouse,
-    CalendarDays,
-    ShoppingCart,
 } from 'lucide-react';
 import { useGrn, useUpdateGRNQC, usePostGRN } from '../../hooks/useGrns';
 import type { UpdateGRNQCInput, UpdateGRNQCItemInput } from '../../types/grn';
 import AuditLogPanel from '../../components/common/AuditLogPanel';
 
 export default function GrnDetailPage() {
+    const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const grnId = parseInt(id || '0', 10);
 
@@ -34,8 +33,11 @@ export default function GrnDetailPage() {
 
     if (isLoading) {
         return (
-            <div className="animate-fade-in flex items-center justify-center min-h-64">
-                <p className="text-gray-500">Đang tải thông tin lệnh nhập kho...</p>
+            <div className="animate-fade-in flex items-center justify-center h-64">
+                <div className="flex items-center gap-2 text-gray-400">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                    Đang tải...
+                </div>
             </div>
         );
     }
@@ -44,11 +46,8 @@ export default function GrnDetailPage() {
         return (
             <div className="animate-fade-in p-6">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                    {error ? `Lỗi: ${(error as Error).message}` : 'Không tìm thấy lệnh nhập kho'}
+                    Lỗi tải dữ liệu: {error ? (error as Error).message : 'Không tìm thấy lệnh nhập kho'}
                 </div>
-                <Link to="/grns" className="btn btn-secondary mt-4 inline-flex">
-                    Quay lại danh sách
-                </Link>
             </div>
         );
     }
@@ -132,24 +131,37 @@ export default function GrnDetailPage() {
 
     return (
         <div className="animate-fade-in">
+            {/* Back */}
+            <button
+                onClick={() => navigate('/grns')}
+                className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-4 text-sm"
+            >
+                <ArrowLeft className="w-4 h-4" />
+                Lệnh Nhập Kho
+            </button>
+
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-start justify-between mb-6 gap-4">
-                <div>
-                    <Link to="/grns" className="text-primary hover:underline flex items-center gap-1 text-sm mb-2">
-                        <ArrowLeft className="w-4 h-4" />
-                        Quay lại danh sách
-                    </Link>
-                    <div className="flex items-center gap-3 flex-wrap">
-                        <h1 className="text-2xl font-bold text-gray-900">{grn.grn_number}</h1>
-                        {getQCBadge(grn.overall_qc_status || 'pending')}
-                        {grn.posted ? (
-                            <span className="badge badge-info flex items-center gap-1">
-                                <Package className="w-3 h-3" /> Đã nhập kho
-                            </span>
-                        ) : (
-                            <span className="badge badge-secondary flex items-center gap-1">
-                                <Clock className="w-3 h-3" /> Chưa nhập kho
-                            </span>
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+                        <ClipboardCheck className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-2xl font-bold text-gray-900">{grn.grn_number}</h1>
+                            {getQCBadge(grn.overall_qc_status || 'pending')}
+                            {grn.posted ? (
+                                <span className="badge badge-info flex items-center gap-1">
+                                    <Package className="w-3 h-3" /> Đã nhập kho
+                                </span>
+                            ) : (
+                                <span className="badge badge-secondary flex items-center gap-1">
+                                    <Clock className="w-3 h-3" /> Chưa nhập kho
+                                </span>
+                            )}
+                        </div>
+                        {grn.purchase_order?.supplier?.name && (
+                            <p className="text-gray-600 mt-0.5">{grn.purchase_order.supplier.name}</p>
                         )}
                     </div>
                 </div>
@@ -192,41 +204,32 @@ export default function GrnDetailPage() {
                 </div>
             </div>
 
-            {/* Info Bar Compact */}
-            <div className="card mb-6 p-0 overflow-hidden">
-                <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
-                    <div className="px-5 py-4">
-                        <p className="text-xs text-gray-400 mb-1 flex items-center gap-1">
-                            <ShoppingCart className="w-3 h-3" /> Đơn mua hàng
+            {/* Info Bar */}
+            <div className="card mb-6 py-3">
+                <div className="flex divide-x divide-gray-200">
+                    <div className="flex-1 px-4 first:pl-0">
+                        <p className="text-xs text-gray-500">Đơn mua hàng</p>
+                        <p className="font-medium text-sm text-gray-900 mt-0.5">
+                            {grn.purchase_order_id ? (
+                                <a href={`/purchase-orders/${grn.purchase_order_id}`} className="text-primary hover:underline">
+                                    {grn.purchase_order?.po_number || `#${grn.purchase_order_id}`}
+                                </a>
+                            ) : '—'}
                         </p>
-                        {grn.purchase_order_id ? (
-                            <Link to={`/purchase-orders/${grn.purchase_order_id}`} className="font-bold text-primary hover:underline text-sm">
-                                {grn.purchase_order?.po_number || `#${grn.purchase_order_id}`}
-                            </Link>
-                        ) : (
-                            <span className="text-sm font-medium text-gray-500 italic">Không có PO</span>
-                        )}
-                        {grn.purchase_order?.supplier?.name && (
-                            <p className="text-xs text-gray-500 mt-0.5 truncate">{grn.purchase_order.supplier.name}</p>
-                        )}
                     </div>
-                    <div className="px-5 py-4">
-                        <p className="text-xs text-gray-400 mb-1 flex items-center gap-1">
-                            <Warehouse className="w-3 h-3" /> Kho nhập
-                        </p>
-                        <p className="font-bold text-sm text-gray-900">{grn.warehouse?.name || '—'}</p>
+                    <div className="flex-1 px-4">
+                        <p className="text-xs text-gray-500">Kho nhập</p>
+                        <p className="font-medium text-sm text-gray-900 mt-0.5">{grn.warehouse?.name || '—'}</p>
                     </div>
-                    <div className="px-5 py-4">
-                        <p className="text-xs text-gray-400 mb-1 flex items-center gap-1">
-                            <CalendarDays className="w-3 h-3" /> Ngày nhập
-                        </p>
-                        <p className="font-bold text-sm text-gray-900">
+                    <div className="flex-1 px-4">
+                        <p className="text-xs text-gray-500">Ngày nhập</p>
+                        <p className="font-medium text-sm text-gray-900 mt-0.5">
                             {new Date(grn.receipt_date).toLocaleDateString('vi-VN')}
                         </p>
                     </div>
-                    <div className="px-5 py-4">
-                        <p className="text-xs text-gray-400 mb-1">Số loại NVL</p>
-                        <p className="font-bold text-sm text-gray-900">{(grn.items || []).length} loại</p>
+                    <div className="flex-1 px-4 last:pr-0">
+                        <p className="text-xs text-gray-500">Số loại NVL</p>
+                        <p className="font-medium text-sm text-gray-900 mt-0.5">{(grn.items || []).length} loại</p>
                     </div>
                 </div>
             </div>
@@ -236,9 +239,13 @@ export default function GrnDetailPage() {
                 {/* Left column (2/3) */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Items table */}
-                    <div className="card p-0 overflow-hidden">
-                        <div className="px-5 py-3 border-b bg-gray-50 flex justify-between items-center">
-                            <h3 className="font-semibold text-sm text-gray-700">Danh Sách Hàng Nhập</h3>
+                    <div className="card">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-base font-semibold flex items-center gap-2">
+                                <Package className="w-4 h-4 text-primary" />
+                                Danh Sách Hàng Nhập
+                                <span className="text-sm text-gray-400 font-normal">({(grn.items || []).length})</span>
+                            </h3>
                             {isQCEditMode && (
                                 <span className="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded">
                                     Chế độ cập nhật KCS
@@ -362,10 +369,10 @@ export default function GrnDetailPage() {
 
                     {/* Notes */}
                     {grn.notes && (
-                        <div className="card space-y-2">
-                            <h4 className="text-xs font-bold uppercase text-gray-400 tracking-widest flex items-center gap-2">
-                                <FileText className="w-3 h-3" /> Ghi Chú
-                            </h4>
+                        <div className="card">
+                            <h3 className="text-base font-semibold mb-3 flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-primary" /> Ghi Chú
+                            </h3>
                             <p className="text-sm text-gray-700 whitespace-pre-wrap">{grn.notes}</p>
                         </div>
                     )}
@@ -375,10 +382,12 @@ export default function GrnDetailPage() {
                 </div>
 
                 {/* Right sidebar (1/3) */}
-                <div className="space-y-5">
+                <div className="space-y-6">
                     {/* Status card */}
-                    <div className="card space-y-4">
-                        <h4 className="text-xs font-bold uppercase text-gray-400 tracking-widest">Trạng Thái</h4>
+                    <div className="card">
+                        <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-primary" /> Trạng Thái
+                        </h3>
 
                         <div className="space-y-3">
                             <div className="flex justify-between items-center">
@@ -426,14 +435,14 @@ export default function GrnDetailPage() {
                     </div>
 
                     {/* Stock impact card */}
-                    <div className="card bg-gray-50 border border-gray-200">
-                        <h4 className="text-xs font-bold uppercase text-gray-400 tracking-widest mb-3">
-                            Tác Động Tồn Kho
-                        </h4>
-                        <p className="text-xs text-gray-500 leading-relaxed">
+                    <div className="card">
+                        <h3 className="text-base font-semibold mb-3 flex items-center gap-2">
+                            <Warehouse className="w-4 h-4 text-primary" /> Tác Động Tồn Kho
+                        </h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
                             {grn.posted
-                                ? 'Lệnh này đã cập nhật sổ kho và số dư tồn kho. Tồn kho đã được tăng theo số lượng chấp nhận KCS.'
-                                : 'Sau khi nhập kho, lệnh này sẽ tăng số lượng tồn kho và tạo bút toán trong sổ kho. Chỉ số lượng KCS đạt mới được ghi nhận.'}
+                                ? 'Lệnh này đã cập nhật sổ kho. Tồn kho đã được tăng theo số lượng chấp nhận KCS.'
+                                : 'Sau khi nhập kho, lệnh này sẽ tăng tồn kho. Chỉ số lượng KCS đạt mới được ghi nhận.'}
                         </p>
                     </div>
                 </div>
