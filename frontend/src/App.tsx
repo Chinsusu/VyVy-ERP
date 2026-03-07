@@ -56,6 +56,9 @@ import AdjustmentCreatePage from './pages/inventory/AdjustmentCreatePage';
 import TransferListPage from './pages/inventory/TransferListPage';
 import TransferDetailPage from './pages/inventory/TransferDetailPage';
 import TransferCreatePage from './pages/inventory/TransferCreatePage';
+import StockTransferListPage from './pages/stock-transfers/StockTransferListPage';
+import StockTransferCreatePage from './pages/stock-transfers/StockTransferCreatePage';
+import StockTransferDetailPage from './pages/stock-transfers/StockTransferDetailPage';
 import StockMovementReportPage from './pages/reports/StockMovementReportPage';
 import InventoryValueReportPage from './pages/reports/InventoryValueReportPage';
 import LowStockReportPage from './pages/reports/LowStockReportPage';
@@ -164,6 +167,11 @@ function App() {
             <Route path="/inventory/transfers" element={<TransferListPage />} />
             <Route path="/inventory/transfers/new" element={<TransferCreatePage />} />
             <Route path="/inventory/transfers/:id" element={<TransferDetailPage />} />
+
+            {/* Stock Transfers (Production flow) Routes */}
+            <Route path="/stock-transfers" element={<StockTransferListPage />} />
+            <Route path="/stock-transfers/new" element={<StockTransferCreatePage />} />
+            <Route path="/stock-transfers/:id" element={<StockTransferDetailPage />} />
 
             {/* Report Routes */}
             <Route path="/reports/stock-movement" element={<StockMovementReportPage />} />

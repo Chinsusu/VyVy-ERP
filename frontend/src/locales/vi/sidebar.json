@@ -20,6 +20,7 @@
         "purchaseOrders": "Đơn mua hàng",
         "goodsReceipt": "Lệnh nhập kho",
         "materialRequests": "Kế hoạch sản xuất",
+        "stockTransfers": "Chuyển kho",
         "issueNotes": "Phiếu xuất kho",
         "deliveryOrders": "Đơn giao hàng",
         "salesChannels": "Kênh bán hàng",

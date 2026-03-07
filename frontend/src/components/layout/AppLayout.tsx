@@ -7,7 +7,7 @@ import { LANGUAGES } from '../../lib/i18n';
 import {
     LayoutDashboard, Package, Users, Warehouse, ShoppingBag,
     ShoppingCart, ClipboardCheck, FileText, Send, Truck, Store,
-    ArrowLeftRight, BarChart3, TrendingDown, Clock,
+    ArrowLeftRight, ArrowRightLeft, BarChart3, TrendingDown, Clock,
     Bell, LogOut, ChevronLeft, Menu, User,
     AlertTriangle, Calendar, BoxesIcon, Activity, Globe, FileCheck, RotateCcw,
     CreditCard, BookOpen, Building2
@@ -56,6 +56,7 @@ const navGroups: NavGroup[] = [
         titleKey: 'groups.production',
         items: [
             { labelKey: 'nav.materialRequests', path: '/production-plans', icon: <FileText className="w-5 h-5" /> },
+            { labelKey: 'nav.stockTransfers', path: '/stock-transfers', icon: <ArrowRightLeft className="w-5 h-5" /> },
             { labelKey: 'nav.issueNotes', path: '/material-issue-notes', icon: <Send className="w-5 h-5" /> },
         ],
     },

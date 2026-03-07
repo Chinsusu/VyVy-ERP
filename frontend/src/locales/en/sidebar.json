@@ -17,6 +17,7 @@
         "purchaseOrders": "Purchase Orders",
         "goodsReceipt": "Goods Receipt",
         "materialRequests": "Production Plan",
+        "stockTransfers": "Stock Transfers",
         "issueNotes": "Issue Notes",
         "deliveryOrders": "Delivery Orders",
         "salesChannels": "Sales Channels",
