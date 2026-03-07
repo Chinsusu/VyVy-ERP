@@ -343,7 +343,7 @@ export default function MRDetailPage() {
                             {mr.status === 'approved' && (
                                 <div className="mt-6">
                                     <Link
-                                        to={`/material-issues/new?mr_id=${mr.id}`}
+                                        to={`/material-issue-notes/new?mr_id=${mr.id}`}
                                         className="btn btn-primary w-full flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         <Package className="w-4 h-4" />
@@ -371,7 +371,7 @@ export default function MRDetailPage() {
                                         const Icon = step.icon;
                                         return (
                                             <div key={step.key} className={`flex items-center gap-3 p-2 rounded-lg ${isCurrent ? 'bg-indigo-100 border border-indigo-300' :
-                                                    isDone ? 'bg-white' : 'opacity-40'
+                                                isDone ? 'bg-white' : 'opacity-40'
                                                 }`}>
                                                 <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${isDone || isCurrent ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-400'
                                                     }`}>
