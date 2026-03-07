@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { FinishedProductReceipt, CreateFPRNInput, FPRNFilters } from '../types/finishedProductReceipt';
+import type { CreateFPRNInput, FPRNFilters } from '../types/finishedProductReceipt';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 

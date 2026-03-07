@@ -14,8 +14,8 @@ export default function FPRNCreatePage() {
     const planId = searchParams.get('production_plan_id');
 
     const createMutation = useCreateFinishedProductReceipt();
-    const { data: warehousesData } = useWarehouses({ limit: 100 });
-    const warehouses = warehousesData?.data?.data?.items || warehousesData?.data?.data || [];
+    const { data: warehousesData } = useWarehouses({ page_size: 100 });
+    const warehouses = warehousesData?.data || [];
 
     const [finishedProducts, setFinishedProducts] = useState<{ id: number; name: string; code: string; unit: string }[]>([]);
 

@@ -14,7 +14,7 @@ interface Props {
     planNumber?: string;
 }
 
-export default function RelatedFPRNsPanel({ planId, planNumber }: Props) {
+export default function RelatedFPRNsPanel({ planId }: Props) {
     const { data: fprns, isLoading } = useRelatedFPRNs(planId);
 
     return (

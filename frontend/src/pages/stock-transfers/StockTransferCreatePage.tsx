@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, ArrowRightLeft } from 'lucide-react';
 import { useCreateStockTransfer } from '../../hooks/useStockTransfers';
@@ -102,8 +102,8 @@ export default function StockTransferCreatePage() {
                                 required
                             >
                                 <option value="">-- Chọn kho xuất --</option>
-                                {warehouses.map((w: { id: number; name: string; type: string }) => (
-                                    <option key={w.id} value={w.id}>{w.name} ({w.type})</option>
+                                {warehouses.map((w: { id: number; name: string; warehouse_type: string }) => (
+                                    <option key={w.id} value={w.id}>{w.name} ({w.warehouse_type})</option>
                                 ))}
                             </select>
                         </div>
@@ -116,8 +116,8 @@ export default function StockTransferCreatePage() {
                                 required
                             >
                                 <option value="">-- Chọn kho nhập --</option>
-                                {warehouses.map((w: { id: number; name: string; type: string }) => (
-                                    <option key={w.id} value={w.id}>{w.name} ({w.type})</option>
+                                {warehouses.map((w: { id: number; name: string; warehouse_type: string }) => (
+                                    <option key={w.id} value={w.id}>{w.name} ({w.warehouse_type})</option>
                                 ))}
                             </select>
                         </div>

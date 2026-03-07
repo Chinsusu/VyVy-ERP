@@ -1,5 +1,5 @@
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRightLeft, CheckCircle, XCircle, Package, Clock } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft, ArrowRightLeft, CheckCircle, XCircle, Package } from 'lucide-react';
 import { useStockTransfer, usePostStockTransfer, useCancelStockTransfer } from '../../hooks/useStockTransfers';
 import type { StockTransferItem } from '../../types/stockTransfer';
 
@@ -17,8 +17,6 @@ const STATUS_LABEL: Record<string, string> = {
 export default function StockTransferDetailPage() {
     const { id } = useParams<{ id: string }>();
     const stId = parseInt(id || '0', 10);
-    const navigate = useNavigate();
-
     const { data: st, isLoading, error } = useStockTransfer(stId);
     const postMutation = usePostStockTransfer();
     const cancelMutation = useCancelStockTransfer();
