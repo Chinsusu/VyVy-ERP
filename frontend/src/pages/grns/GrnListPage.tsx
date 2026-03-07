@@ -193,9 +193,16 @@ export default function GrnListPage() {
                                                 <td className="p-4 text-center">{getQCStatusBadge(grn.overall_qc_status)}</td>
                                                 <td className="p-4 text-center">{getPostingBadge(grn.posted)}</td>
                                                 <td className="p-4 text-right">
-                                                    <Link to={`/grns/${grn.id}`} className="text-primary hover:underline text-sm font-medium">
-                                                        Xem
-                                                    </Link>
+                                                    <div className="flex items-center justify-end gap-3">
+                                                        <Link to={`/grns/${grn.id}`} className="text-primary hover:underline text-sm font-medium">
+                                                            Xem
+                                                        </Link>
+                                                        {!grn.posted && (
+                                                            <Link to={`/grns/${grn.id}/edit`} className="text-gray-500 hover:text-gray-700 text-sm">
+                                                                Sửa
+                                                            </Link>
+                                                        )}
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
