@@ -10,7 +10,7 @@ import {
     ArrowLeftRight, ArrowRightLeft, BarChart3, TrendingDown, Clock,
     Bell, LogOut, ChevronLeft, Menu, User,
     AlertTriangle, Calendar, BoxesIcon, Activity, Globe, FileCheck, RotateCcw,
-    CreditCard, BookOpen, Building2
+    CreditCard, BookOpen, Building2, PackageCheck
 } from 'lucide-react';
 
 interface NavItem {
@@ -58,6 +58,7 @@ const navGroups: NavGroup[] = [
             { labelKey: 'nav.materialRequests', path: '/production-plans', icon: <FileText className="w-5 h-5" /> },
             { labelKey: 'nav.stockTransfers', path: '/stock-transfers', icon: <ArrowRightLeft className="w-5 h-5" /> },
             { labelKey: 'nav.issueNotes', path: '/material-issue-notes', icon: <Send className="w-5 h-5" /> },
+            { labelKey: 'nav.fpReceipts', path: '/finished-product-receipts', icon: <PackageCheck className="w-5 h-5" /> },
         ],
     },
     {

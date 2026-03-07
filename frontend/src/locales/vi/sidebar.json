@@ -22,6 +22,7 @@
         "materialRequests": "Kế hoạch sản xuất",
         "stockTransfers": "Chuyển kho",
         "issueNotes": "Phiếu xuất kho",
+        "fpReceipts": "Nhập kho TP",
         "deliveryOrders": "Đơn giao hàng",
         "salesChannels": "Kênh bán hàng",
         "carriers": "Đơn vị vận chuyển",

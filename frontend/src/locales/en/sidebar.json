@@ -19,6 +19,7 @@
         "materialRequests": "Production Plan",
         "stockTransfers": "Stock Transfers",
         "issueNotes": "Issue Notes",
+        "fpReceipts": "FP Receipts",
         "deliveryOrders": "Delivery Orders",
         "salesChannels": "Sales Channels",
         "carriers": "Carriers",

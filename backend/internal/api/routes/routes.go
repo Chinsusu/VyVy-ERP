@@ -40,6 +40,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	roRepo := repository.NewReturnOrderRepository(db)
 	auditLogRepo := repository.NewAuditLogRepository(db)
 	productionTaskRepo := repository.NewProductionTaskRepository(db)
+	fprnRepo := repository.NewFinishedProductReceiptRepository(db)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -66,6 +67,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	reconService := service.NewReconciliationService(reconRepo, carrierRepo)
 	roService := service.NewReturnOrderService(db, roRepo, doRepo)
 	productionTaskService := service.NewProductionTaskService(productionTaskRepo)
+	fprnService := service.NewFinishedProductReceiptService(fprnRepo, stockLedgerRepo, stockBalanceRepo, db)
 
 	supplierDocHandler := handlers.NewSupplierDocumentHandler(db)
 	poDocHandler := handlers.NewPODocumentHandler(db)
@@ -94,6 +96,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	reconHandler := handlers.NewReconciliationHandler(reconService)
 	roHandler := handlers.NewReturnOrderHandler(roService)
 	productionTaskHandler := handlers.NewProductionTaskHandler(productionTaskService)
+	fprnHandler := handlers.NewFinishedProductReceiptHandler(fprnService)
 
 	// API v1 group
 	v1 := router.Group("/api/v1")
@@ -269,6 +272,17 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		minGroup.POST("", minHandler.Create)
 		minGroup.POST("/:id/post", middleware.RequireRole("warehouse_manager"), minHandler.Post)
 		minGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), minHandler.Cancel)
+	}
+
+	// Finished Product Receipt (FPRN) routes - Phase D
+	fprnGroup := v1.Group("/finished-product-receipts")
+	fprnGroup.Use(middleware.AuthMiddleware(authService))
+	{
+		fprnGroup.GET("", fprnHandler.List)
+		fprnGroup.GET("/:id", fprnHandler.GetByID)
+		fprnGroup.POST("", fprnHandler.Create)
+		fprnGroup.POST("/:id/post", middleware.RequireRole("warehouse_manager"), fprnHandler.Post)
+		fprnGroup.POST("/:id/cancel", middleware.RequireRole("warehouse_manager"), fprnHandler.Cancel)
 	}
 
 	// Delivery Order (DO) routes - All protected

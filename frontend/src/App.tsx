@@ -59,6 +59,9 @@ import TransferCreatePage from './pages/inventory/TransferCreatePage';
 import StockTransferListPage from './pages/stock-transfers/StockTransferListPage';
 import StockTransferCreatePage from './pages/stock-transfers/StockTransferCreatePage';
 import StockTransferDetailPage from './pages/stock-transfers/StockTransferDetailPage';
+import FPRNListPage from './pages/finished-product-receipts/FPRNListPage';
+import FPRNCreatePage from './pages/finished-product-receipts/FPRNCreatePage';
+import FPRNDetailPage from './pages/finished-product-receipts/FPRNDetailPage';
 import StockMovementReportPage from './pages/reports/StockMovementReportPage';
 import InventoryValueReportPage from './pages/reports/InventoryValueReportPage';
 import LowStockReportPage from './pages/reports/LowStockReportPage';
@@ -172,6 +175,11 @@ function App() {
             <Route path="/stock-transfers" element={<StockTransferListPage />} />
             <Route path="/stock-transfers/new" element={<StockTransferCreatePage />} />
             <Route path="/stock-transfers/:id" element={<StockTransferDetailPage />} />
+
+            {/* Finished Product Receipts (FPRN) Routes - Phase D */}
+            <Route path="/finished-product-receipts" element={<FPRNListPage />} />
+            <Route path="/finished-product-receipts/new" element={<FPRNCreatePage />} />
+            <Route path="/finished-product-receipts/:id" element={<FPRNDetailPage />} />
 
             {/* Report Routes */}
             <Route path="/reports/stock-movement" element={<StockMovementReportPage />} />
