@@ -329,6 +329,105 @@ Buttons:
 
 ---
 
+### 9. List Page Pattern (Chuẩn — áp dụng đồng nhất)
+
+> Pattern này được chuẩn hóa từ phiên bản **v1.0.0-rc24** và áp dụng cho tất cả các List pages:
+> Materials, Finished Products, Warehouses, Purchase Orders, GRN, Production Plans.
+
+#### Cấu trúc Layout
+
+```
+1. Header
+   ┌──────────────────────────────────────────────┐
+   │ [Icon w-8] Tên Module                [+ Thêm]│
+   │           Mô tả ngắn                         │
+   └──────────────────────────────────────────────┘
+
+2. Stats Bar (3 cards)
+   ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+   │ [icon] 103   │ │ [icon] 20    │ │ [icon] 0     │
+   │ Tổng records │ │ Đang HĐ      │ │ Cần chú ý    │
+   └──────────────┘ └──────────────┘ └──────────────┘
+
+3. Filter card (rounded-b-none border-b-0) — liền với table
+   ┌──────────────────────────────────────────────┐
+   │ 🔍 Search input (full width)                 │
+   │ ─────────────────────────────────────────── │
+   │ [Tất cả] [Tab A] [Tab B] [Tab C]             │ ← border-b-2 active
+   └──────────────────────────────────────── ─ ─ ─
+
+4. Table card (rounded-t-none, shadow-md) — liền với filter card
+   ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+   │ CỘT 1 │ CỘT 2 │ ... │ Trạng thái │ Thao tác │
+   ├──────────────────────────────────────────────┤
+   │ data  │ data  │ ... │  [badge]   │ Xem  Sửa │
+   └──────────────────────────────────────────────┘
+   │     Pagination: PageSize | range | Trước Tiếp│
+   └──────────────────────────────────────────────┘
+```
+
+#### Chi tiết từng phần
+
+**1. Header**
+- `h1`: `text-3xl font-bold text-gray-900 flex items-center gap-3`
+- Icon: `w-8 h-8 text-primary` (Lucide icon phù hợp với module)
+- Subtitle: `text-gray-600 mt-1`
+- Nút thêm mới: `btn btn-primary` với `<Plus w-5 h-5 />`
+
+**2. Stats Bar**
+- Grid: `grid grid-cols-3 gap-4 mb-6`
+- Mỗi card: `card py-4 flex items-center gap-3`
+- Icon container: `flex items-center justify-center w-10 h-10 rounded-xl bg-{color}/10`
+- Icon size: `w-5 h-5 text-{color}-600`
+- Số: `text-2xl font-bold text-gray-900`
+- Label: `text-xs text-gray-500`
+- Stats cards chỉ hiện khi `pagination.total_items > 0`
+
+**Màu icon mỗi card:**
+| Card | Background | Icon color |
+|------|-----------|-----------|
+| Tổng | `bg-primary/10` | `text-primary` |
+| Đang HĐ / Đã duyệt | `bg-green-50` | `text-green-600` |
+| Cần chú ý / Đặc biệt | `bg-amber-50` hoặc `bg-blue-50` | `text-amber-500` hoặc `text-blue-600` |
+
+**3. Filter Card (Merged với table)**
+- Class: `card mb-0 rounded-b-none border-b-0`
+- SearchInput: full width `flex-1`
+- Tabs container: `flex gap-1 mt-4 border-b border-gray-200 -mx-6 px-6`
+- Tab active: `border-b-2 border-primary text-primary`
+- Tab inactive: `border-b-2 border-transparent text-gray-500 hover:text-gray-700`
+- Tab có màu: thêm `<span className="w-2 h-2 rounded-full">` trước label
+
+**4. Table Card**
+- Class: `card shadow-md rounded-t-none`
+- Loading state: `animate-spin h-5 w-5 border-b-2 border-primary`
+- Empty state: icon `w-10 h-10 text-gray-300` + text + CTA btn
+- Rows: `border-b border-gray-50 hover:bg-gray-50 transition-colors`
+- Cells: `p-4`
+
+**5. Cột Thao tác**
+| Loại page | Actions |
+|-----------|---------|
+| Master data (NVL, TP, Kho) | `Xem` · `Sửa` |
+| Transactional read-only (GRN) | `Xem` |
+| Transactional với edit condition (PO) | `Xem` · `Sửa` *(chỉ khi draft)* |
+| Navigable rows (KHSX) | `Xem` *(+ clickable row)* |
+
+- "Xem": `text-primary hover:underline text-sm font-medium`
+- "Sửa": `text-gray-500 hover:text-gray-700 text-sm`
+- Container: `flex items-center justify-end gap-3`
+
+**6. Pagination**
+- Vị trí: `flex items-center justify-between p-4 border-t border-gray-200`
+- Trái: `<PageSizeSelector>` + range text `text-sm text-gray-500`
+- Phải: Trước/Tiếp buttons `btn btn-secondary btn-sm disabled:opacity-50`
+- Biểu thị trang: `{page} / {total_pages}`
+
+---
+
+
+---
+
 ## III. LAYOUT STRUCTURE
 
 ### 1. Main Layout
@@ -464,46 +563,55 @@ Active state:
 
 ---
 
-### Screen 2: Materials List (Danh Sách Nguyên Liệu)
+### Screen 2: Materials List — *Reference Pattern cho tất cả List Pages*
+
+> Screen này là **chuẩn tham chiếu** — xem **II.9** để biết quy tắc chi tiết.
 
 **Header:**
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ Nguyên Liệu                                  [+ Thêm Mới]  │
+│ [⚗️ icon] Nguyên Vật Liệu               [+ Thêm Nguyên Liệu]│
+│           Quản lý danh mục nguyên vật liệu                  │
 └────────────────────────────────────────────────────────────┘
 ```
 
-**Filters:**
+**Stats Bar:**
+```
+┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐
+│ [⚗️] 150          │ │ [✓]  145          │ │ [📦]  12          │
+│ Tổng NVL         │ │ Đang dùng        │ │ Đóng gói         │
+└──────────────────┘ └──────────────────┘ └──────────────────┘
+```
+
+**Filter Card (merged với table):**
 ```
 ┌────────────────────────────────────────────────────────────┐
-│ [Search: Tìm theo mã/tên...]                               │
-│                                                            │
-│ Loại: [All ▼] Category: [All ▼] NCC: [All ▼] Status: [Active ▼] │
-│                                                            │
-│ [ ] Chỉ hiện hàng tồn thấp   [ ] Chỉ hiện hàng yêu cầu QC│
+│ 🔍 Tìm theo mã hoặc tên nguyên liệu...                     │
+│ ─────────────────────────────────────────────────────────  │
+│ [Tất cả]  [Nguyên liệu]  [Đóng gói]                        │
+└──────────────────────────────────────────────────────────  │
+```
+
+**Table Card (liền với filter, rounded-t-none):**
+```
+┌──────────┬─────────────────┬───────┬──────────┬──────────────┐
+│ Mã       │ Tên             │ Loại  │ ĐVT      │ Thao tác     │
+├──────────┼─────────────────┼───────┼──────────┼──────────────┤
+│ACI_Citric│CITRIC ACID      │ [NVL] │ KG       │ Xem  Sửa     │
+│ACT_B3    │NIACINAMIDE      │ [NVL] │ KG       │ Xem  Sửa     │
+└──────────┴─────────────────┴───────┴──────────┴──────────────┘
+│ 20/trang ▼  1–20 / 150 NVL              [< Trước] [1/8] [Tiếp>]│
 └────────────────────────────────────────────────────────────┘
 ```
 
-**Table:**
-```
-┌──────────┬────────────────┬─────┬─────────┬─────────┬────────┬──────────┐
-│ Mã       │ Tên            │ Loại│ NCC     │ Tồn     │ Trạng  │ Actions  │
-├──────────┼────────────────┼─────┼─────────┼─────────┼────────┼──────────┤
-│ACI_Citric│CITRIC ACID     │ ACI │Nguyễn Bá│ 2.1 KG  │ [Low]  │[👁️][✏️][🗑️]│
-│          │                │     │         │         │🟠      │          │
-├──────────┼────────────────┼─────┼─────────┼─────────┼────────┼──────────┤
-│ACT_B3    │NIACINAMIDE     │ ACT │Nguyễn Bá│15.5 KG  │ [OK]   │[👁️][✏️][🗑️]│
-│          │                │     │         │         │🟢      │          │
-└──────────┴────────────────┴─────┴─────────┴─────────┴────────┴──────────┘
-
-Showing 1-20 of 150  [< 1 2 3 ... 8 >]
-```
-
-**Features:**
-- Inline stock status indicator (color badge)
-- Quick actions: View detail, Edit, Delete
-- Sortable columns
-- Bulk actions: Export CSV, Print
+**Áp dụng tương tự cho các pages:**
+| Page | Icon | Stats 3 cards | Tabs |
+|------|------|--------------|------|
+| Kho hàng | `Warehouse` | Tổng / Đang HĐ / Tổng vị trí | Lab / Bán hàng / Nhà máy |
+| Thành Phẩm | `Package` | Tổng / Đang dùng / Có giá bán | Đang dùng / Ngưng dùng |
+| Đơn Mua Hàng | `ShoppingCart` | Tổng / Đã duyệt / Nháp | Nháp / Đã duyệt / Hoàn thành / Đã hủy |
+| Lệnh Nhập Kho | `PackageCheck` | Tổng / Đã nhập / Chưa nhập | Nháp / Đã nhập kho |
+| KHSX | `Factory` | Tổng / Đã duyệt / Đang tiến hành | Nháp / Đã duyệt / Đã hủy |
 
 ---
 
