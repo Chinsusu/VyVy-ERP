@@ -56,11 +56,12 @@ type SafeGoodsReceiptNoteItem struct {
 	ID                  uint                 `json:"id"`
 	GRNID               uint                 `json:"grn_id"`
 	POItemID            uint                 `json:"po_item_id"`
+	POQuantity          float64              `json:"po_quantity"`   // Số lượng đặt từ PO (gốc, không đổi)
 	MaterialID          uint                 `json:"material_id"`
 	Material            *SafeMaterial        `json:"material,omitempty"`
 	WarehouseLocationID *uint                `json:"warehouse_location_id,omitempty"`
 	WarehouseLocation   *SafeWarehouseLocation `json:"warehouse_location,omitempty"`
-	Quantity            float64              `json:"quantity"`
+	Quantity            float64              `json:"quantity"` // Số lượng thực nhận từ NCC
 	AcceptedQuantity    float64              `json:"accepted_quantity"`
 	RejectedQuantity    float64              `json:"rejected_quantity"`
 	BatchNumber         string               `json:"batch_number,omitempty"`
@@ -96,6 +97,13 @@ func (item *GoodsReceiptNoteItem) ToSafe() *SafeGoodsReceiptNoteItem {
 		Notes:               item.Notes,
 		CreatedAt:           item.CreatedAt,
 		UpdatedAt:           item.UpdatedAt,
+	}
+
+	// POQuantity: lấy từ po_item.quantity nếu có, fallback về quantity hiện tại
+	if item.PurchaseOrderItem != nil {
+		safe.POQuantity = item.PurchaseOrderItem.Quantity
+	} else {
+		safe.POQuantity = item.Quantity
 	}
 
 	if item.Material != nil {

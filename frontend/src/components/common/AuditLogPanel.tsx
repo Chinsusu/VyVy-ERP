@@ -114,6 +114,8 @@ function ActionBadge({ action }: { action: string }) {
     if (action === 'UPDATE_PAYMENT_STATUS') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700"><CreditCard className="w-3 h-3" />Cập nhật thanh toán</span>;
     if (action === 'UPDATE_INVOICE_STATUS') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700"><FileText className="w-3 h-3" />Cập nhật hóa đơn</span>;
     if (action === 'ASSIGN') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700"><UserCheck className="w-3 h-3" />Phân công</span>;
+    if (action === 'UPDATE_QC') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-teal-100 text-teal-700"><CheckCircle className="w-3 h-3" />Cập nhật KCS</span>;
+    if (action === 'POST') return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-violet-100 text-violet-700"><Truck className="w-3 h-3" />Nhập kho</span>;
     return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600"><Edit className="w-3 h-3" />{action}</span>;
 }
 
@@ -153,9 +155,13 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                                     log.action === 'DELETE' ? 'bg-red-500' :
                                         log.action === 'APPROVE' ? 'bg-emerald-500' :
                                             log.action === 'CANCEL' ? 'bg-red-500' :
-                                                log.action === 'UPDATE_PAYMENT_STATUS' ? 'bg-yellow-500' :
-                                                    log.action === 'UPDATE_INVOICE_STATUS' ? 'bg-purple-500' :
-                                                        'bg-blue-500'
+                                                log.action === 'UPDATE_QC' ? 'bg-teal-500' :
+                                                    log.action === 'POST' ? 'bg-violet-500' :
+                                                        log.action === 'UPDATE_GRN_STATUS' ? 'bg-cyan-500' :
+                                                            log.action === 'UPDATE_GRN_ITEMS' ? 'bg-lime-500' :
+                                                                log.action === 'UPDATE_PAYMENT_STATUS' ? 'bg-yellow-500' :
+                                                                    log.action === 'UPDATE_INVOICE_STATUS' ? 'bg-purple-500' :
+                                                                        'bg-blue-500'
                                     }`} />
 
                                 <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
@@ -269,6 +275,63 @@ export default function AuditLogPanel({ tableName, recordId }: AuditLogPanelProp
                                     )}
                                     {log.action === 'CANCEL' && (
                                         <p className="text-xs text-gray-500 mt-1">Đơn hàng đã bị hủy</p>
+                                    )}
+
+                                    {/* Summary for GRN actions */}
+                                    {log.action === 'UPDATE_QC' && (() => {
+                                        const qcStatusStr = log.new_values?.qc_status != null ? String(log.new_values.qc_status) : '';
+                                        const rawItems = log.new_values?.items;
+                                        const qcItems = Array.isArray(rawItems) ? rawItems as Array<Record<string, unknown>> : [];
+                                        const qcStatusLabel: Record<string, string> = {
+                                            pass: 'Đạt', fail: 'Không đạt', partial: 'Một phần', pending: 'Chờ'
+                                        };
+                                        return (
+                                            <div className="mt-2 space-y-1.5">
+                                                {qcStatusStr && (
+                                                    <p className="text-xs text-gray-600">KCS tổng thể: <span className="font-medium text-teal-700">{qcStatusStr}</span></p>
+                                                )}
+                                                {qcItems.length > 0 && (
+                                                    <div className="mt-1.5 border border-gray-200 rounded overflow-hidden">
+                                                        <table className="w-full text-xs">
+                                                            <thead>
+                                                                <tr className="bg-gray-100 text-gray-500">
+                                                                    <th className="text-left px-2 py-1">Vật liệu</th>
+                                                                    <th className="text-right px-2 py-1">Thực nhận</th>
+                                                                    <th className="text-right px-2 py-1 text-green-700">Chấp nhận</th>
+                                                                    <th className="text-right px-2 py-1 text-red-600">Từ chối</th>
+                                                                    <th className="text-center px-2 py-1">KCS</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {qcItems.map((item, i) => {
+                                                                    const mat = item.material != null ? String(item.material) : '—';
+                                                                    const recv = item.received_quantity != null ? String(item.received_quantity) : '—';
+                                                                    const acc = item.accepted_quantity != null ? String(item.accepted_quantity) : '—';
+                                                                    const rej = item.rejected_quantity != null ? String(item.rejected_quantity) : '—';
+                                                                    const qs = item.qc_status != null ? String(item.qc_status) : '';
+                                                                    const qsLabel = qcStatusLabel[qs] ?? qs;
+                                                                    const qsBadge = qs === 'pass' ? 'bg-green-100 text-green-700' : qs === 'fail' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+                                                                    return (
+                                                                        <tr key={i} className="border-t border-gray-100">
+                                                                            <td className="px-2 py-1 font-medium text-gray-700">{mat}</td>
+                                                                            <td className="px-2 py-1 text-right text-gray-600">{recv}</td>
+                                                                            <td className="px-2 py-1 text-right text-green-700 font-medium">{acc}</td>
+                                                                            <td className="px-2 py-1 text-right text-red-600">{rej}</td>
+                                                                            <td className="px-2 py-1 text-center">
+                                                                                <span className={`inline-block px-1.5 py-0.5 rounded text-xs ${qsBadge}`}>{qsLabel}</span>
+                                                                            </td>
+                                                                        </tr>
+                                                                    );
+                                                                })}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+                                    {log.action === 'POST' && (
+                                        <p className="text-xs text-gray-500 mt-1">Lệnh đã được nhập kho, tồn kho đã cập nhật</p>
                                     )}
 
                                     {/* Detail for ASSIGN */}

@@ -17,6 +17,7 @@ type ProductionPlanRepository interface {
 	Update(mr *models.ProductionPlan) error
 	Delete(id uint) error
 	UpdateStatus(id uint, status string, approvedBy *uint, approvedAt *time.Time) error
+	UpdateProcurementStatus(id uint, procurementStatus string) error
 	UpdateIssuedQuantity(itemID uint, issuedQty float64) error
 }
 
@@ -178,5 +179,14 @@ func (r *productionPlanRepository) UpdateIssuedQuantity(itemID uint, issuedQty f
 	return r.db.Model(&models.ProductionPlanItem{}).
 		Where("id = ?", itemID).
 		UpdateColumn("issued_quantity", gorm.Expr("issued_quantity + ?", issuedQty)).
+		Error
+}
+
+// UpdateProcurementStatus updates only the procurement_status field of a production plan.
+// This is called by hooks in PO/GRN/MIN services to track the lifecycle.
+func (r *productionPlanRepository) UpdateProcurementStatus(id uint, procurementStatus string) error {
+	return r.db.Model(&models.ProductionPlan{}).
+		Where("id = ?", id).
+		UpdateColumn("procurement_status", procurementStatus).
 		Error
 }

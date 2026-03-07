@@ -6,7 +6,7 @@ import type { WarehouseLocation } from './warehouseLocation';
 export interface GoodsReceiptNote {
     id: number;
     grn_number: string;
-    purchase_order_id: number;
+    purchase_order_id?: number | null;
     purchase_order?: PurchaseOrder;
     warehouse_id: number;
     warehouse?: Warehouse;
@@ -15,6 +15,8 @@ export interface GoodsReceiptNote {
     posted: boolean;
     posted_at?: string;
     posted_by?: number;
+    qc_approved_at?: string;
+    qc_approved_by?: number;
     notes?: string;
     items: GoodsReceiptNoteItem[];
     created_at: string;
@@ -30,7 +32,8 @@ export interface GoodsReceiptNoteItem {
     material?: Material;
     warehouse_location_id: number;
     warehouse_location?: WarehouseLocation;
-    quantity: number;
+    quantity: number;       // SL thực nhận từ NCC
+    po_quantity: number;    // SL đặt từ PO gốc
     unit_cost: number;
     batch_number?: string;
     lot_number?: string;
@@ -66,6 +69,7 @@ export interface CreateGRNInput {
 }
 
 export interface UpdateGRNQCItemInput {
+    received_quantity?: number;  // SL thực nhận từ NCC (có thể ít hơn SL đặt)
     accepted_quantity: number;
     rejected_quantity: number;
     qc_status: 'pass' | 'fail' | 'partial';

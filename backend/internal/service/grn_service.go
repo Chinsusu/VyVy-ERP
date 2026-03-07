@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/VyVy-ERP/warehouse-backend/internal/dto"
 	"github.com/VyVy-ERP/warehouse-backend/internal/models"
 	"github.com/VyVy-ERP/warehouse-backend/internal/repository"
@@ -12,11 +13,11 @@ import (
 
 // GRNService defines the interface for GRN business logic
 type GRNService interface {
-	CreateGRN(req *dto.CreateGRNRequest, userID uint) (*models.SafeGoodsReceiptNote, error)
+	CreateGRN(req *dto.CreateGRNRequest, userID uint, username string) (*models.SafeGoodsReceiptNote, error)
 	GetGRNByID(id uint) (*models.SafeGoodsReceiptNote, error)
 	ListGRNs(filter *dto.GRNFilterRequest) ([]*models.SafeGoodsReceiptNote, int64, error)
-	UpdateQC(id uint, req *dto.UpdateGRNQCRequest, userID uint) (*models.SafeGoodsReceiptNote, error)
-	PostGRN(id uint, userID uint) (*models.SafeGoodsReceiptNote, error)
+	UpdateQC(id uint, req *dto.UpdateGRNQCRequest, userID uint, username string) (*models.SafeGoodsReceiptNote, error)
+	PostGRN(id uint, userID uint, username string) (*models.SafeGoodsReceiptNote, error)
 }
 
 type grnService struct {
@@ -28,6 +29,8 @@ type grnService struct {
 	warehouseRepo     repository.WarehouseRepository
 	stockLedgerRepo   repository.StockLedgerRepository
 	stockBalanceRepo  repository.StockBalanceRepository
+	ppRepo            repository.ProductionPlanRepository // for KHSX status hooks
+	auditSvc          AuditLogService
 }
 
 // NewGRNService creates a new GRNService
@@ -40,6 +43,8 @@ func NewGRNService(
 	warehouseRepo repository.WarehouseRepository,
 	stockLedgerRepo repository.StockLedgerRepository,
 	stockBalanceRepo repository.StockBalanceRepository,
+	ppRepo repository.ProductionPlanRepository,
+	auditSvc AuditLogService,
 ) GRNService {
 	return &grnService{
 		db:               db,
@@ -50,10 +55,12 @@ func NewGRNService(
 		warehouseRepo:    warehouseRepo,
 		stockLedgerRepo:  stockLedgerRepo,
 		stockBalanceRepo: stockBalanceRepo,
+		ppRepo:           ppRepo,
+		auditSvc:         auditSvc,
 	}
 }
 
-func (s *grnService) CreateGRN(req *dto.CreateGRNRequest, userID uint) (*models.SafeGoodsReceiptNote, error) {
+func (s *grnService) CreateGRN(req *dto.CreateGRNRequest, userID uint, username string) (*models.SafeGoodsReceiptNote, error) {
 	// Validate GRN number uniqueness
 	existing, err := s.grnRepo.GetByGRNNumber(req.GRNNumber)
 	if err == nil && existing.ID > 0 {
@@ -139,6 +146,15 @@ func (s *grnService) CreateGRN(req *dto.CreateGRNRequest, userID uint) (*models.
 		return nil, err
 	}
 
+	// Audit log: CREATE
+	_ = s.auditSvc.Log("goods_receipt_notes", "CREATE", int64(grn.ID), int64(userID), username, nil, map[string]interface{}{
+		"grn_number":  grn.GRNNumber,
+		"po_id":       grn.PurchaseOrderID,
+		"warehouse_id": grn.WarehouseID,
+		"receipt_date": grn.ReceiptDate,
+		"items_count":  len(grn.Items),
+	})
+
 	return grn.ToSafe(), nil
 }
 
@@ -164,7 +180,7 @@ func (s *grnService) ListGRNs(filter *dto.GRNFilterRequest) ([]*models.SafeGoods
 	return safeGRNs, total, nil
 }
 
-func (s *grnService) UpdateQC(id uint, req *dto.UpdateGRNQCRequest, userID uint) (*models.SafeGoodsReceiptNote, error) {
+func (s *grnService) UpdateQC(id uint, req *dto.UpdateGRNQCRequest, userID uint, username string) (*models.SafeGoodsReceiptNote, error) {
 	grn, err := s.grnRepo.GetByID(id)
 	if err != nil {
 		return nil, errors.New("GRN not found")
@@ -186,7 +202,7 @@ func (s *grnService) UpdateQC(id uint, req *dto.UpdateGRNQCRequest, userID uint)
 			if qcReq.QCStatus == "fail" || qcReq.QCStatus == "partial" {
 				overallQCStatus = "conditional"
 			}
-			if err := txGRNItemRepo.UpdateQC(itemID, qcReq.AcceptedQuantity, qcReq.RejectedQuantity, qcReq.QCStatus, qcReq.QCNotes); err != nil {
+			if err := txGRNItemRepo.UpdateQC(itemID, qcReq.ReceivedQuantity, qcReq.AcceptedQuantity, qcReq.RejectedQuantity, qcReq.QCStatus, qcReq.QCNotes); err != nil {
 				return err
 			}
 		}
@@ -207,10 +223,42 @@ func (s *grnService) UpdateQC(id uint, req *dto.UpdateGRNQCRequest, userID uint)
 		return nil, err
 	}
 
+	// Audit log: UPDATE_QC — build per-item detail
+	itemDetails := make([]map[string]interface{}, 0, len(req.Items))
+	// Build lookup for item material names from updated grn
+	itemNameMap := make(map[uint]string)
+	for _, grnItem := range grn.Items {
+		if grnItem.Material != nil {
+			itemNameMap[grnItem.ID] = grnItem.Material.TradingName
+		} else {
+			itemNameMap[grnItem.ID] = fmt.Sprintf("Item #%d", grnItem.ID)
+		}
+	}
+	for itemID, qcReq := range req.Items {
+		receivedQty := qcReq.AcceptedQuantity + qcReq.RejectedQuantity // fallback
+		if qcReq.ReceivedQuantity != nil {
+			receivedQty = *qcReq.ReceivedQuantity
+		}
+		detail := map[string]interface{}{
+			"item_id":           itemID,
+			"material":          itemNameMap[itemID],
+			"received_quantity": receivedQty,
+			"accepted_quantity": qcReq.AcceptedQuantity,
+			"rejected_quantity": qcReq.RejectedQuantity,
+			"qc_status":         qcReq.QCStatus,
+		}
+		itemDetails = append(itemDetails, detail)
+	}
+	_ = s.auditSvc.Log("goods_receipt_notes", "UPDATE_QC", int64(id), int64(userID), username, nil, map[string]interface{}{
+		"qc_status": overallQCStatus,
+		"notes":     req.Notes,
+		"items":     itemDetails,
+	})
+
 	return grn.ToSafe(), nil
 }
 
-func (s *grnService) PostGRN(id uint, userID uint) (*models.SafeGoodsReceiptNote, error) {
+func (s *grnService) PostGRN(id uint, userID uint, username string) (*models.SafeGoodsReceiptNote, error) {
 	grn, err := s.grnRepo.GetByID(id)
 	if err != nil {
 		return nil, errors.New("GRN not found")
@@ -337,7 +385,25 @@ func (s *grnService) PostGRN(id uint, userID uint) (*models.SafeGoodsReceiptNote
 	// B7: Auto-complete PO if all items fully received
 	if grn.PurchaseOrderID != nil {
 		_ = s.poRepo.CompleteIfFullyReceived(*grn.PurchaseOrderID, userID)
+		// Hook: tìm KHSX liên kết với PO này, cập nhật procurement_status='receiving'
+		if s.ppRepo != nil {
+			po, err2 := s.poRepo.GetByID(*grn.PurchaseOrderID)
+			if err2 == nil && len(po.Notes) >= 10 {
+				var plans []models.ProductionPlan
+				if err3 := s.db.Where("? ILIKE '%' || plan_number || '%'", po.Notes).Find(&plans).Error; err3 == nil {
+					for _, p := range plans {
+						_ = s.ppRepo.UpdateProcurementStatus(p.ID, "receiving")
+					}
+				}
+			}
+		}
 	}
+
+	// Audit log: POST
+	_ = s.auditSvc.Log("goods_receipt_notes", "POST", int64(id), int64(userID), username, nil, map[string]interface{}{
+		"grn_number": grn.GRNNumber,
+		"status":     "posted",
+	})
 
 	return grn.ToSafe(), nil
 }

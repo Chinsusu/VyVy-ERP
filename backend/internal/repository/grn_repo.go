@@ -45,6 +45,7 @@ func (r *goodsReceiptNoteRepository) GetByID(id uint) (*models.GoodsReceiptNote,
 		Preload("Items").
 		Preload("Items.Material").
 		Preload("Items.WarehouseLocation").
+		Preload("Items.PurchaseOrderItem").
 		First(&grn, id).Error
 	return &grn, err
 }

@@ -29,7 +29,9 @@ type purchaseOrderService struct {
 	poItemRepo    repository.PurchaseOrderItemRepository
 	supplierRepo  repository.SupplierRepository
 	warehouseRepo repository.WarehouseRepository
+	ppRepo        repository.ProductionPlanRepository // for KHSX status hooks
 	auditSvc      AuditLogService
+	db            *gorm.DB
 }
 
 // NewPurchaseOrderService creates a new PurchaseOrderService
@@ -38,6 +40,8 @@ func NewPurchaseOrderService(
 	poItemRepo repository.PurchaseOrderItemRepository,
 	supplierRepo repository.SupplierRepository,
 	warehouseRepo repository.WarehouseRepository,
+	ppRepo repository.ProductionPlanRepository,
+	db *gorm.DB,
 	auditSvc AuditLogService,
 ) PurchaseOrderService {
 	return &purchaseOrderService{
@@ -45,8 +49,30 @@ func NewPurchaseOrderService(
 		poItemRepo:    poItemRepo,
 		supplierRepo:  supplierRepo,
 		warehouseRepo: warehouseRepo,
+		ppRepo:        ppRepo,
+		db:            db,
 		auditSvc:      auditSvc,
 	}
+}
+
+// findLinkedKHSXIDs finds all production plan IDs linked to the given PO via notes.
+func (s *purchaseOrderService) findLinkedKHSXIDs(po *models.PurchaseOrder) []uint {
+	if s.ppRepo == nil {
+		return nil
+	}
+	// Auto-POs have notes like "Liên quan KHSX: {plan_number}"
+	if len(po.Notes) < 10 {
+		return nil
+	}
+	var plans []models.ProductionPlan
+	if err := s.db.Where("? ILIKE '%' || plan_number || '%'", po.Notes).Find(&plans).Error; err != nil {
+		return nil
+	}
+	ids := make([]uint, 0, len(plans))
+	for _, p := range plans {
+		ids = append(ids, p.ID)
+	}
+	return ids
 }
 
 // CreatePurchaseOrder creates a new purchase order with items
@@ -508,6 +534,12 @@ func (s *purchaseOrderService) UpdateOrderStatus(id uint, req *dto.UpdateOrderSt
 	_ = s.auditSvc.Log("purchase_orders", "UPDATE_ORDER_STATUS", int64(id), int64(userID), username,
 		map[string]interface{}{"order_status": oldStatus},
 		map[string]interface{}{"order_status": req.OrderStatus, "notes": req.Notes})
+	// Hook: khi PO chuyển sang 'ordered' -> cập nhật KHSX liên kết sang 'ordering'
+	if req.OrderStatus == "ordered" && s.ppRepo != nil {
+		for _, ppID := range s.findLinkedKHSXIDs(po) {
+			_ = s.ppRepo.UpdateProcurementStatus(ppID, "ordering")
+		}
+	}
 	return po.ToSafe(), nil
 }
 
@@ -534,6 +566,12 @@ func (s *purchaseOrderService) UpdatePaymentStatus(id uint, req *dto.UpdatePayme
 	_ = s.auditSvc.Log("purchase_orders", "UPDATE_PAYMENT_STATUS", int64(id), int64(userID), username,
 		map[string]interface{}{"payment_status": oldStatus},
 		map[string]interface{}{"payment_status": req.PaymentStatus, "notes": req.Notes})
+	// Hook: khi thanh toán hoàn thành -> cập nhật KHSX liên kết sang 'completed'
+	if req.PaymentStatus == "completed" && s.ppRepo != nil {
+		for _, ppID := range s.findLinkedKHSXIDs(po) {
+			_ = s.ppRepo.UpdateProcurementStatus(ppID, "completed")
+		}
+	}
 	return po.ToSafe(), nil
 }
 

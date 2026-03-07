@@ -155,20 +155,20 @@ export default function GrnListPage() {
                 <div className="card overflow-hidden">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-64">
-                            <div className="text-gray-500">Loading GRNs...</div>
+                            <div className="text-gray-500">Đang tải...</div>
                         </div>
                     ) : error ? (
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 m-6">
-                            Error loading GRNs: {(error as Error).message}
+                            Lỗi khi tải dữ liệu: {(error as Error).message}
                         </div>
                     ) : grns.length === 0 ? (
                         <div className="text-center py-12">
                             <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Package className="w-8 h-8 text-gray-400" />
                             </div>
-                            <p className="text-gray-500 mb-4 font-medium">No Goods Receipt Notes found</p>
+                            <p className="text-gray-500 mb-4 font-medium">Chưa có lệnh nhập kho nào</p>
                             <Link to="/grns/new" className="btn btn-primary">
-                                Receive Your First Shipment
+                                Tạo Lệnh Nhập Kho Đầu Tiên
                             </Link>
                         </div>
                     ) : (
@@ -234,8 +234,8 @@ export default function GrnListPage() {
                                         />
                                         <span className="text-sm text-gray-500">
                                             {(filters.page_size || 0) >= 999999
-                                                ? `Tất cả ${pagination.total_items} GRN`
-                                                : `${((pagination.page - 1) * (filters.page_size || 10)) + 1}–${Math.min(pagination.page * (filters.page_size || 10), pagination.total_items)} / ${pagination.total_items} GRN`}
+                                                ? `Tất cả ${pagination.total_items} lệnh nhập kho`
+                                                : `${((pagination.page - 1) * (filters.page_size || 10)) + 1}–${Math.min(pagination.page * (filters.page_size || 10), pagination.total_items)} / ${pagination.total_items} lệnh nhập kho`}
                                         </span>
                                     </div>
                                     {(filters.page_size || 0) < 999999 && pagination.total_pages > 1 && (

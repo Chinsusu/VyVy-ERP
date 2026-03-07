@@ -76,8 +76,10 @@ func (h *GRNHandler) Create(c *gin.Context) {
 		return
 	}
 	userID := val.(int64)
+	usernameVal, _ := c.Get("username")
+	usernameStr, _ := usernameVal.(string)
 
-	grn, err := h.service.CreateGRN(&req, uint(userID))
+	grn, err := h.service.CreateGRN(&req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("CREATE_ERROR", err.Error()))
 		return
@@ -108,8 +110,10 @@ func (h *GRNHandler) UpdateQC(c *gin.Context) {
 		return
 	}
 	userID := val.(int64)
+	usernameVal, _ := c.Get("username")
+	usernameStr, _ := usernameVal.(string)
 
-	grn, err := h.service.UpdateQC(uint(id), &req, uint(userID))
+	grn, err := h.service.UpdateQC(uint(id), &req, uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("UPDATE_ERROR", err.Error()))
 		return
@@ -134,8 +138,10 @@ func (h *GRNHandler) Post(c *gin.Context) {
 		return
 	}
 	userID := val.(int64)
+	usernameVal, _ := c.Get("username")
+	usernameStr, _ := usernameVal.(string)
 
-	grn, err := h.service.PostGRN(uint(id), uint(userID))
+	grn, err := h.service.PostGRN(uint(id), uint(userID), usernameStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, utils.ErrorResponse("POST_ERROR", err.Error()))
 		return

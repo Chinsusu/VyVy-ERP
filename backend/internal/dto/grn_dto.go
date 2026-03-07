@@ -28,10 +28,11 @@ type CreateGRNRequest struct {
 
 // UpdateGRNQCItemRequest represents the QC update for a single item
 type UpdateGRNQCItemRequest struct {
-	AcceptedQuantity float64 `json:"accepted_quantity" binding:"required,gte=0"`
-	RejectedQuantity float64 `json:"rejected_quantity" binding:"required,gte=0"`
-	QCStatus         string  `json:"qc_status" binding:"required"` // pass, fail, partial
-	QCNotes          string  `json:"qc_notes"`
+	ReceivedQuantity *float64 `json:"received_quantity"`                              // SL thực nhận (optional, default = ban đầu)
+	AcceptedQuantity float64  `json:"accepted_quantity" binding:"required,gte=0"`
+	RejectedQuantity float64  `json:"rejected_quantity" binding:"required,gte=0"`
+	QCStatus         string   `json:"qc_status" binding:"required"` // pass, fail, partial
+	QCNotes          string   `json:"qc_notes"`
 }
 
 // UpdateGRNQCRequest represents the bulk QC update for a GRN

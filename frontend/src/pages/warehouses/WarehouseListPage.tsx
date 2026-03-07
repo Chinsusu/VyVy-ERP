@@ -113,8 +113,8 @@ export default function WarehouseListPage() {
                                 type="button"
                                 onClick={() => setTypeFilter(tab.key)}
                                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${typeFilter === tab.key
-                                    ? 'bg-primary text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                                    ? 'bg-slate-800 text-white shadow-sm'
+                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                                     }`}
                             >
                                 {tab.label}

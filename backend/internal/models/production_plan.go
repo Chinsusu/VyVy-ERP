@@ -15,8 +15,12 @@ type ProductionPlan struct {
 	RequestDate  string  `gorm:"column:request_date;type:date;not null" json:"request_date"`
 	RequiredDate *string `gorm:"column:required_date;type:date" json:"required_date,omitempty"`
 
-	// Status: draft, approved, issued, closed, cancelled
+	// Status: draft, approved, cancelled
 	Status string `gorm:"column:status;size:50;not null;default:draft" json:"status"`
+
+	// ProcurementStatus tracks the procurement lifecycle for this plan:
+	// draft -> ordering -> receiving -> received -> in_production -> completed | cancelled
+	ProcurementStatus string `gorm:"column:procurement_status;size:50;not null;default:draft" json:"procurement_status"`
 
 	// Approval
 	ApprovedBy *uint      `gorm:"column:approved_by" json:"approved_by,omitempty"`
@@ -78,7 +82,8 @@ type SafeProductionPlan struct {
 	Department   string                     `json:"department"`
 	RequestDate  string                     `json:"request_date"`
 	RequiredDate *string                    `json:"required_date,omitempty"`
-	Status       string                     `json:"status"`
+	Status             string                     `json:"status"`
+	ProcurementStatus  string                     `json:"procurement_status"`
 	ApprovedBy   *uint                      `json:"approved_by,omitempty"`
 	ApprovedAt   *time.Time                 `json:"approved_at,omitempty"`
 	ApprovedByUser *SafeUser                `json:"approved_by_user,omitempty"`
@@ -111,7 +116,8 @@ func (pp *ProductionPlan) ToSafe() *SafeProductionPlan {
 		Department:   pp.Department,
 		RequestDate:  pp.RequestDate,
 		RequiredDate: pp.RequiredDate,
-		Status:       pp.Status,
+		Status:             pp.Status,
+		ProcurementStatus:  pp.ProcurementStatus,
 		ApprovedBy:   pp.ApprovedBy,
 		ApprovedAt:   pp.ApprovedAt,
 		Purpose:      pp.Purpose,

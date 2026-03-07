@@ -13,7 +13,10 @@ import {
     AlertCircle,
     Package,
     ClipboardCheck,
-    Plus
+    Plus,
+    ShoppingCart,
+    Truck,
+    Wrench
 } from 'lucide-react';
 import {
     useProductionPlan,
@@ -79,6 +82,30 @@ export default function MRDetailPage() {
         }
     };
 
+    const getProcurementStatusBadge = (ps: string) => {
+        const map: Record<string, { label: string; cls: string }> = {
+            draft: { label: 'Chưa đặt hàng', cls: 'badge-secondary' },
+            ordering: { label: 'Đang đặt hàng', cls: 'badge-warning' },
+            receiving: { label: 'Đang nhận hàng', cls: 'badge-info' },
+            received: { label: 'Đã nhận đủ', cls: 'badge-primary' },
+            in_production: { label: 'Đang sản xuất', cls: 'badge-warning' },
+            completed: { label: 'Hoàn thành', cls: 'badge-success' },
+            cancelled: { label: 'Đã hủy', cls: 'badge-danger' },
+        };
+        const m = map[ps] || { label: ps, cls: '' };
+        return <span className={`badge ${m.cls}`}>{m.label}</span>;
+    };
+
+    const PROCUREMENT_STEPS = [
+        { key: 'ordering', icon: ShoppingCart, label: 'Đặt hàng' },
+        { key: 'receiving', icon: Truck, label: 'Nhận hàng' },
+        { key: 'received', icon: Package, label: 'Nhập kho đủ' },
+        { key: 'in_production', icon: Wrench, label: 'Sản xuất' },
+        { key: 'completed', icon: CheckCircle, label: 'Hoàn thành' },
+    ];
+    const procurementStepOrder = ['draft', 'ordering', 'receiving', 'received', 'in_production', 'completed'];
+    const currentProcurementIdx = procurementStepOrder.indexOf((mr as any).procurement_status || 'draft');
+
     const handleApprove = async () => {
         if (window.confirm('Bạn có chắc muốn duyệt kế hoạch sản xuất này không?')) {
             try {
@@ -128,6 +155,7 @@ export default function MRDetailPage() {
                             <div className="flex items-center gap-3 mb-1">
                                 <h1 className="text-3xl font-bold text-gray-900">{mr.plan_number}</h1>
                                 {getStatusBadge(mr.status)}
+                                {getProcurementStatusBadge((mr as any).procurement_status || 'draft')}
                             </div>
                             <div className="flex items-center gap-4 text-sm text-gray-500">
                                 <span className="flex items-center gap-1">
@@ -327,6 +355,38 @@ export default function MRDetailPage() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Procurement Status Card */}
+                        {mr.status !== 'draft' && (
+                            <div className="card bg-indigo-50 border-indigo-200">
+                                <h3 className="text-sm font-bold uppercase text-indigo-600 mb-4 tracking-wider flex items-center gap-2">
+                                    <ShoppingCart className="w-4 h-4" />
+                                    Tiến độ mua hàng
+                                </h3>
+                                <div className="space-y-2">
+                                    {PROCUREMENT_STEPS.map((step) => {
+                                        const stepIdx = procurementStepOrder.indexOf(step.key);
+                                        const isDone = currentProcurementIdx >= stepIdx && currentProcurementIdx > 0;
+                                        const isCurrent = (mr as any).procurement_status === step.key;
+                                        const Icon = step.icon;
+                                        return (
+                                            <div key={step.key} className={`flex items-center gap-3 p-2 rounded-lg ${isCurrent ? 'bg-indigo-100 border border-indigo-300' :
+                                                    isDone ? 'bg-white' : 'opacity-40'
+                                                }`}>
+                                                <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${isDone || isCurrent ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-400'
+                                                    }`}>
+                                                    <Icon className="w-3.5 h-3.5" />
+                                                </div>
+                                                <span className={`text-sm font-medium ${isCurrent ? 'text-indigo-900' : isDone ? 'text-gray-700' : 'text-gray-400'
+                                                    }`}>{step.label}</span>
+                                                {isCurrent && <span className="ml-auto text-xs text-indigo-600 font-semibold">Hiện tại</span>}
+                                                {isDone && !isCurrent && <CheckCircle className="ml-auto w-4 h-4 text-green-500" />}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Timeline Card */}
                         <div className="card">

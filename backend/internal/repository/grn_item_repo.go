@@ -15,7 +15,7 @@ type GoodsReceiptNoteItemRepository interface {
 	Update(item *models.GoodsReceiptNoteItem) error
 	Delete(id uint) error
 	DeleteByGRNID(grnID uint) error
-	UpdateQC(id uint, acceptedQty float64, rejectedQty float64, status string, notes string) error
+	UpdateQC(id uint, receivedQty *float64, acceptedQty float64, rejectedQty float64, status string, notes string) error
 }
 
 type goodsReceiptNoteItemRepository struct {
@@ -37,13 +37,13 @@ func (r *goodsReceiptNoteItemRepository) CreateBulk(items []*models.GoodsReceipt
 
 func (r *goodsReceiptNoteItemRepository) GetByID(id uint) (*models.GoodsReceiptNoteItem, error) {
 	var item models.GoodsReceiptNoteItem
-	err := r.db.Preload("Material").First(&item, id).Error
+	err := r.db.Preload("Material").Preload("PurchaseOrderItem").First(&item, id).Error
 	return &item, err
 }
 
 func (r *goodsReceiptNoteItemRepository) ListByGRNID(grnID uint) ([]*models.GoodsReceiptNoteItem, error) {
 	var items []*models.GoodsReceiptNoteItem
-	err := r.db.Preload("Material").Where("grn_id = ?", grnID).Find(&items).Error
+	err := r.db.Preload("Material").Preload("PurchaseOrderItem").Where("grn_id = ?", grnID).Find(&items).Error
 	return items, err
 }
 
@@ -59,12 +59,16 @@ func (r *goodsReceiptNoteItemRepository) DeleteByGRNID(grnID uint) error {
 	return r.db.Where("grn_id = ?", grnID).Delete(&models.GoodsReceiptNoteItem{}).Error
 }
 
-func (r *goodsReceiptNoteItemRepository) UpdateQC(id uint, acceptedQty float64, rejectedQty float64, status string, notes string) error {
+func (r *goodsReceiptNoteItemRepository) UpdateQC(id uint, receivedQty *float64, acceptedQty float64, rejectedQty float64, status string, notes string) error {
 	updates := map[string]interface{}{
 		"accepted_quantity": acceptedQty,
 		"rejected_quantity": rejectedQty,
 		"qc_status":         status,
 		"qc_notes":          notes,
+	}
+	// Update received quantity if provided (SL thực nhận từ NCC)
+	if receivedQty != nil {
+		updates["quantity"] = *receivedQty
 	}
 	return r.db.Model(&models.GoodsReceiptNoteItem{}).Where("id = ?", id).Updates(updates).Error
 }

@@ -25,11 +25,12 @@ export default function GrnForm() {
 
     // Quy tắc kho theo loại NVL:
     // raw_material  -> lab, factory
-    // packaging     -> factory, commercial
-    // mixed (cả hai) -> factory only
+    // raw_material  -> lab, factory
+    // packaging     -> lab, factory, commercial (bao bì cần QC tại Lab trước)
+    // mixed (cả hai) -> lab + factory (intersection)
     const WAREHOUSE_RULES: Record<string, string[]> = {
         raw_material: ['lab', 'factory'],
-        packaging: ['factory', 'commercial'],
+        packaging: ['lab', 'factory', 'commercial'],
     };
 
     // State
