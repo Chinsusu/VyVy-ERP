@@ -198,7 +198,7 @@ export default function PurchaseOrderListPage() {
                                                         <Link to={`/purchase-orders/${po.id}`} className="text-primary hover:underline text-sm font-medium">
                                                             Xem
                                                         </Link>
-                                                        {po.status === 'draft' && (
+                                                        {!['completed', 'cancelled'].includes(po.status) && (
                                                             <Link to={`/purchase-orders/${po.id}/edit`} className="text-gray-500 hover:text-gray-700 text-sm">
                                                                 Sửa
                                                             </Link>
