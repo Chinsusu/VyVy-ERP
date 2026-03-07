@@ -23,6 +23,7 @@ type fprnService struct {
 	repo             repository.FinishedProductReceiptRepository
 	stockLedgerRepo  repository.StockLedgerRepository
 	stockBalanceRepo repository.StockBalanceRepository
+	ppRepo           repository.ProductionPlanRepository
 	db               *gorm.DB
 }
 
@@ -30,12 +31,14 @@ func NewFinishedProductReceiptService(
 	repo repository.FinishedProductReceiptRepository,
 	stockLedgerRepo repository.StockLedgerRepository,
 	stockBalanceRepo repository.StockBalanceRepository,
+	ppRepo repository.ProductionPlanRepository,
 	db *gorm.DB,
 ) FinishedProductReceiptService {
 	return &fprnService{
 		repo:             repo,
 		stockLedgerRepo:  stockLedgerRepo,
 		stockBalanceRepo: stockBalanceRepo,
+		ppRepo:           ppRepo,
 		db:               db,
 	}
 }
@@ -192,12 +195,23 @@ func (s *fprnService) Post(id uint, userID uint) error {
 		}
 
 		// 4. Mark FPRN as posted
-		return tx.Model(&models.FinishedProductReceipt{}).Where("id = ?", id).Updates(map[string]interface{}{
+		if err := tx.Model(&models.FinishedProductReceipt{}).Where("id = ?", id).Updates(map[string]interface{}{
 			"posted":    true,
 			"posted_by": userID,
 			"posted_at": now,
 			"status":    "posted",
-		}).Error
+		}).Error; err != nil {
+			return err
+		}
+
+		// 5. Auto-update linked KHSX procurement_status → 'completed'
+		if fprn.ProductionPlanID != nil && *fprn.ProductionPlanID > 0 {
+			if err := s.ppRepo.UpdateProcurementStatus(*fprn.ProductionPlanID, "completed"); err != nil {
+				// Non-fatal: log but don't fail the transaction
+				_ = err
+			}
+		}
+		return nil
 	})
 }
 

@@ -82,7 +82,12 @@ func (h *FinishedProductReceiptHandler) List(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("LIST_FAILED", err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, utils.PaginatedResponse(fprns, total, page, limit))
+	pagination := utils.CalculatePagination(page, limit, total)
+	c.JSON(http.StatusOK, gin.H{
+		"success":    true,
+		"data":       fprns,
+		"pagination": pagination,
+	})
 }
 
 // Post handles POST /finished-product-receipts/:id/post

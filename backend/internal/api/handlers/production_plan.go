@@ -235,3 +235,21 @@ func (h *ProductionPlanHandler) GetRelatedPOs(c *gin.Context) {
 
 	c.JSON(http.StatusOK, utils.SuccessResponse(pos))
 }
+
+// GetRelatedFPRNs returns finished product receipts linked to this production plan
+func (h *ProductionPlanHandler) GetRelatedFPRNs(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, utils.ErrorResponse("INVALID_ID", "Invalid production plan ID"))
+		return
+	}
+
+	fprns, err := h.service.GetRelatedFPRNs(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ErrorResponse("FETCH_ERROR", err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.SuccessResponse(fprns))
+}

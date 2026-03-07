@@ -67,7 +67,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	reconService := service.NewReconciliationService(reconRepo, carrierRepo)
 	roService := service.NewReturnOrderService(db, roRepo, doRepo)
 	productionTaskService := service.NewProductionTaskService(productionTaskRepo)
-	fprnService := service.NewFinishedProductReceiptService(fprnRepo, stockLedgerRepo, stockBalanceRepo, db)
+	fprnService := service.NewFinishedProductReceiptService(fprnRepo, stockLedgerRepo, stockBalanceRepo, ppRepo, db)
 
 	supplierDocHandler := handlers.NewSupplierDocumentHandler(db)
 	poDocHandler := handlers.NewPODocumentHandler(db)
@@ -261,6 +261,8 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 
 		// Related purchase orders (auto-created on approve)
 		ppGroup.GET("/:id/purchase-orders", ppHandler.GetRelatedPOs)
+		// Related finished product receipts
+		ppGroup.GET("/:id/finished-product-receipts", ppHandler.GetRelatedFPRNs)
 	}
 
 	// Material Issue Note (MIN) routes - All protected

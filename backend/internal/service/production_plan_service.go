@@ -21,6 +21,7 @@ type ProductionPlanService interface {
 	ApproveProductionPlan(id uint, userID uint, username string) (*models.SafeProductionPlan, error)
 	CancelProductionPlan(id uint, userID uint, username string) (*models.SafeProductionPlan, error)
 	GetRelatedPurchaseOrders(id uint) ([]*models.SafePurchaseOrder, error)
+	GetRelatedFPRNs(id uint) ([]*models.FinishedProductReceipt, error)
 }
 
 type productionPlanService struct {
@@ -587,4 +588,17 @@ func (s *productionPlanService) GetRelatedPurchaseOrders(id uint) ([]*models.Saf
 		result[i] = po.ToSafe()
 	}
 	return result, nil
+}
+
+// GetRelatedFPRNs returns finished product receipts linked to this production plan
+func (s *productionPlanService) GetRelatedFPRNs(id uint) ([]*models.FinishedProductReceipt, error) {
+	var fprns []*models.FinishedProductReceipt
+	err := s.db.
+		Preload("Warehouse").
+		Preload("Items").
+		Preload("Items.FinishedProduct").
+		Where("production_plan_id = ?", id).
+		Order("created_at DESC").
+		Find(&fprns).Error
+	return fprns, err
 }
