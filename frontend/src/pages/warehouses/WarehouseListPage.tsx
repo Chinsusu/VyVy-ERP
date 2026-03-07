@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Warehouse as WarehouseIcon, ChevronLeft, ChevronRight, FlaskConical, ShoppingBag, Factory } from 'lucide-react';
+import { Plus, Warehouse as WarehouseIcon, ChevronLeft, ChevronRight, FlaskConical, ShoppingBag, Factory, CheckCircle, MapPin } from 'lucide-react';
 import { useWarehouses } from '../../hooks/useWarehouses';
 import type { WarehouseFilters } from '../../types/warehouse';
 import PageSizeSelector from '../../components/common/PageSizeSelector';
@@ -82,56 +82,62 @@ export default function WarehouseListPage() {
 
             {/* Stats Bar */}
             <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="card p-4">
-                    <p className="text-sm text-gray-500">Tổng số kho</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">
-                        {isLoading ? '—' : (pagination?.total_items ?? warehouses.length)}
-                    </p>
+                <div className="card py-4 flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10">
+                        <WarehouseIcon className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                        <p className="text-2xl font-bold text-gray-900">{isLoading ? '—' : (pagination?.total_items ?? warehouses.length)}</p>
+                        <p className="text-xs text-gray-500">Tổng số kho</p>
+                    </div>
                 </div>
-                <div className="card p-4">
-                    <p className="text-sm text-gray-500">Đang hoạt động</p>
-                    <p className="text-2xl font-bold text-green-600 mt-1">
-                        {isLoading ? '—' : totalActive}
-                    </p>
+                <div className="card py-4 flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-green-50">
+                        <CheckCircle className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                        <p className="text-2xl font-bold text-gray-900">{isLoading ? '—' : totalActive}</p>
+                        <p className="text-xs text-gray-500">Đang hoạt động</p>
+                    </div>
                 </div>
-                <div className="card p-4">
-                    <p className="text-sm text-gray-500">Tổng vị trí</p>
-                    <p className="text-2xl font-bold text-primary mt-1">
-                        {isLoading ? '—' : totalLocations}
-                    </p>
+                <div className="card py-4 flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50">
+                        <MapPin className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                        <p className="text-2xl font-bold text-gray-900">{isLoading ? '—' : totalLocations}</p>
+                        <p className="text-xs text-gray-500">Tổng vị trí</p>
+                    </div>
                 </div>
             </div>
 
-            {/* Filter + Search */}
-            <div className="card mb-4">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                    {/* Type tabs */}
-                    <div className="flex gap-1">
-                        {TYPE_FILTER_TABS.map((tab) => (
-                            <button
-                                key={tab.key}
-                                type="button"
-                                onClick={() => setTypeFilter(tab.key)}
-                                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${typeFilter === tab.key
-                                    ? 'bg-slate-800 text-white shadow-sm'
-                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                                    }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
-                    <SearchInput
-                        value={filters.search || ''}
-                        onChange={handleSearch}
-                        placeholder="Tìm theo mã hoặc tên kho..."
-                        width="w-72"
-                    />
+            {/* Filter + Search — merged card */}
+            <div className="card mb-0 rounded-b-none border-b-0">
+                <SearchInput
+                    value={filters.search || ''}
+                    onChange={handleSearch}
+                    placeholder="Tìm theo mã hoặc tên kho..."
+                    width="flex-1"
+                />
+                <div className="flex gap-1 mt-4 border-b border-gray-200 -mx-6 px-6">
+                    {TYPE_FILTER_TABS.map((tab) => (
+                        <button
+                            key={tab.key}
+                            type="button"
+                            onClick={() => setTypeFilter(tab.key)}
+                            className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${typeFilter === tab.key
+                                    ? 'border-primary text-primary'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
             </div>
 
             {/* Table */}
-            <div className="card shadow-md">
+            <div className="card shadow-md rounded-t-none">
                 {isLoading ? (
                     <div className="flex items-center justify-center py-16">
                         <div className="text-gray-500 flex items-center gap-2">
