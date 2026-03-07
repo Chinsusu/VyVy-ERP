@@ -170,12 +170,13 @@ export default function MRListPage() {
                                         <th>Ngày tạo</th>
                                         <th className="text-center">Trạng thái</th>
                                         <th className="text-center">Tiến độ MH</th>
+                                        <th className="text-right">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {productionPlans.length === 0 ? (
                                         <tr>
-                                            <td colSpan={6} className="text-center p-16">
+                                            <td colSpan={7} className="text-center p-16">
                                                 <Factory className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                                                 <p className="text-gray-500">Chưa có kế hoạch sản xuất nào</p>
                                                 <Link to="/production-plans/new" className="btn btn-primary mt-4 inline-flex items-center gap-2">
@@ -209,6 +210,11 @@ export default function MRListPage() {
                                                 <td className="p-4 text-center">{getStatusBadge(mr.status)}</td>
                                                 <td className="p-4 text-center">
                                                     {getProcurementBadge((mr as any).procurement_status || 'not_started')}
+                                                </td>
+                                                <td className="p-4 text-right" onClick={(e) => e.stopPropagation()}>
+                                                    <Link to={`/production-plans/${mr.id}`} className="text-primary hover:underline text-sm font-medium">
+                                                        Xem
+                                                    </Link>
                                                 </td>
                                             </tr>
                                         ))
