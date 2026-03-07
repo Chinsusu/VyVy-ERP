@@ -7,6 +7,41 @@ và dự án tuân thủ [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ---
 
+## [1.0.0-rc23] - 2026-03-07
+
+### Changed — KHSX UI/UX Refactor (commit `ddbbc7e`)
+
+**MRDetailPage.tsx** — Viết lại theo chuẩn `PurchaseOrderDetailPage`:
+- **Header**: breadcrumb kiểu `text-sm` link (← Kế Hoạch Sản Xuất), không dùng text lớn
+- **Info bar compact**: horizontal `divide-x` với 4 mục (Phòng ban | Kho xuất | Ngày lập | Tiến độ MH), thay card 2-cột dọc cũ
+- **Items table**: có progress bar hiển thị % SL đã xuất từng dòng
+- **AuditLogPanel**: đặt đúng vị trí — cuối cột trái (`lg:col-span-2`), không còn full-width ngoài grid
+- **Sidebar**: bỏ hardcoded Timeline card; chỉ còn Workflow + Procurement steps + Creator card
+- **Related panels**: `RelatedPOsPanel` và `RelatedFPRNsPanel` nằm trong cột trái layout
+- **Confirm modal**: thay thế `window.alert()` / `window.confirm()` cho 3 actions (Duyệt / Hủy / Xóa)
+- **Status badge**: `badge-primary` → `badge-success` cho trạng thái `approved`
+- **Grid spacing**: `gap-8 / space-y-8` → `gap-6 / space-y-6`
+
+**MRListPage.tsx** — Refactor danh sách:
+- Thêm cột **"Tiến độ"** hiển thị `procurement_status` badge theo màu
+- Thêm filter **"Tiến độ mua hàng"** dropdown
+- Rows **clickable**: `cursor-pointer`, `hover:bg-primary-50/5`
+- Empty state: thêm `Package` icon + nút CTA rõ ràng
+- `badge-primary` → `badge-success` cho `approved`
+- Table header: `text-xs uppercase` style nhất quán với PO
+
+### Fixed — TS Compile Errors (5 files)
+- `RelatedFPRNsPanel.tsx`: Xóa prop `planNumber` khai báo nhưng không dùng (TS6133)
+- `FPRNCreatePage.tsx`: Sửa `useWarehouses({ limit → page_size })` và fix data access path
+- `StockTransferCreatePage.tsx`: Xóa `useEffect` unused, sửa `w.type → w.warehouse_type`
+- `StockTransferDetailPage.tsx`: Xóa `Clock` icon và `navigate` hook không dùng
+- `finishedProductReceipts.ts`: Xóa `FinishedProductReceipt` type import không dùng
+
+### Documentation
+- `erp-warehouse-docs/03_UI_UX_DESIGN.md`: Thêm Screen 10 (MRListPage) và Screen 11 (MRDetailPage)
+
+---
+
 ## [1.0.0-rc22] - 2026-03-06
 
 ### Changed

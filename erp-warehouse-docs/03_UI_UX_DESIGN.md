@@ -769,6 +769,174 @@ Loại: [Nguyên Liệu ▼] Kho: [All ▼]
 
 ---
 
+### Screen 10: Production Plan List — MRListPage
+
+**Header:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Kế Hoạch Sản Xuất                              [+ Tạo KHSX Mới] │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Filters:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ [🔍 Tìm theo số KH, ghi chú...]                                 │
+│ Trạng thái: [Tất cả ▼]   Tiến độ MH: [Tất cả ▼]               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Table (clickable rows):**
+```
+┌────────────┬────────────┬────────────┬──────────┬──────────────┬──────────────┐
+│ Số KH      │ Bộ Phận    │ Ngày lập   │ Trạng TT │ Tiến độ MH   │ Người lập    │
+├────────────┼────────────┼────────────┼──────────┼──────────────┼──────────────┤
+│ KHSX-001   │ Sản xuất   │ 07/03/2026 │ [Đã duyệt│ [Đang mua]   │ Admin        │
+│            │            │            │ 🟢]      │ 🟡           │              │
+├────────────┼────────────┼────────────┼──────────┼──────────────┼──────────────┤
+│ KHSX-002   │ Sản xuất   │ 06/03/2026 │ [Nháp 🔘]│ [Chưa MH 🔘] │ Admin        │
+└────────────┴────────────┴────────────┴──────────┴──────────────┴──────────────┘
+```
+
+**Tiến độ mua hàng badge colors:**
+- `not_started` → badge-secondary (Chưa mua hàng)
+- `ordering` → badge-warning (Đang đặt hàng)
+- `receiving` → badge-info (Đang nhận hàng)
+- `received` → badge-primary (Đã nhận hàng)
+- `completed` → badge-success (Hoàn thành)
+
+**Empty state (khi không có dữ liệu):**
+```
+┌─────────────────────────────────────────┐
+│            📦                           │
+│   Chưa có kế hoạch sản xuất nào         │
+│   Tạo kế hoạch đầu tiên để bắt đầu      │
+│   [+ Tạo Kế Hoạch]                      │
+└─────────────────────────────────────────┘
+```
+
+---
+
+### Screen 11: Production Plan Detail — MRDetailPage
+
+**Layout: 2 columns (2/3 + 1/3), breadcrumb header**
+
+```
+← Kế Hoạch Sản Xuất
+
+KHSX-001                                              [Duyệt] [Hủy] [Xóa]
+                [Nháp 🔘] | Phòng ban | Kho | Ngày lập | Tiến độ MH
+─────────────────────────────────────────────────────────────────────────
+```
+
+**Info bar compact (horizontal `divide-x`):**
+```
+┌───────────────┬─────────────────┬──────────────────┬──────────────────┐
+│ 🏢 Phòng Ban  │ 🏭 Kho xuất NVL │ 📅 Ngày lập       │ 📦 Tiến độ MH    │
+│ Sản xuất      │ Kho Nhà Máy     │ 07/03/2026        │ [Đang đặt hàng] │
+└───────────────┴─────────────────┴──────────────────┴──────────────────┘
+```
+
+**Left column (2/3 width):**
+
+*Danh sách NVL:*
+```
+┌──┬────────────────┬───────┬──────────┬──────────────────────────┐
+│ #│ Nguyên Liệu    │ SL YC │ SL xuất  │ Tiến độ xuất             │
+├──┼────────────────┼───────┼──────────┼──────────────────────────┤
+│ 1│ CITRIC ACID    │ 50 KG │ 20 KG    │ [████░░░░░░] 40%         │
+│  │ ACI_Citric     │       │          │                          │
+├──┼────────────────┼───────┼──────────┼──────────────────────────┤
+│ 2│ NIACINAMIDE    │ 30 KG │ 0 KG     │ [░░░░░░░░░░] 0%          │
+└──┴────────────────┴───────┴──────────┴──────────────────────────┘
+```
+
+*Related POs panel (Đơn mua hàng liên quan):*
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Đơn Mua Hàng Liên Quan                                          │
+├──────────────┬────────────┬──────────┬──────────────────────────┤
+│ Số PO        │ Nhà CC     │ Trạng TT │ Tổng tiền                │
+│ PO-2026-001  │ Nguyễn Bá  │ [Nháp]   │ 4,250,000đ              │
+└──────────────┴────────────┴──────────┴──────────────────────────┘
+```
+
+*Related FPRNs panel (Phiếu nhập kho TP):*
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Phiếu Nhập Kho Thành Phẩm                     [+ Tạo phiếu]   │
+├──────────────┬────────────┬──────────┬──────────┬──────────────┤
+│ Số phiếu     │ Kho        │ Ngày     │ Trạng TT │ Tổng SL      │
+│ FPRN-001     │ Kho BH     │ 07/03    │ [Posted] │ 1,000 cái   │
+└──────────────┴────────────┴──────────┴──────────┴──────────────┘
+```
+
+*Lịch sử thay đổi (AuditLogPanel — cuối cột trái):*
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Lịch Sử Thay Đổi                                                │
+├─────────────────────────────────────────────────────────────────┤
+│ 🟢 CREATE   Admin   07/03/2026 14:00   Tạo kế hoạch            │
+│ 🔵 UPDATE   Admin   07/03/2026 14:05   Cập nhật NVL            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Right column (1/3 width — sidebar):**
+
+*Trạng thái duyệt (Workflow):*
+```
+┌─────────────────────┐
+│ TRẠNG THÁI          │
+│ ✓ Tạo phiếu     07/03│
+│ ○ Đã duyệt      Chờ  │
+└─────────────────────┘
+```
+
+*Tiến độ mua hàng:*
+```
+┌─────────────────────────────┐
+│ TIẾN ĐỘ MUA HÀNG            │
+│ ✓ Tạo PO                    │
+│ ▣ Xác nhận đặt hàng  Chờ   │
+│ ○ Nhận hàng          Chờ   │
+│ ○ Hoàn tất           Chờ   │
+└─────────────────────────────┘
+```
+
+*Người tạo:*
+```
+┌─────────────────────────────┐
+│ Tạo bởi: Admin              │
+│ 07/03/2026 14:00:00         │
+└─────────────────────────────┘
+```
+
+**Confirm Modal (thay thế window.alert/confirm):**
+```
+┌──────────────────────────────────────────┐
+│       ✓ Xác nhận Duyệt KHSX             │
+│                                          │
+│  Bạn có chắc muốn duyệt kế hoạch sản    │
+│  xuất này? Hệ thống sẽ tự động tạo PO   │
+│  cho NVL thiếu.                         │
+│                                         │
+│              [Hủy]  [Xác nhận ▶]        │
+└─────────────────────────────────────────┘
+```
+
+**Design decisions (after refactor 2026-03-07, commit ddbbc7e):**
+- Header breadcrumb: `text-sm` link style (← Kế Hoạch Sản Xuất), không dùng `text-3xl` back button
+- Info bar: compact horizontal `divide-x` (4 mục), không dùng card 2-cột dọc
+- Grid gap: `gap-6 / space-y-6` (thay `gap-8`)  
+- AuditLogPanel: cuối cột trái (`lg:col-span-2`), không phải full-width
+- Sidebar: bỏ hardcoded Timeline, chỉ Workflow + Procurement steps + Creator
+- Status badge: `badge-success` cho `approved` (không dùng `badge-primary`)
+- Action confirmation: Custom modal component (không dùng browser `alert()`)
+
+---
+
+
+
 ## V. RESPONSIVE DESIGN
 
 ### Breakpoints
